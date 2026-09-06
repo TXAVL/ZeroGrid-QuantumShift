@@ -26,18 +26,18 @@
           </h2>
           <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal max-w-md mx-auto">
             {{ isEn 
-              ? `This authorization request has exceeded the ${expiryDurationLabel} security limit. Your account was protected and no permissions were granted.` 
-              : `Phiên ủy quyền này đã vượt quá thời hạn ${expiryDurationLabel} kể từ khi game gửi yêu cầu nhằm bảo vệ an toàn cho tài khoản TXA Studio của bạn.` }}
+              ? `This authorization request has exceeded the ${expiryDurationLabel} security limit since the app requested it. Your account was protected and no permissions were granted.` 
+              : `Phiên ủy quyền này đã vượt quá thời hạn ${expiryDurationLabel} kể từ khi ứng dụng gửi yêu cầu nhằm bảo vệ an toàn cho tài khoản TXA Studio của bạn.` }}
           </p>
         </div>
 
         <!-- Action Button -->
         <div class="pt-2 space-y-3">
           <button 
-            @click="handleRetryFromGame"
+            @click="handleRetryFromApp"
             class="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-slate-950 font-display font-black text-xs uppercase tracking-wider shadow-lg shadow-amber-500/30 hover:shadow-amber-400/50 hover:scale-[1.02] active:scale-95 transition-all"
           >
-            {{ isEn ? 'OPEN NEW REQUEST FROM GAME' : 'MỞ LẠI YÊU CẦU MỚI TỪ GAME' }}
+            {{ isEn ? 'OPEN NEW REQUEST FROM APP' : 'MỞ LẠI YÊU CẦU TỪ ỨNG DỤNG' }}
           </button>
           
           <router-link to="/" class="inline-block text-xs font-mono text-slate-500 hover:text-slate-300 underline">
@@ -110,10 +110,10 @@
 
         <div class="pt-2">
           <button 
-            @click="handleRetryFromGame"
+            @click="handleRetryFromApp"
             class="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-display font-black text-xs uppercase tracking-wider shadow-lg shadow-purple-500/30 hover:scale-[1.02] active:scale-95 transition-all"
           >
-            {{ isEn ? 'OPEN YOUR GAME' : 'MỞ LẠI ỨNG DỤNG CỦA BẠN' }}
+            {{ isEn ? 'OPEN YOUR APP' : 'MỞ LẠI ỨNG DỤNG CỦA BẠN' }}
           </button>
         </div>
       </div>
@@ -136,14 +136,14 @@
             {{ isEn ? 'Authorization Successful!' : 'Ủy Quyền Thành Công!' }}
           </h2>
           <p class="text-xs text-slate-300 font-mono">
-            {{ isEn ? 'Redirecting back to your game...' : 'Đang tự động chuyển hướng về game...' }}
+            {{ isEn ? 'Redirecting back to your app...' : 'Đang tự động chuyển hướng về ứng dụng...' }}
           </p>
         </div>
 
         <!-- 1-Click Copy Code Fallback -->
         <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-700/80 text-left space-y-2">
           <div class="flex items-center justify-between text-[11px] font-mono text-slate-400">
-            <span>{{ isEn ? 'Fallback Code (If app did not open):' : 'Mã dự phòng (Nếu game chưa tự mở):' }}</span>
+            <span>{{ isEn ? 'Fallback Code (If app did not open):' : 'Mã dự phòng (Nếu ứng dụng chưa tự mở):' }}</span>
             <span class="text-emerald-400 font-bold">txa_code_...</span>
           </div>
           <div class="flex items-center gap-2">
@@ -167,7 +167,7 @@
             @click="triggerDeepLink"
             class="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-cyan-400 via-sky-500 to-pink-500 text-slate-950 font-display font-black text-xs uppercase tracking-wider shadow-lg shadow-cyan-500/30 hover:scale-[1.02] active:scale-95 transition-all"
           >
-            {{ isEn ? 'TAP HERE TO RETURN TO GAME' : 'BẤM VÀO ĐÂY ĐỂ VỀ LẠI GAME' }}
+            {{ isEn ? 'TAP HERE TO RETURN TO APP' : 'BẤM VÀO ĐÂY ĐỂ VỀ LẠI ỨNG DỤNG' }}
           </button>
         </div>
       </div>
@@ -535,8 +535,16 @@ function handleCancel() {
   router.push('/');
 }
 
-function handleRetryFromGame() {
+function handleRetryFromApp() {
   sound.playClick();
-  window.location.href = 'txa.zerogrid.quantumshift://';
+  const targetUri = redirectUri.value || (appInfo.value?.redirect_uris?.[0]);
+  if (targetUri && targetUri.includes('://')) {
+    const schemeBase = targetUri.split('://')[0] + '://';
+    window.location.href = schemeBase;
+  } else if (targetUri) {
+    window.location.href = targetUri;
+  } else {
+    router.push('/');
+  }
 }
 </script>
