@@ -70,7 +70,13 @@ final gpgsServiceProvider = Provider<GpgsService>((ref) {
 
 final supabaseServiceProvider = Provider<SupabaseService>((ref) {
   final storage = ref.watch(storageServiceProvider);
-  return SupabaseService(storage);
+  final supabase = SupabaseService(storage);
+  storage.onSaveDataChanged = (saveData) {
+    if (storage.isAuthenticated) {
+      supabase.syncGameSave(saveData);
+    }
+  };
+  return supabase;
 });
 
 final authServiceProvider = Provider<TxaAuthService>((ref) {

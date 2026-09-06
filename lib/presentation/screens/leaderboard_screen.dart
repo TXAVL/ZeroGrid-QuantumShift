@@ -90,20 +90,10 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
         supabase.fetchLeaderboard('endless', limit: 100),
       ]);
 
-      var leagueEntries = results[0];
-      var campaignEntries = results[1];
-      var dailyEntries = results[2];
-      var endlessEntries = results[3];
-
-      // Nếu bảng giải đấu tuần từ server trống và người chơi đã chơi >= 1 ván: Tạo bảng đấu 20-30 người sinh động
-      if (leagueEntries.isEmpty && storage.weeklyGamesPlayed >= 1) {
-        leagueEntries = _generateSimulatedLeaguePool(storage);
-      }
-
-      // Đảm bảo các tab Campaign, Daily, Endless luôn có pool đối thủ sinh động (không bị trống hoặc chỉ có 1 người lặp lại)
-      campaignEntries = _ensureSimulatedCompetitors(campaignEntries, 'campaign', storage);
-      dailyEntries = _ensureSimulatedCompetitors(dailyEntries, 'daily', storage);
-      endlessEntries = _ensureSimulatedCompetitors(endlessEntries, 'endless', storage);
+      var leagueEntries = _processRealLeaderboardEntries(results[0], 'league', storage);
+      var campaignEntries = _processRealLeaderboardEntries(results[1], 'campaign', storage);
+      var dailyEntries = _processRealLeaderboardEntries(results[2], 'daily', storage);
+      var endlessEntries = _processRealLeaderboardEntries(results[3], 'endless', storage);
 
       // Lưu lại rank của người chơi trong giải đấu tuần
       final playerId = storage.playerId;
@@ -157,16 +147,16 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
     }
   }
 
-  List<LeaderboardEntry> _ensureSimulatedCompetitors(
+  /// Xử lý danh sách xếp hạng THỰC TẾ từ Supabase Database (100% người chơi thật, không sinh bot ảo)
+  List<LeaderboardEntry> _processRealLeaderboardEntries(
     List<LeaderboardEntry> realEntries,
     String mode,
     dynamic storage,
   ) {
     final playerId = storage.playerId as String;
     final username = storage.playerUsername as String;
-    final pool = <LeaderboardEntry>[];
 
-    // Lọc ra danh sách thực tế không trùng lặp
+    // 1. Khử trùng lặp theo userId (chỉ giữ điểm cao nhất)
     final Map<String, LeaderboardEntry> uniqueUsers = {};
     for (final e in realEntries) {
       if (e.userId.isNotEmpty) {
@@ -176,21 +166,24 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
       }
     }
 
-    // Nếu người chơi chưa có trong list, thêm người chơi vào
+    // 2. Nếu người chơi hiện tại chưa có trong danh sách và đã có điểm số hợp lệ, bổ sung người chơi vào
     if (!uniqueUsers.containsKey(playerId)) {
       int myScore = 0;
       int myMoves = 5;
       int myDuration = 25;
-      int myStars = 3;
+      int myStars = 0;
 
       if (mode == 'campaign') {
-        myScore = storage.accumulatedScore > 0 ? storage.accumulatedScore : 6995;
+        myScore = storage.accumulatedScore as int;
+        myStars = storage.totalCampaignStars as int;
       } else if (mode == 'daily') {
         final todayUtc = TxaTime.getTodayUtcDateString();
-        myScore = storage.getDailyScore(todayUtc) > 0 ? storage.getDailyScore(todayUtc) : 5800;
-        myStars = storage.getDailyStars(todayUtc);
+        myScore = storage.getDailyScore(todayUtc) as int;
+        myStars = storage.getDailyStars(todayUtc) as int;
       } else if (mode == 'endless') {
-        myScore = storage.endlessHighScore > 0 ? storage.endlessHighScore : 4500;
+        myScore = storage.endlessHighScore as int;
+      } else if (mode == 'league') {
+        myScore = storage.weeklyTournamentScore as int;
       }
 
       if (myScore > 0) {
@@ -207,53 +200,10 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
       }
     }
 
-    pool.addAll(uniqueUsers.values);
-
-    // Nếu số lượng người chơi < 15: Tạo thêm các đấu thủ giả lập sinh động
-    if (pool.length < 15) {
-      final sampleNames = [
-        'QuantumMaster', 'CyberKnight', 'NeonPulse', 'VortexPro', 'AlphaZero',
-        'HyperSonic', 'PixelGhost', 'StarGazer', 'GridRunner', 'MatrixCoder',
-        'ShadowEcho', 'TitanNova', 'BlazeStrike', 'CosmicRider', 'FrostByte',
-        'AeroSync', 'ChronoDrift', 'ApexPredator', 'ZenithSky', 'SolarFlare',
-        'VoltSurge', 'ZeroGravity', 'AstroWolf', 'PhantomBlade', 'OmegaRay',
-        'TxaStudio'
-      ];
-
-      final userEntry = uniqueUsers[playerId];
-      final baseScore = (userEntry != null && userEntry.score > 0) ? userEntry.score : 5000;
-      final random = Random(playerId.hashCode ^ mode.hashCode);
-
-      int botIdx = 0;
-      for (final name in sampleNames) {
-        final botId = 'sim_${mode}_$botIdx';
-        if (uniqueUsers.containsKey(botId)) continue;
-
-        // Sinh điểm phân bố tự nhiên quanh điểm người chơi
-        final variance = (random.nextDouble() * 0.7 - 0.35); // -35% đến +35%
-        final botScore = max(500, (baseScore * (1 + variance)).toInt());
-        final botMoves = max(3, (4 + random.nextInt(6)));
-        final botDuration = max(10, (15 + random.nextInt(45)));
-
-        pool.add(LeaderboardEntry(
-          rank: 0,
-          userId: botId,
-          username: name,
-          score: botScore,
-          moves: botMoves,
-          durationSeconds: botDuration,
-          stars: max(1, min(3, 3 - (random.nextInt(3)))),
-          createdAt: DateTime.now().toUtc().subtract(Duration(hours: botIdx * 3 + 1)),
-        ));
-
-        botIdx++;
-        if (pool.length >= 25) break;
-      }
-    }
-
+    final pool = uniqueUsers.values.toList();
     pool.sort((a, b) => b.score.compareTo(a.score));
 
-    // Đánh số thứ tự rank chính xác 1, 2, 3...
+    // Đánh số thứ tự thứ hạng chuẩn xác 1, 2, 3...
     final numberedPool = <LeaderboardEntry>[];
     for (int i = 0; i < pool.length; i++) {
       final e = pool[i];
@@ -270,69 +220,6 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
     }
 
     return numberedPool;
-  }
-
-  List<LeaderboardEntry> _generateSimulatedLeaguePool(dynamic storage) {
-    final userScore = storage.weeklyTournamentScore as int;
-    final username = storage.playerUsername as String;
-    final userId = storage.playerId as String;
-
-    final pool = <LeaderboardEntry>[];
-    pool.add(LeaderboardEntry(
-      rank: 1,
-      userId: userId,
-      username: username,
-      score: userScore,
-      moves: 0,
-      durationSeconds: 0,
-      stars: 0,
-      createdAt: DateTime.now().toUtc(),
-    ));
-
-    final sampleNames = [
-      'QuantumMaster', 'CyberKnight', 'NeonPulse', 'VortexPro', 'AlphaZero',
-      'HyperSonic', 'PixelGhost', 'StarGazer', 'GridRunner', 'MatrixCoder',
-      'ShadowEcho', 'TitanNova', 'BlazeStrike', 'CosmicRider', 'FrostByte',
-      'AeroSync', 'ChronoDrift', 'ApexPredator', 'ZenithSky', 'SolarFlare',
-      'VoltSurge', 'ZeroGravity', 'AstroWolf', 'PhantomBlade', 'OmegaRay',
-      'TxaStudio'
-    ];
-
-    final int currentTier = storage.currentLeagueTier;
-    final tierBaseScore = (currentTier + 1) * 2000;
-    final random = Random(userId.hashCode);
-
-    for (int i = 0; i < sampleNames.length; i++) {
-      final diff = (random.nextDouble() * 2 - 1) * (tierBaseScore * 0.8);
-      final score = max(100, (tierBaseScore + diff).toInt());
-      pool.add(LeaderboardEntry(
-        rank: i + 2,
-        userId: 'bot_$i',
-        username: sampleNames[i],
-        score: score,
-        moves: 0,
-        durationSeconds: 0,
-        stars: 0,
-        createdAt: DateTime.now().toUtc().subtract(Duration(hours: i * 2)),
-      ));
-    }
-
-    pool.sort((a, b) => b.score.compareTo(a.score));
-    final numbered = <LeaderboardEntry>[];
-    for (int i = 0; i < pool.length; i++) {
-      final e = pool[i];
-      numbered.add(LeaderboardEntry(
-        rank: i + 1,
-        userId: e.userId,
-        username: e.username,
-        score: e.score,
-        moves: e.moves,
-        durationSeconds: e.durationSeconds,
-        stars: e.stars,
-        createdAt: e.createdAt,
-      ));
-    }
-    return numbered;
   }
 
   @override

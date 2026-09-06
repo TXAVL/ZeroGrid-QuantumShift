@@ -96,7 +96,13 @@ class StorageService {
   bool get isAuthenticated => !isGuestMode && authProviderName != 'guest';
 
   /// Xóa sạch phiên đăng nhập (cho cả Google & tài khoản thủ công) và thiết lập lại phiên Khách
-  void resetToGuestSession() {
+  Future<void> resetToGuestSession() async {
+    final oldUserId = _settingsBox.get('player_id')?.toString() ?? '';
+    if (oldUserId.isNotEmpty) {
+      final oldSave = exportCurrentSaveData();
+      _settingsBox.put('local_save_$oldUserId', jsonEncode(oldSave));
+    }
+
     isGuestMode = true;
     authProviderName = 'guest';
     authEmail = '';
@@ -112,7 +118,148 @@ class StorageService {
     final randName = 100 + Random().nextInt(900);
     playerUsername = 'QuantumPlayer#$randName';
 
+    // Dữ liệu khách mới bắt đầu từ level 1
+    await importSaveData(null);
+  }
+
+  /// Xuất toàn bộ tiến trình game hiện tại thành cấu trúc JSON để lưu đám mây hoặc sao lưu
+  Map<String, dynamic> exportCurrentSaveData() {
+    final Map<String, int> starsMap = {};
+    final Map<String, int> scoresMap = {};
+    for (final key in _progressBox.keys) {
+      final keyStr = key.toString();
+      if (keyStr.startsWith('stars_lvl_')) {
+        final val = _progressBox.get(keyStr);
+        if (val is int) starsMap[keyStr] = val;
+      } else if (keyStr.startsWith('score_lvl_')) {
+        final val = _progressBox.get(keyStr);
+        if (val is int) scoresMap[keyStr] = val;
+      }
+    }
+
+    return {
+      'unlocked_level': unlockedCampaignLevel,
+      'hints_count': hintsCount,
+      'is_ad_free': isAdFree,
+      'endless_high_score': endlessHighScore,
+      'endless_max_wave': endlessMaxWave,
+      'total_games_played': totalGamesPlayed,
+      'total_wins': totalWins,
+      'current_win_streak': currentWinStreak,
+      'max_win_streak': maxWinStreak,
+      'total_play_time_sec': totalPlayTimeSeconds,
+      'accumulated_score': accumulatedScore,
+      'current_league_tier': currentLeagueTier,
+      'unlocked_themes': unlockedThemes,
+      'level_stars': starsMap,
+      'level_scores': scoresMap,
+      'total_campaign_stars': totalCampaignStars,
+    };
+  }
+
+  /// Nạp tiến trình game từ dữ liệu JSON (từ Supabase hoặc bản lưu cục bộ của tài khoản)
+  Future<void> importSaveData(Map<String, dynamic>? data) async {
+    await _progressBox.clear();
+
+    if (data != null && data.isNotEmpty) {
+      if (data['unlocked_level'] != null) {
+        _progressBox.put('unlocked_level', (data['unlocked_level'] as num).toInt());
+      }
+      if (data['hints_count'] != null) {
+        hintsCount = (data['hints_count'] as num).toInt();
+      }
+      if (data['is_ad_free'] != null) {
+        isAdFree = data['is_ad_free'] == true;
+      }
+      if (data['endless_high_score'] != null) {
+        _progressBox.put('endless_high_score', (data['endless_high_score'] as num).toInt());
+      }
+      if (data['endless_max_wave'] != null) {
+        _progressBox.put('endless_max_wave', (data['endless_max_wave'] as num).toInt());
+      }
+      if (data['total_games_played'] != null) {
+        _progressBox.put('total_games_played', (data['total_games_played'] as num).toInt());
+      }
+      if (data['total_wins'] != null) {
+        _progressBox.put('total_wins', (data['total_wins'] as num).toInt());
+      }
+      if (data['current_win_streak'] != null) {
+        _progressBox.put('current_win_streak', (data['current_win_streak'] as num).toInt());
+      }
+      if (data['max_win_streak'] != null) {
+        _progressBox.put('max_win_streak', (data['max_win_streak'] as num).toInt());
+      }
+      if (data['total_play_time_sec'] != null) {
+        _progressBox.put('total_play_time_sec', (data['total_play_time_sec'] as num).toInt());
+      }
+      if (data['accumulated_score'] != null) {
+        _progressBox.put('accumulated_score', (data['accumulated_score'] as num).toInt());
+      }
+      if (data['current_league_tier'] != null) {
+        _progressBox.put('current_league_tier', (data['current_league_tier'] as num).toInt());
+      }
+      if (data['unlocked_themes'] is List) {
+        _settingsBox.put('unlocked_themes', List<String>.from(data['unlocked_themes']));
+      }
+
+      if (data['level_stars'] is Map) {
+        final stars = data['level_stars'] as Map;
+        for (final entry in stars.entries) {
+          if (entry.value is num) {
+            _progressBox.put(entry.key.toString(), (entry.value as num).toInt());
+          }
+        }
+      }
+      if (data['level_scores'] is Map) {
+        final scores = data['level_scores'] as Map;
+        for (final entry in scores.entries) {
+          if (entry.value is num) {
+            _progressBox.put(entry.key.toString(), (entry.value as num).toInt());
+          }
+        }
+      }
+    } else {
+      // Thiết lập mặc định cho tài khoản mới
+      _progressBox.put('unlocked_level', 1);
+      hintsCount = 3;
+      _progressBox.put('endless_high_score', 0);
+      _progressBox.put('total_games_played', 0);
+      _progressBox.put('total_wins', 0);
+      _progressBox.put('accumulated_score', 0);
+    }
+
+    hintsCountNotifier.value = hintsCount;
+    isAdFreeNotifier.value = isAdFree;
+    totalStarsNotifier.value = totalCampaignStars;
     progressNotifier.value = progressNotifier.value + 1;
+  }
+
+  /// Chuyển đổi tài khoản an toàn: Lưu snapshot của tài khoản cũ và nạp tiến trình của tài khoản mới
+  Future<void> switchAccount(String newUserId, {Map<String, dynamic>? cloudSave}) async {
+    final oldUserId = _settingsBox.get('player_id')?.toString() ?? '';
+    if (oldUserId.isNotEmpty) {
+      final oldSave = exportCurrentSaveData();
+      _settingsBox.put('local_save_$oldUserId', jsonEncode(oldSave));
+    }
+
+    _settingsBox.put('player_id', newUserId);
+
+    if (cloudSave != null && cloudSave.isNotEmpty) {
+      await importSaveData(cloudSave);
+      _settingsBox.put('local_save_$newUserId', jsonEncode(cloudSave));
+    } else {
+      final localBackup = _settingsBox.get('local_save_$newUserId');
+      if (localBackup != null && localBackup is String && localBackup.isNotEmpty) {
+        try {
+          final decoded = jsonDecode(localBackup) as Map<String, dynamic>;
+          await importSaveData(decoded);
+        } catch (_) {
+          await importSaveData(null);
+        }
+      } else {
+        await importSaveData(null);
+      }
+    }
   }
 
   // --- CONTROL SCHEME (Tap vs Swipe) ---
@@ -180,11 +327,25 @@ class StorageService {
     _settingsBox.put('unlocked_themes', ['cyber_neon', 'cyber_magenta', 'monokai_dark', 'zen_gold']);
   }
 
+  void Function(Map<String, dynamic> saveData)? onSaveDataChanged;
+
+  void _triggerSaveDataChanged() {
+    final curId = playerId;
+    if (curId.isNotEmpty) {
+      final save = exportCurrentSaveData();
+      _settingsBox.put('local_save_$curId', jsonEncode(save));
+      if (isAuthenticated) {
+        onSaveDataChanged?.call(save);
+      }
+    }
+  }
+
   // --- LEVEL PROGRESSION ---
   int get unlockedCampaignLevel => _progressBox.get('unlocked_level', defaultValue: 1);
   set unlockedCampaignLevel(int value) {
     _progressBox.put('unlocked_level', value);
     progressNotifier.value = progressNotifier.value + 1;
+    _triggerSaveDataChanged();
   }
 
   int getLevelStars(int levelId) => _progressBox.get('stars_lvl_$levelId', defaultValue: 0);
@@ -202,6 +363,7 @@ class StorageService {
     }
     totalStarsNotifier.value = totalCampaignStars;
     progressNotifier.value = progressNotifier.value + 1;
+    _triggerSaveDataChanged();
   }
 
   int get totalCampaignStars {

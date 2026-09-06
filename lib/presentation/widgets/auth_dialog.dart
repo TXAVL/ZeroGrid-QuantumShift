@@ -39,8 +39,26 @@ class _AuthDialogState extends ConsumerState<AuthDialog> with WidgetsBindingObse
 
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _oauthCodeController = TextEditingController();
+
+  // Real-time validation states
+  String? _usernameError;
+  bool _isUsernameValid = false;
+  bool _isCheckingUsername = false;
+  Timer? _usernameDebounce;
+
+  String? _passwordError;
+  bool _isPasswordValid = false;
+
+  String? _confirmPasswordError;
+  bool _isConfirmPasswordValid = false;
+
+  String? _emailError;
+  bool _isEmailValid = true;
+  bool _isCheckingEmail = false;
+  Timer? _emailDebounce;
 
   String _deviceDisplayName = '...';
   StreamSubscription<Map<String, dynamic>>? _authSub;
@@ -61,7 +79,6 @@ class _AuthDialogState extends ConsumerState<AuthDialog> with WidgetsBindingObse
       }
     });
 
-    // Kiểm tra clipboard ngay khi mở dialog
     _checkClipboardForOAuthCode();
   }
 
@@ -91,11 +108,181 @@ class _AuthDialogState extends ConsumerState<AuthDialog> with WidgetsBindingObse
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _authSub?.cancel();
+    _usernameDebounce?.cancel();
+    _emailDebounce?.cancel();
     _usernameController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     _emailController.dispose();
     _oauthCodeController.dispose();
     super.dispose();
+  }
+
+  void _onUsernameChanged(String value) {
+    _usernameDebounce?.cancel();
+    final trimmed = value.trim();
+
+    if (!_isRegisterMode) {
+      setState(() {
+        _usernameError = null;
+        _isUsernameValid = trimmed.isNotEmpty;
+        _isCheckingUsername = false;
+      });
+      return;
+    }
+
+    if (trimmed.isEmpty) {
+      setState(() {
+        _usernameError = null;
+        _isUsernameValid = false;
+        _isCheckingUsername = false;
+      });
+      return;
+    }
+
+    if (trimmed.length < 3) {
+      setState(() {
+        _usernameError = 'Tên đăng nhập phải có ít nhất 3 ký tự';
+        _isUsernameValid = false;
+        _isCheckingUsername = false;
+      });
+      return;
+    }
+
+    final validCharacters = RegExp(r'^[a-zA-Z0-9_.\s]+$');
+    if (!validCharacters.hasMatch(trimmed)) {
+      setState(() {
+        _usernameError = 'Chỉ được chứa chữ, số, dấu chấm và gạch dưới';
+        _isUsernameValid = false;
+        _isCheckingUsername = false;
+      });
+      return;
+    }
+
+    setState(() {
+      _usernameError = null;
+      _isCheckingUsername = true;
+      _isUsernameValid = false;
+    });
+
+    _usernameDebounce = Timer(const Duration(milliseconds: 500), () async {
+      final supabase = ref.read(supabaseServiceProvider);
+      final exists = await supabase.checkUsernameExists(trimmed);
+      if (!mounted) return;
+      setState(() {
+        _isCheckingUsername = false;
+        if (exists) {
+          _usernameError = 'Tên này đã được sử dụng, vui lòng chọn tên khác!';
+          _isUsernameValid = false;
+        } else {
+          _usernameError = null;
+          _isUsernameValid = true;
+        }
+      });
+    });
+  }
+
+  void _onPasswordChanged(String value) {
+    final trimmed = value.trim();
+    if (!_isRegisterMode) {
+      setState(() {
+        _passwordError = null;
+        _isPasswordValid = trimmed.isNotEmpty;
+      });
+      return;
+    }
+
+    if (trimmed.isEmpty) {
+      setState(() {
+        _passwordError = null;
+        _isPasswordValid = false;
+      });
+      return;
+    }
+
+    if (trimmed.length < 6) {
+      setState(() {
+        _passwordError = 'Mật khẩu phải có ít nhất 6 ký tự';
+        _isPasswordValid = false;
+      });
+    } else {
+      setState(() {
+        _passwordError = null;
+        _isPasswordValid = true;
+      });
+    }
+
+    if (_confirmPasswordController.text.isNotEmpty) {
+      _onConfirmPasswordChanged(_confirmPasswordController.text);
+    }
+  }
+
+  void _onConfirmPasswordChanged(String value) {
+    if (!_isRegisterMode) return;
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) {
+      setState(() {
+        _confirmPasswordError = null;
+        _isConfirmPasswordValid = false;
+      });
+      return;
+    }
+
+    if (trimmed != _passwordController.text.trim()) {
+      setState(() {
+        _confirmPasswordError = 'Mật khẩu xác nhận không khớp!';
+        _isConfirmPasswordValid = false;
+      });
+    } else {
+      setState(() {
+        _confirmPasswordError = null;
+        _isConfirmPasswordValid = true;
+      });
+    }
+  }
+
+  void _onEmailChanged(String value) {
+    _emailDebounce?.cancel();
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) {
+      setState(() {
+        _emailError = null;
+        _isEmailValid = true;
+        _isCheckingEmail = false;
+      });
+      return;
+    }
+
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    if (!emailRegex.hasMatch(trimmed)) {
+      setState(() {
+        _emailError = 'Định dạng email không hợp lệ (ví dụ: name@gmail.com)';
+        _isEmailValid = false;
+        _isCheckingEmail = false;
+      });
+      return;
+    }
+
+    setState(() {
+      _emailError = null;
+      _isCheckingEmail = true;
+    });
+
+    _emailDebounce = Timer(const Duration(milliseconds: 500), () async {
+      final supabase = ref.read(supabaseServiceProvider);
+      final exists = await supabase.checkEmailExists(trimmed);
+      if (!mounted) return;
+      setState(() {
+        _isCheckingEmail = false;
+        if (exists) {
+          _emailError = 'Email này đã liên kết với tài khoản khác!';
+          _isEmailValid = false;
+        } else {
+          _emailError = null;
+          _isEmailValid = true;
+        }
+      });
+    });
   }
 
   Future<void> _handleTxaStudioOAuth() async {
@@ -134,33 +321,77 @@ class _AuthDialogState extends ConsumerState<AuthDialog> with WidgetsBindingObse
     final password = _passwordController.text.trim();
     final email = _emailController.text.trim();
 
-    if (username.isEmpty || password.isEmpty) {
-      TxaToast.warning(context, TxaLanguage.tr('auth_fill_fields_warning', widget.langCode));
-      return;
-    }
+    if (!_isRegisterMode) {
+      // 1. LUỒNG ĐĂNG NHẬP
+      if (username.isEmpty || password.isEmpty) {
+        TxaToast.warning(context, TxaLanguage.tr('auth_fill_fields_warning', widget.langCode));
+        return;
+      }
 
-    setState(() => _isLoading = true);
-    final auth = ref.read(authServiceProvider);
+      setState(() => _isLoading = true);
+      final auth = ref.read(authServiceProvider);
+      final result = await auth.loginCustom(
+        usernameOrEmail: username,
+        password: password,
+      );
 
-    final result = await auth.loginOrRegisterCustom(
-      username: username,
-      password: password,
-      email: email.isNotEmpty ? email : null,
-    );
+      if (mounted) {
+        setState(() => _isLoading = false);
+        if (result['success'] == true) {
+          TxaToast.success(context, TxaLanguage.tr('auth_login_success', widget.langCode));
+          Navigator.of(context).pop(true);
+        } else {
+          TxaToast.error(context, result['error'] ?? 'Đăng nhập thất bại');
+        }
+      }
+    } else {
+      // 2. LUỒNG ĐĂNG KÝ (Có validate chặt chẽ)
+      if (username.isEmpty || password.isEmpty) {
+        TxaToast.warning(context, TxaLanguage.tr('auth_fill_fields_warning', widget.langCode));
+        return;
+      }
 
-    if (mounted) {
-      setState(() => _isLoading = false);
-      if (result['success'] == true) {
-        final isNew = result['is_new'] == true;
-        TxaToast.success(
-          context,
-          isNew
-              ? TxaLanguage.tr('auth_register_success', widget.langCode)
-              : TxaLanguage.tr('auth_login_success', widget.langCode),
-        );
-        Navigator.of(context).pop(true);
-      } else {
-        TxaToast.error(context, result['error'] ?? 'Authentication error');
+      if (_isCheckingUsername || _isCheckingEmail) {
+        TxaToast.warning(context, 'Hệ thống đang kiểm tra tính khả dụng, vui lòng chờ trong giây lát.');
+        return;
+      }
+
+      if (!_isUsernameValid || _usernameError != null) {
+        TxaToast.error(context, _usernameError ?? 'Tên đăng nhập không hợp lệ!');
+        return;
+      }
+
+      if (!_isPasswordValid || _passwordError != null) {
+        TxaToast.error(context, _passwordError ?? 'Mật khẩu phải từ 6 ký tự trở lên!');
+        return;
+      }
+
+      if (!_isConfirmPasswordValid || _confirmPasswordError != null) {
+        TxaToast.error(context, _confirmPasswordError ?? 'Mật khẩu xác nhận không khớp!');
+        return;
+      }
+
+      if (!_isEmailValid || _emailError != null) {
+        TxaToast.error(context, _emailError ?? 'Email không hợp lệ!');
+        return;
+      }
+
+      setState(() => _isLoading = true);
+      final auth = ref.read(authServiceProvider);
+      final result = await auth.registerCustom(
+        username: username,
+        password: password,
+        email: email.isNotEmpty ? email : null,
+      );
+
+      if (mounted) {
+        setState(() => _isLoading = false);
+        if (result['success'] == true) {
+          TxaToast.success(context, TxaLanguage.tr('auth_register_success', widget.langCode));
+          Navigator.of(context).pop(true);
+        } else {
+          TxaToast.error(context, result['error'] ?? 'Đăng ký thất bại');
+        }
       }
     }
   }
@@ -185,6 +416,99 @@ class _AuthDialogState extends ConsumerState<AuthDialog> with WidgetsBindingObse
     ref.read(authServiceProvider).continueAsGuest();
     TxaToast.info(context, TxaLanguage.tr('auth_guest_toast', widget.langCode));
     Navigator.of(context).pop(false);
+  }
+
+  Widget _buildFieldStatus({
+    required bool isChecking,
+    required String? error,
+    required bool isValid,
+    required String validText,
+    required GameColorPalette palette,
+  }) {
+    if (isChecking) {
+      return const Padding(
+        padding: EdgeInsets.only(top: 4, left: 6),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 11,
+              height: 11,
+              child: CircularProgressIndicator(strokeWidth: 1.5, color: Color(0xFFFFCC00)),
+            ),
+            SizedBox(width: 6),
+            Text(
+              'Đang kiểm tra tính khả dụng...',
+              style: TextStyle(fontSize: 10.5, color: Color(0xFFFFCC00), fontWeight: FontWeight.w500),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (error != null) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 4, left: 6),
+        child: Row(
+          children: [
+            const Icon(Icons.error_outline_rounded, size: 13, color: Color(0xFFFF3366)),
+            const SizedBox(width: 5),
+            Expanded(
+              child: Text(
+                error,
+                style: const TextStyle(fontSize: 10.5, color: Color(0xFFFF3366), fontWeight: FontWeight.w500),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (isValid && _isRegisterMode) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 4, left: 6),
+        child: Row(
+          children: [
+            const Icon(Icons.check_circle_outline_rounded, size: 13, color: Color(0xFF00FFA3)),
+            const SizedBox(width: 5),
+            Expanded(
+              child: Text(
+                validText,
+                style: const TextStyle(fontSize: 10.5, color: Color(0xFF00FFA3), fontWeight: FontWeight.w500),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return const SizedBox.shrink();
+  }
+
+  InputBorder _buildInputBorder({
+    required bool isChecking,
+    required String? error,
+    required bool isValid,
+    required GameColorPalette palette,
+    bool isFocused = false,
+  }) {
+    Color borderColor = isFocused ? palette.accentNeon : Colors.white12;
+    double borderWidth = isFocused ? 1.4 : 1.0;
+
+    if (error != null) {
+      borderColor = const Color(0xFFFF3366); // Đỏ
+      borderWidth = 1.6;
+    } else if (isChecking) {
+      borderColor = const Color(0xFFFFCC00); // Vàng
+      borderWidth = 1.4;
+    } else if (isValid && _isRegisterMode) {
+      borderColor = const Color(0xFF00FFA3); // Xanh neon
+      borderWidth = 1.6;
+    }
+
+    return OutlineInputBorder(
+      borderRadius: BorderRadius.circular(14),
+      borderSide: BorderSide(color: borderColor, width: borderWidth),
+    );
   }
 
   @override
@@ -444,48 +768,244 @@ class _AuthDialogState extends ConsumerState<AuthDialog> with WidgetsBindingObse
               const SizedBox(height: 16),
 
               // Username input
-              TextField(
-                controller: _usernameController,
-                style: const TextStyle(color: Colors.white, fontSize: 13.5),
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: palette.background,
-                  prefixIcon: Icon(Icons.person_outline_rounded, size: 18, color: palette.accentNeon),
-                  hintText: TxaLanguage.tr('auth_username_hint', widget.langCode),
-                  hintStyle: TextStyle(color: palette.textSecondary.withValues(alpha: 0.5), fontSize: 12),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextField(
+                    controller: _usernameController,
+                    onChanged: _onUsernameChanged,
+                    style: const TextStyle(color: Colors.white, fontSize: 13.5),
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: palette.background,
+                      prefixIcon: Icon(
+                        Icons.person_outline_rounded,
+                        size: 18,
+                        color: _usernameError != null
+                            ? const Color(0xFFFF3366)
+                            : (_isUsernameValid && _isRegisterMode
+                                ? const Color(0xFF00FFA3)
+                                : palette.accentNeon),
+                      ),
+                      suffixIcon: _isCheckingUsername
+                          ? const Padding(
+                              padding: EdgeInsets.all(14),
+                              child: SizedBox(
+                                width: 14,
+                                height: 14,
+                                child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFFFFCC00)),
+                              ),
+                            )
+                          : (_usernameError != null
+                              ? const Icon(Icons.cancel_rounded, size: 18, color: Color(0xFFFF3366))
+                              : (_isUsernameValid && _isRegisterMode
+                                  ? const Icon(Icons.check_circle_rounded, size: 18, color: Color(0xFF00FFA3))
+                                  : null)),
+                      hintText: _isRegisterMode
+                          ? 'Tên người dùng (Tối thiểu 3 ký tự)'
+                          : TxaLanguage.tr('auth_username_hint', widget.langCode),
+                      hintStyle: TextStyle(color: palette.textSecondary.withValues(alpha: 0.5), fontSize: 12),
+                      enabledBorder: _buildInputBorder(
+                        isChecking: _isCheckingUsername,
+                        error: _usernameError,
+                        isValid: _isUsernameValid,
+                        palette: palette,
+                      ),
+                      focusedBorder: _buildInputBorder(
+                        isChecking: _isCheckingUsername,
+                        error: _usernameError,
+                        isValid: _isUsernameValid,
+                        palette: palette,
+                        isFocused: true,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    ),
+                  ),
+                  _buildFieldStatus(
+                    isChecking: _isCheckingUsername,
+                    error: _usernameError,
+                    isValid: _isUsernameValid,
+                    validText: 'Tên người dùng hợp lệ và có thể đăng ký',
+                    palette: palette,
+                  ),
+                ],
               ),
               const SizedBox(height: 10),
 
               // Password input
-              TextField(
-                controller: _passwordController,
-                obscureText: true,
-                style: const TextStyle(color: Colors.white, fontSize: 13.5),
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: palette.background,
-                  prefixIcon: Icon(Icons.lock_outline_rounded, size: 18, color: palette.accentNeon),
-                  hintText: TxaLanguage.tr('auth_password_hint', widget.langCode),
-                  hintStyle: TextStyle(color: palette.textSecondary.withValues(alpha: 0.5), fontSize: 12),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextField(
+                    controller: _passwordController,
+                    obscureText: true,
+                    onChanged: _onPasswordChanged,
+                    style: const TextStyle(color: Colors.white, fontSize: 13.5),
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: palette.background,
+                      prefixIcon: Icon(
+                        Icons.lock_outline_rounded,
+                        size: 18,
+                        color: _passwordError != null
+                            ? const Color(0xFFFF3366)
+                            : (_isPasswordValid && _isRegisterMode
+                                ? const Color(0xFF00FFA3)
+                                : palette.accentNeon),
+                      ),
+                      suffixIcon: _passwordError != null
+                          ? const Icon(Icons.cancel_rounded, size: 18, color: Color(0xFFFF3366))
+                          : (_isPasswordValid && _isRegisterMode
+                              ? const Icon(Icons.check_circle_rounded, size: 18, color: Color(0xFF00FFA3))
+                              : null),
+                      hintText: _isRegisterMode
+                          ? 'Mật khẩu (Tối thiểu 6 ký tự)'
+                          : TxaLanguage.tr('auth_password_hint', widget.langCode),
+                      hintStyle: TextStyle(color: palette.textSecondary.withValues(alpha: 0.5), fontSize: 12),
+                      enabledBorder: _buildInputBorder(
+                        isChecking: false,
+                        error: _passwordError,
+                        isValid: _isPasswordValid,
+                        palette: palette,
+                      ),
+                      focusedBorder: _buildInputBorder(
+                        isChecking: false,
+                        error: _passwordError,
+                        isValid: _isPasswordValid,
+                        palette: palette,
+                        isFocused: true,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    ),
+                  ),
+                  _buildFieldStatus(
+                    isChecking: false,
+                    error: _passwordError,
+                    isValid: _isPasswordValid,
+                    validText: 'Mật khẩu đạt độ dài yêu cầu',
+                    palette: palette,
+                  ),
+                ],
               ),
+
               if (_isRegisterMode) ...[
                 const SizedBox(height: 10),
-                TextField(
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  style: const TextStyle(color: Colors.white, fontSize: 13.5),
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: palette.background,
-                    prefixIcon: Icon(Icons.email_outlined, size: 18, color: palette.accentNeon),
-                    hintText: TxaLanguage.tr('auth_email_hint', widget.langCode),
-                    hintStyle: TextStyle(color: palette.textSecondary.withValues(alpha: 0.5), fontSize: 12),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
-                  ),
+                // Confirm Password input
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextField(
+                      controller: _confirmPasswordController,
+                      obscureText: true,
+                      onChanged: _onConfirmPasswordChanged,
+                      style: const TextStyle(color: Colors.white, fontSize: 13.5),
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: palette.background,
+                        prefixIcon: Icon(
+                          Icons.verified_user_outlined,
+                          size: 18,
+                          color: _confirmPasswordError != null
+                              ? const Color(0xFFFF3366)
+                              : (_isConfirmPasswordValid
+                                  ? const Color(0xFF00FFA3)
+                                  : palette.accentNeon),
+                        ),
+                        suffixIcon: _confirmPasswordError != null
+                            ? const Icon(Icons.cancel_rounded, size: 18, color: Color(0xFFFF3366))
+                            : (_isConfirmPasswordValid
+                                ? const Icon(Icons.check_circle_rounded, size: 18, color: Color(0xFF00FFA3))
+                                : null),
+                        hintText: 'Xác nhận lại mật khẩu',
+                        hintStyle: TextStyle(color: palette.textSecondary.withValues(alpha: 0.5), fontSize: 12),
+                        enabledBorder: _buildInputBorder(
+                          isChecking: false,
+                          error: _confirmPasswordError,
+                          isValid: _isConfirmPasswordValid,
+                          palette: palette,
+                        ),
+                        focusedBorder: _buildInputBorder(
+                          isChecking: false,
+                          error: _confirmPasswordError,
+                          isValid: _isConfirmPasswordValid,
+                          palette: palette,
+                          isFocused: true,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                      ),
+                    ),
+                    _buildFieldStatus(
+                      isChecking: false,
+                      error: _confirmPasswordError,
+                      isValid: _isConfirmPasswordValid,
+                      validText: 'Mật khẩu xác nhận trùng khớp',
+                      palette: palette,
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 10),
+                // Email input (Optional)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextField(
+                      controller: _emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      onChanged: _onEmailChanged,
+                      style: const TextStyle(color: Colors.white, fontSize: 13.5),
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: palette.background,
+                        prefixIcon: Icon(
+                          Icons.email_outlined,
+                          size: 18,
+                          color: _emailError != null
+                              ? const Color(0xFFFF3366)
+                              : (_emailController.text.isNotEmpty && _isEmailValid
+                                  ? const Color(0xFF00FFA3)
+                                  : palette.accentNeon),
+                        ),
+                        suffixIcon: _isCheckingEmail
+                            ? const Padding(
+                                padding: EdgeInsets.all(14),
+                                child: SizedBox(
+                                  width: 14,
+                                  height: 14,
+                                  child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFFFFCC00)),
+                                ),
+                              )
+                            : (_emailError != null
+                                ? const Icon(Icons.cancel_rounded, size: 18, color: Color(0xFFFF3366))
+                                : (_emailController.text.isNotEmpty && _isEmailValid
+                                    ? const Icon(Icons.check_circle_rounded, size: 18, color: Color(0xFF00FFA3))
+                                    : null)),
+                        hintText: 'Email (Tùy chọn - để khôi phục)',
+                        hintStyle: TextStyle(color: palette.textSecondary.withValues(alpha: 0.5), fontSize: 12),
+                        enabledBorder: _buildInputBorder(
+                          isChecking: _isCheckingEmail,
+                          error: _emailError,
+                          isValid: _emailController.text.isNotEmpty && _isEmailValid,
+                          palette: palette,
+                        ),
+                        focusedBorder: _buildInputBorder(
+                          isChecking: _isCheckingEmail,
+                          error: _emailError,
+                          isValid: _emailController.text.isNotEmpty && _isEmailValid,
+                          palette: palette,
+                          isFocused: true,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                      ),
+                    ),
+                    _buildFieldStatus(
+                      isChecking: _isCheckingEmail,
+                      error: _emailError,
+                      isValid: _emailController.text.isNotEmpty && _isEmailValid,
+                      validText: 'Email hợp lệ và có thể liên kết',
+                      palette: palette,
+                    ),
+                  ],
                 ),
               ],
               const SizedBox(height: 18),
@@ -504,8 +1024,8 @@ class _AuthDialogState extends ConsumerState<AuthDialog> with WidgetsBindingObse
                   child: _isLoading
                       ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
                       : Text(
-                          _isRegisterMode ? TxaLanguage.tr('btn_register', widget.langCode) : TxaLanguage.tr('btn_login', widget.langCode),
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                          _isRegisterMode ? 'ĐĂNG KÝ TÀI KHOẢN' : 'ĐĂNG NHẬP',
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, letterSpacing: 0.5),
                         ),
                 ),
               ),
@@ -514,12 +1034,22 @@ class _AuthDialogState extends ConsumerState<AuthDialog> with WidgetsBindingObse
               // Switch Mode Button
               TextButton(
                 onPressed: () {
-                  setState(() => _isRegisterMode = !_isRegisterMode);
+                  setState(() {
+                    _isRegisterMode = !_isRegisterMode;
+                    _usernameError = null;
+                    _passwordError = null;
+                    _confirmPasswordError = null;
+                    _emailError = null;
+                    _isCheckingUsername = false;
+                    _isCheckingEmail = false;
+                  });
+                  if (_usernameController.text.isNotEmpty) _onUsernameChanged(_usernameController.text);
+                  if (_passwordController.text.isNotEmpty) _onPasswordChanged(_passwordController.text);
                 },
                 child: Text(
                   _isRegisterMode
-                      ? TxaLanguage.tr('auth_already_have_acc', widget.langCode)
-                      : TxaLanguage.tr('auth_dont_have_acc', widget.langCode),
+                      ? 'Đã có tài khoản? Đăng nhập ngay'
+                      : 'Chưa có tài khoản? Tạo tài khoản mới',
                   style: TextStyle(color: palette.accentNeon, fontSize: 12, fontWeight: FontWeight.bold),
                 ),
               ),

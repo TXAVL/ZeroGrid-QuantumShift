@@ -79,7 +79,68 @@ class SupabaseService {
     }
   }
 
-  /// Nộp kết quả ván đấu lên Supabase Database
+  /// Kiểm tra xem Username đã tồn tại trên hệ thống chưa (phục vụ real-time validation)
+  Future<bool> checkUsernameExists(String username) async {
+    final clean = username.trim();
+    if (clean.isEmpty) return false;
+    final url = Uri.parse('$supabaseUrl/rest/v1/rpc/check_username_exists');
+    try {
+      final res = await http.post(
+        url,
+        headers: _headers,
+        body: jsonEncode({'p_username': clean}),
+      );
+      if (res.statusCode == 200) {
+        return jsonDecode(res.body) == true;
+      }
+    } catch (e) {
+      debugPrint("Supabase checkUsernameExists error: $e");
+    }
+    return false;
+  }
+
+  /// Kiểm tra xem Email đã được đăng ký chưa (phục vụ real-time validation)
+  Future<bool> checkEmailExists(String email) async {
+    final clean = email.trim();
+    if (clean.isEmpty) return false;
+    final url = Uri.parse('$supabaseUrl/rest/v1/rpc/check_email_exists');
+    try {
+      final res = await http.post(
+        url,
+        headers: _headers,
+        body: jsonEncode({'p_email': clean}),
+      );
+      if (res.statusCode == 200) {
+        return jsonDecode(res.body) == true;
+      }
+    } catch (e) {
+      debugPrint("Supabase checkEmailExists error: $e");
+    }
+    return false;
+  }
+
+  /// Đồng bộ toàn bộ tiến trình game (save_data) lên Supabase
+  Future<bool> syncGameSave(Map<String, dynamic> saveData, {int? totalStars, int? endlessScore}) async {
+    if (_storage.isGuestMode || userId.isEmpty) return false;
+    final url = Uri.parse('$supabaseUrl/rest/v1/rpc/sync_game_save');
+    try {
+      final res = await http.post(
+        url,
+        headers: _headers,
+        body: jsonEncode({
+          'p_user_id': userId,
+          'p_save_data': saveData,
+          'p_total_stars': totalStars ?? _storage.totalCampaignStars,
+          'p_endless_high_score': endlessScore ?? _storage.endlessHighScore,
+        }),
+      );
+      return res.statusCode >= 200 && res.statusCode < 300;
+    } catch (e) {
+      debugPrint("Supabase syncGameSave error: $e");
+      return false;
+    }
+  }
+
   Future<bool> submitScore({
     required String mode,
     required String levelId,

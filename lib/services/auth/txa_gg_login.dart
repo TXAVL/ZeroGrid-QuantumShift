@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../../core/config/txa_config.dart';
@@ -82,17 +81,8 @@ class TxaGgLogin {
       }
       return null; // Người dùng chủ động tắt popup
     } catch (e) {
-      debugPrint("TxaGgLogin native sign-in warning (Chưa link SHA-1 Google Play Console): $e");
-
-      // 2. Chế độ Debug Demo: Tạo tài khoản Google Demo an toàn để test luồng gameplay và Supabase
-      final rand = 100 + Random().nextInt(900);
-      _mockDemoUser = TxaGgUser(
-        id: 'gg_demo_${DateTime.now().millisecondsSinceEpoch}_$rand',
-        displayName: 'GooglePlayer#$rand',
-        email: 'player.demo$rand@gmail.com',
-        isDemoUser: true,
-      );
-      return _mockDemoUser;
+      debugPrint("TxaGgLogin native sign-in error: $e");
+      return null;
     }
   }
 

@@ -53,90 +53,156 @@ class TxaAuthService {
     return sha256.convert(bytes).toString();
   }
 
-  /// 1. Đăng ký hoặc Đăng nhập bằng Tài khoản Custom (Username / Password)
-  Future<Map<String, dynamic>> loginOrRegisterCustom({
-    required String username,
+  /// 1A. Đăng nhập bằng Tài khoản Custom (Username / Email + Mật khẩu)
+  /// Kiểm tra sự tồn tại và mật khẩu, KHÔNG tự động tạo tài khoản mới nếu chưa có!
+  Future<Map<String, dynamic>> loginCustom({
+    required String usernameOrEmail,
     required String password,
-    String? email,
   }) async {
-    final url = Uri.parse('$supabaseUrl/rest/v1/rpc/auth_register_or_login');
+    final url = Uri.parse('$supabaseUrl/rest/v1/rpc/auth_custom_login');
     final passwordHash = _hashPassword(password);
     final deviceInfo = await TxaDevice.getDeviceInfoSummary();
     final deviceId = await TxaDevice.getUniqueDeviceId();
     final platform = TxaDevice.getPlatformName();
 
     final body = jsonEncode({
-      'p_username': username,
+      'p_username_or_email': usernameOrEmail.trim(),
       'p_password_hash': passwordHash,
-      'p_email': email,
-      'p_auth_provider': 'custom',
       'p_device_id': deviceId,
       'p_device_info': deviceInfo,
       'p_platform': platform,
-      'p_avatar_url': null,
     });
 
     try {
-      TXALogger.logApi('Attempting custom login/register for: $username');
+      TXALogger.logApi('Attempting custom login for: $usernameOrEmail');
       final res = await http.post(url, headers: _headers, body: body);
       if (res.statusCode == 200) {
         final data = jsonDecode(res.body) as Map<String, dynamic>;
         if (data['success'] == true) {
+          final userId = data['user_id']?.toString() ?? '';
+          final cloudSave = data['save_data'] as Map<String, dynamic>?;
+
+          // Chuyển đổi tài khoản và nạp chính xác dữ liệu game đã lưu
+          await _storage.switchAccount(userId, cloudSave: cloudSave);
+
+          _storage.isGuestMode = false;
+          _storage.authProviderName = 'custom';
+          _storage.playerUsername = data['username'] ?? usernameOrEmail;
+          if (data['email'] != null) _storage.authEmail = data['email'];
+          _storage.userRole = data['role'] ?? 'player';
+          _storage.avatarUrl = data['avatar_url'] ?? '';
+          TXALogger.logApi('Custom login success: ${data['username']}, role: ${data['role']}');
+        }
+        return data;
+      }
+      TXALogger.logApi('Custom login failed with status: ${res.statusCode}');
+      return {'success': false, 'error': _tr('oauth_err_server_status', {'code': res.statusCode.toString()})};
+    } catch (e, stack) {
+      TXALogger.logError('TxaAuthService loginCustom error: $e', stackTrace: stack);
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  /// 1B. Đăng Ký Tài khoản Mới (Kiểm tra trùng lặp username, email)
+  Future<Map<String, dynamic>> registerCustom({
+    required String username,
+    required String password,
+    String? email,
+  }) async {
+    final url = Uri.parse('$supabaseUrl/rest/v1/rpc/auth_custom_register');
+    final passwordHash = _hashPassword(password);
+    final deviceInfo = await TxaDevice.getDeviceInfoSummary();
+    final deviceId = await TxaDevice.getUniqueDeviceId();
+    final platform = TxaDevice.getPlatformName();
+
+    final body = jsonEncode({
+      'p_username': username.trim(),
+      'p_password_hash': passwordHash,
+      'p_email': email != null && email.trim().isNotEmpty ? email.trim() : null,
+      'p_device_id': deviceId,
+      'p_device_info': deviceInfo,
+      'p_platform': platform,
+    });
+
+    try {
+      TXALogger.logApi('Attempting custom registration for: $username');
+      final res = await http.post(url, headers: _headers, body: body);
+      if (res.statusCode == 200) {
+        final data = jsonDecode(res.body) as Map<String, dynamic>;
+        if (data['success'] == true) {
+          final userId = data['user_id']?.toString() ?? '';
+
+          // Tài khoản mới toanh: khởi tạo save sạch sẽ
+          await _storage.switchAccount(userId, cloudSave: null);
+
           _storage.isGuestMode = false;
           _storage.authProviderName = 'custom';
           _storage.playerUsername = data['username'] ?? username;
           if (email != null) _storage.authEmail = email;
           _storage.userRole = data['role'] ?? 'player';
-          _storage.avatarUrl = data['avatar_url'] ?? '';
-          TXALogger.logApi('Custom auth success: ${data['username']}, role: ${data['role']}');
+          _storage.avatarUrl = '';
+          TXALogger.logApi('Custom registration success: ${data['username']}');
         }
         return data;
       }
-      TXALogger.logApi('Custom auth failed with status: ${res.statusCode}');
       return {'success': false, 'error': _tr('oauth_err_server_status', {'code': res.statusCode.toString()})};
     } catch (e, stack) {
-      TXALogger.logError('TxaAuthService loginOrRegisterCustom error: $e', stackTrace: stack);
+      TXALogger.logError('TxaAuthService registerCustom error: $e', stackTrace: stack);
       return {'success': false, 'error': e.toString()};
     }
   }
 
+  /// Phương thức tương thích ngược
+  Future<Map<String, dynamic>> loginOrRegisterCustom({
+    required String username,
+    required String password,
+    String? email,
+  }) => loginCustom(usernameOrEmail: username, password: password);
+
   /// 2. Đăng nhập bằng Google (TxaGgLogin)
+  /// Tự động khôi phục tài khoản cũ nếu đã từng đăng nhập trước đó, chỉ tạo mới khi chưa có
   Future<bool> loginWithGoogle() async {
     try {
       TXALogger.logApi('Starting Google Sign-In...');
       final ggUser = await TxaGgLogin.signIn();
       if (ggUser == null) {
-        TXALogger.logApi('Google Sign-In cancelled by user');
+        TXALogger.logApi('Google Sign-In cancelled or error');
         return false;
       }
 
-      final url = Uri.parse('$supabaseUrl/rest/v1/rpc/auth_register_or_login');
+      final url = Uri.parse('$supabaseUrl/rest/v1/rpc/auth_oauth_login_or_register');
       final deviceInfo = await TxaDevice.getDeviceInfoSummary();
       final deviceId = await TxaDevice.getUniqueDeviceId();
       final platform = TxaDevice.getPlatformName();
 
       final body = jsonEncode({
-        'p_username': ggUser.displayName,
-        'p_password_hash': 'google_oauth_${ggUser.id}',
+        'p_oauth_id': ggUser.id,
         'p_email': ggUser.email,
+        'p_display_name': ggUser.displayName,
         'p_auth_provider': 'google',
+        'p_avatar_url': ggUser.photoUrl,
         'p_device_id': deviceId,
         'p_device_info': deviceInfo,
         'p_platform': platform,
-        'p_avatar_url': ggUser.photoUrl,
       });
 
       final res = await http.post(url, headers: _headers, body: body);
       if (res.statusCode == 200) {
         final data = jsonDecode(res.body) as Map<String, dynamic>;
         if (data['success'] == true) {
+          final userId = data['user_id']?.toString() ?? '';
+          final cloudSave = data['save_data'] as Map<String, dynamic>?;
+
+          // Chuyển đổi sang tài khoản Google và nạp toàn bộ dữ liệu game đã lưu
+          await _storage.switchAccount(userId, cloudSave: cloudSave);
+
           _storage.isGuestMode = false;
           _storage.authProviderName = 'google';
-          _storage.playerUsername = ggUser.displayName;
+          _storage.playerUsername = data['display_name'] ?? ggUser.displayName;
           _storage.authEmail = ggUser.email;
           _storage.avatarUrl = ggUser.photoUrl ?? (data['avatar_url'] ?? '');
           _storage.userRole = data['role'] ?? 'player';
-          TXALogger.logApi('Google auth success: ${ggUser.email}, role: ${data['role']}, avatar: ${ggUser.photoUrl}');
+          TXALogger.logApi('Google auth success: ${ggUser.email}, is_new: ${data['is_new']}, role: ${data['role']}');
           return true;
         }
       }
@@ -182,49 +248,44 @@ class TxaAuthService {
         final data = jsonDecode(res.body) as Map<String, dynamic>;
         if (data['success'] == true) {
           final user = data['user'] as Map<String, dynamic>?;
-          _storage.isGuestMode = false;
-          _storage.authProviderName = 'txa_studio';
-          _storage.playerUsername = user?['display_name'] ?? 'TXA Player';
-          _storage.authEmail = user?['email'] ?? '';
-          _storage.avatarUrl = user?['avatar_url'] ?? '';
-          _storage.userRole = 'player';
-          TXALogger.logApi('TXA Studio OAuth success: ${_storage.playerUsername} (${_storage.authEmail})');
+          final txaEmail = user?['email']?.toString() ?? '';
+          final txaName = user?['display_name']?.toString() ?? 'TXA Player';
+          final txaAvatar = user?['avatar_url']?.toString() ?? '';
+          final txaUserId = user?['id']?.toString() ?? '';
 
-          // Tự động đồng bộ và liên kết hồ sơ vào cơ sở dữ liệu game (zg_users)
+          // Đồng bộ và khôi phục đúng tài khoản game
           try {
-            if (user?['id'] != null) {
-              _storage.playerId = 'zg_txa_${user!['id']}';
-            }
             final deviceInfo = await TxaDevice.getDeviceInfoSummary();
             final deviceId = await TxaDevice.getUniqueDeviceId();
             final platform = TxaDevice.getPlatformName();
-            final syncUrl = Uri.parse('$supabaseUrl/rest/v1/rpc/auth_register_or_login');
+            final syncUrl = Uri.parse('$supabaseUrl/rest/v1/rpc/auth_oauth_login_or_register');
             final syncRes = await http.post(
               syncUrl,
               headers: _headers,
               body: jsonEncode({
-                'p_username': _storage.playerUsername,
-                'p_password_hash': 'txa_studio_oauth_${user?['id']}',
-                'p_email': _storage.authEmail,
+                'p_oauth_id': txaUserId,
+                'p_email': txaEmail,
+                'p_display_name': txaName,
                 'p_auth_provider': 'txa_studio',
+                'p_avatar_url': txaAvatar.isNotEmpty ? txaAvatar : null,
                 'p_device_id': deviceId,
                 'p_device_info': deviceInfo,
                 'p_platform': platform,
-                'p_avatar_url': _storage.avatarUrl.isNotEmpty ? _storage.avatarUrl : null,
               }),
             );
             if (syncRes.statusCode == 200) {
               final syncData = jsonDecode(syncRes.body) as Map<String, dynamic>;
               if (syncData['success'] == true) {
-                if (syncData['user_id'] != null) {
-                  _storage.playerId = syncData['user_id'].toString();
-                }
-                if (syncData['role'] != null) {
-                  _storage.userRole = syncData['role'].toString();
-                }
-                if (syncData['avatar_url'] != null && (syncData['avatar_url'] as String).isNotEmpty) {
-                  _storage.avatarUrl = syncData['avatar_url'].toString();
-                }
+                final resolvedUserId = syncData['user_id']?.toString() ?? 'zg_txa_$txaUserId';
+                final cloudSave = syncData['save_data'] as Map<String, dynamic>?;
+
+                await _storage.switchAccount(resolvedUserId, cloudSave: cloudSave);
+                _storage.isGuestMode = false;
+                _storage.authProviderName = 'txa_studio';
+                _storage.playerUsername = syncData['display_name'] ?? txaName;
+                _storage.authEmail = txaEmail;
+                _storage.avatarUrl = syncData['avatar_url'] ?? txaAvatar;
+                _storage.userRole = syncData['role'] ?? 'player';
               }
             }
           } catch (syncErr) {
@@ -283,8 +344,8 @@ class TxaAuthService {
   }
 
   /// 5. Tiếp tục dưới dạng Chế độ Khách (Guest Mode)
-  void continueAsGuest() {
-    _storage.resetToGuestSession();
+  Future<void> continueAsGuest() async {
+    await _storage.resetToGuestSession();
     TXALogger.logApi('User continued as Guest');
   }
 
@@ -297,7 +358,7 @@ class TxaAuthService {
     } catch (e) {
       TXALogger.logError('Google SignOut error: $e');
     }
-    _storage.resetToGuestSession();
+    await _storage.resetToGuestSession();
     TXALogger.logApi('User logged out, session cleared, switched to Guest mode');
   }
 }
