@@ -444,3 +444,23 @@ export async function updateSystemConfig(key, value) {
     p_value: String(value)
   });
 }
+
+// Convert seconds into standard formatted human label (e.g. 360 -> "06 phút")
+export function formatSecondsToHumanLabel(totalSeconds, isEn = false) {
+  const s = parseInt(totalSeconds, 10) || 300;
+  const minutes = Math.floor(s / 60);
+  const remainingSeconds = s % 60;
+  const mm = minutes < 10 ? '0' + minutes : '' + minutes;
+
+  if (minutes === 0) {
+    const ss = remainingSeconds < 10 ? '0' + remainingSeconds : '' + remainingSeconds;
+    return isEn ? `${ss} seconds` : `${ss} giây`;
+  }
+
+  if (remainingSeconds === 0) {
+    return isEn ? `${mm} minutes` : `${mm} phút`;
+  }
+  const ss = remainingSeconds < 10 ? '0' + remainingSeconds : '' + remainingSeconds;
+  return isEn ? `${mm}m ${ss}s` : `${mm} phút ${ss} giây`;
+}
+

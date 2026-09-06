@@ -26,8 +26,8 @@
           </h2>
           <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal max-w-md mx-auto">
             {{ isEn 
-              ? 'This authorization request has exceeded the 5-minute security limit. Your account was protected and no permissions were granted.' 
-              : 'Phiên ủy quyền này đã vượt quá thời hạn 5 phút kể từ khi game gửi yêu cầu nhằm bảo vệ an toàn cho tài khoản TXA Studio của bạn.' }}
+              ? `This authorization request has exceeded the ${expiryDurationLabel} security limit. Your account was protected and no permissions were granted.` 
+              : `Phiên ủy quyền này đã vượt quá thời hạn ${expiryDurationLabel} kể từ khi game gửi yêu cầu nhằm bảo vệ an toàn cho tài khoản TXA Studio của bạn.` }}
           </p>
         </div>
 
@@ -325,7 +325,9 @@ import {
   getCurrentWebUser, 
   clearCurrentWebUser, 
   getOAuthAppInfo, 
-  generateOAuthCode 
+  generateOAuthCode,
+  getSystemConfigs,
+  formatSecondsToHumanLabel
 } from '../services/supabase.js';
 import { sound } from '../services/sound.js';
 
@@ -348,9 +350,14 @@ const isSubmitting = ref(false);
 const grantedAuthCode = ref('');
 const codeCopied = ref(false);
 
-// Live 2-Digit Countdown Timer (MM:SS)
-const countdownSeconds = ref(300); // 5 minutes default
+// Live Dynamic Countdown Timer (MM:SS) based on Admin Configured Seconds
+const configuredSeconds = ref(300); // Default 300s (05:00)
+const countdownSeconds = ref(300);
 let timerInterval = null;
+
+const expiryDurationLabel = computed(() => {
+  return formatSecondsToHumanLabel(configuredSeconds.value, isEn.value);
+});
 
 const formattedCountdown = computed(() => {
   const m = Math.floor(countdownSeconds.value / 60);
@@ -432,13 +439,26 @@ onMounted(async () => {
   }
 
   try {
-    const app = await getOAuthAppInfo(clientId.value);
+    const [app, configs] = await Promise.all([
+      getOAuthAppInfo(clientId.value),
+      getSystemConfigs()
+    ]);
+
     if (!app) {
       errorState.value = 'TXA_ERR_INVALID_CLIENT_OR_PARAMS';
       return;
     }
     appInfo.value = app;
-    // Start the live 5-minute countdown!
+
+    // Read dynamic expiry seconds configured by admin (e.g. 360s = 06:00)
+    const rawSeconds = configs['oauth_expiry_seconds'] || (configs['oauth_expiry_minutes'] ? configs['oauth_expiry_minutes'] * 60 : 300);
+    const parsedSeconds = parseInt(rawSeconds, 10);
+    if (!isNaN(parsedSeconds) && parsedSeconds > 0) {
+      configuredSeconds.value = parsedSeconds;
+      countdownSeconds.value = parsedSeconds;
+    }
+
+    // Start the live countdown!
     startCountdown();
   } catch (err) {
     errorState.value = 'TXA_ERR_INVALID_CLIENT_OR_PARAMS';

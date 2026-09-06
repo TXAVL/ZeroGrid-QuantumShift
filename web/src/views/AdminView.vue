@@ -263,20 +263,23 @@
           <div class="p-6 rounded-3xl border border-slate-800 bg-[#090d1a]/80 backdrop-blur-xl space-y-5">
             <h2 class="text-lg font-display font-black text-white">Cấu Hình Thời Hạn OAuth & An Ninh</h2>
 
-            <!-- Expiry Config -->
+            <!-- Expiry Config in Seconds -->
             <div class="space-y-2">
               <label class="block text-xs font-mono uppercase tracking-wider text-slate-400 font-bold">
-                Thời Hạn Phiên Ủy Quyền OAuth (Phút)
+                Thời Hạn Phiên Yêu Cầu OAuth (Đơn Vị: GIÂY)
               </label>
-              <div class="flex items-center gap-3">
+              <div class="flex items-center gap-3 flex-wrap">
                 <input 
                   type="number" 
-                  min="1" 
-                  max="60"
-                  v-model="expiryInput" 
-                  class="w-24 px-4 py-2.5 rounded-xl bg-black/60 border border-slate-700 text-cyan-300 font-mono text-sm outline-none focus:border-cyan-400 text-center font-bold"
+                  min="10" 
+                  max="86400"
+                  v-model="expirySecondsInput" 
+                  class="w-28 px-4 py-2.5 rounded-xl bg-black/60 border border-slate-700 text-cyan-300 font-mono text-sm outline-none focus:border-cyan-400 text-center font-bold"
                 />
-                <span class="text-xs text-slate-400 font-mono">phút (Mặc định: 5 phút)</span>
+                <span class="text-xs text-slate-400 font-mono">giây</span>
+                <span class="px-2.5 py-1 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 font-mono text-xs font-bold">
+                  (= {{ previewExpiryLabel }})
+                </span>
                 <button 
                   @click="saveExpiryConfig"
                   class="px-4 py-2.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-300 text-xs font-mono font-bold transition-all ml-auto"
@@ -284,6 +287,9 @@
                   Lưu Cấu Hình
                 </button>
               </div>
+              <p class="text-[11px] font-mono text-slate-500">
+                Ví dụ: Nhập 360 giây → khi người chơi mở trang ủy quyền sẽ tự động hiển thị "{{ formatSecondsToHumanLabel(360) }}". Mặc định: 300 giây (05 phút).
+              </p>
             </div>
 
             <!-- PIN Config -->
@@ -450,7 +456,8 @@ import {
   adminListDeletions, 
   adminUpdateDeletion, 
   getSystemConfigs, 
-  updateSystemConfig 
+  updateSystemConfig,
+  formatSecondsToHumanLabel
 } from '../services/supabase.js';
 import { sound } from '../services/sound.js';
 
@@ -466,7 +473,8 @@ const appList = ref([]);
 const deletionList = ref([]);
 const systemConfigs = ref({});
 
-const expiryInput = ref('5');
+const expirySecondsInput = ref('300');
+const previewExpiryLabel = computed(() => formatSecondsToHumanLabel(expirySecondsInput.value, isEn.value));
 const newPinInput = ref('');
 const settingsNotice = ref('');
 
@@ -535,7 +543,7 @@ async function loadDashboardData() {
     appList.value = apps || [];
     deletionList.value = deletions || [];
     systemConfigs.value = configs || {};
-    expiryInput.value = configs['oauth_expiry_minutes'] || '5';
+    expirySecondsInput.value = configs['oauth_expiry_seconds'] || (configs['oauth_expiry_minutes'] ? String(parseInt(configs['oauth_expiry_minutes'], 10) * 60) : '300');
   } catch (e) {
     console.error('Failed to load admin data', e);
   }
@@ -579,10 +587,16 @@ async function handleCreateApp() {
 
 async function saveExpiryConfig() {
   sound.playClick();
-  await updateSystemConfig('oauth_expiry_minutes', expiryInput.value);
-  settingsNotice.value = '✓ Đã cập nhật thời hạn phiên OAuth thành công!';
+  const sec = parseInt(expirySecondsInput.value, 10);
+  if (isNaN(sec) || sec <= 0) {
+    alert('Vui lòng nhập số giây hợp lệ (> 0)');
+    return;
+  }
+  await updateSystemConfig('oauth_expiry_seconds', String(sec));
+  await updateSystemConfig('oauth_expiry_minutes', String(Math.round(sec / 60)));
+  settingsNotice.value = `✓ Đã cập nhật thời hạn OAuth: ${sec} giây (= ${previewExpiryLabel.value})!`;
   sound.playSuccess();
-  setTimeout(() => { settingsNotice.value = ''; }, 3000);
+  setTimeout(() => { settingsNotice.value = ''; }, 3500);
 }
 
 async function savePinConfig() {
