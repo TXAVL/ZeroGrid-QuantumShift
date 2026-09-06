@@ -211,7 +211,7 @@
                   @click="viewSnippet(app)"
                   class="text-xs font-mono text-cyan-400 hover:text-cyan-300 underline font-bold"
                 >
-                  📋 Xem mã Flutter txa_config.dart
+                  📋 {{ isEn ? 'View Config Snippet' : 'Xem mã cấu hình' }}
                 </button>
                 <span class="text-[10px] font-mono text-slate-500">Status: {{ app.status }}</span>
               </div>
@@ -459,12 +459,16 @@
         >
           <div class="w-full max-w-xl rounded-3xl border border-slate-800 bg-[#090d1a] p-6 sm:p-8 space-y-4 text-slate-100 shadow-2xl">
             <div class="flex items-center justify-between pb-3 border-b border-slate-800">
-              <h3 class="font-display font-black text-white text-base">Mã Cấu Hình Flutter (txa_config.dart)</h3>
+              <h3 class="font-display font-black text-white text-base">
+                {{ isEn ? 'Application Configuration Code' : 'Mã Cấu Hình Ứng Dụng / Game' }}
+              </h3>
               <button @click="selectedAppSnippet = null" class="text-slate-400 hover:text-white">✕</button>
             </div>
 
             <p class="text-xs text-slate-300 font-mono">
-              Dán đoạn mã sau vào file <span class="text-cyan-400 font-bold">lib/core/config/txa_config.dart</span> trong dự án game của bạn:
+              {{ isEn 
+                ? 'Paste the following code into your project configuration file:' 
+                : 'Dán đoạn mã sau vào file cấu hình trong dự án của bạn:' }}
             </p>
 
             <div class="relative p-4 rounded-2xl bg-black/80 border border-slate-800 font-mono text-xs">
