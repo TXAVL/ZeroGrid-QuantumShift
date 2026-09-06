@@ -18,6 +18,7 @@
 .pub/
 /build/
 /coverage/
+
 **/ios/Flutter/.last_build_id
 .widget_preview/
 
@@ -26,6 +27,7 @@ web/node_modules/
 web/dist/
 web/.vite/
 *.log
+node_modules/
 
 # Sensitive API Keys, Configs & Credentials (Ẩn file nhạy cảm)
 andr.json
