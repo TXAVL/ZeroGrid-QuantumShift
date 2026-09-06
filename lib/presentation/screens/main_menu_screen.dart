@@ -394,6 +394,32 @@ class _MainMenuScreenState extends ConsumerState<MainMenuScreen> {
                       ),
                       const Divider(color: Colors.white10),
 
+                      // Quản lý gói đăng ký & giao dịch (Google Play / App Store)
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF00E5FF).withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Icon(Icons.open_in_new_rounded, color: Color(0xFF00E5FF), size: 22),
+                        ),
+                        title: Text(
+                          TxaLanguage.tr('manage_subscriptions', langCode),
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                        ),
+                        subtitle: Text(
+                          TxaLanguage.tr('manage_subscriptions_desc', langCode),
+                          style: const TextStyle(color: Color(0xFF8B9BB4), fontSize: 12),
+                        ),
+                        onTap: () {
+                          Navigator.of(ctx).pop();
+                          TxaConfig.openStoreSubscriptions();
+                        },
+                      ),
+                      const Divider(color: Colors.white10),
+
                       // Có gì mới ở phiên bản này (What's New)
                       ListTile(
                         contentPadding: EdgeInsets.zero,

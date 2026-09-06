@@ -66,16 +66,28 @@
 
         <!-- Wave Canvas Area -->
         <div 
-          class="relative w-full h-44 sm:h-52 bg-[#060913] rounded-2xl border border-slate-800/90 overflow-hidden cursor-crosshair select-none"
+          class="relative w-full h-44 sm:h-52 bg-[#060913] rounded-2xl border transition-all duration-300 overflow-hidden cursor-crosshair select-none"
+          :class="isLockSuccess 
+            ? 'border-emerald-400 ring-4 ring-emerald-500/40 shadow-2xl shadow-emerald-500/40' 
+            : (flashMiss ? 'border-rose-500/80 ring-2 ring-rose-500/30' : 'border-slate-800/90 hover:border-cyan-500/50')"
           @click="handleLockClick"
         >
           <canvas ref="canvasRef" class="w-full h-full block"></canvas>
           
-          <!-- Hit Flash Effect -->
-          <div 
-            v-if="flashHit" 
-            class="absolute inset-0 bg-cyan-400/20 pointer-events-none transition-opacity duration-300"
-          ></div>
+          <!-- Hit Success Highlight (Tô xanh khi bấm trúng) -->
+          <transition enter-active-class="transition duration-150 ease-out" enter-from-class="opacity-0 scale-95" enter-to-class="opacity-100 scale-100">
+            <div 
+              v-if="isLockSuccess" 
+              class="absolute inset-0 bg-emerald-500/20 backdrop-blur-[1px] pointer-events-none flex items-center justify-center"
+            >
+              <div class="px-5 py-2.5 rounded-2xl bg-emerald-400 text-slate-950 font-display font-black text-sm uppercase tracking-widest shadow-2xl shadow-emerald-500/60 flex items-center gap-2 border border-emerald-300 animate-bounce">
+                <span class="text-base font-black">✓</span>
+                <span>{{ isEn ? 'SIGNAL LOCKED!' : 'ĐÃ KHÓA TÍN HIỆU!' }}</span>
+              </div>
+            </div>
+          </transition>
+
+          <!-- Miss Flash Effect -->
           <div 
             v-if="flashMiss" 
             class="absolute inset-0 bg-rose-500/20 pointer-events-none transition-opacity duration-300"
@@ -83,8 +95,12 @@
         </div>
 
         <!-- Status / Feedback line -->
-        <div class="text-center min-h-[24px]">
-          <p v-if="attemptCount === 0" class="text-xs sm:text-sm text-slate-400 font-mono">
+        <div class="text-center min-h-[28px] flex items-center justify-center">
+          <p v-if="isLockSuccess" class="text-xs sm:text-sm font-mono font-bold text-emerald-400 flex items-center gap-2">
+            <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            <span>{{ isEn ? '✓ SIGNAL LOCKED! Opening gift vault...' : '✓ KHÓA TÍN HIỆU CHÍNH XÁC! Đang mở kho quà...' }}</span>
+          </p>
+          <p v-else-if="attemptCount === 0" class="text-xs sm:text-sm text-slate-400 font-mono">
             {{ isEn 
               ? 'The window is lit. Hit Lock when the playhead is inside it.' 
               : 'Khung sáng đã bật. Hãy bấm LOCK khi vạch quét chạy vào bên trong khung.' 
@@ -101,9 +117,14 @@
         <!-- Big Lock Button -->
         <button
           @click="handleLockClick"
-          class="w-full py-3.5 sm:py-4 rounded-2xl bg-white hover:bg-slate-100 text-slate-950 font-display font-black text-sm sm:text-base uppercase tracking-widest transition-all duration-150 hover:scale-[1.01] active:scale-95 shadow-xl shadow-white/10 flex items-center justify-center gap-2"
+          :disabled="isLockSuccess"
+          class="w-full py-3.5 sm:py-4 rounded-2xl font-display font-black text-sm sm:text-base uppercase tracking-widest transition-all duration-200 flex items-center justify-center gap-2"
+          :class="isLockSuccess
+            ? 'bg-gradient-to-r from-emerald-400 to-teal-300 text-slate-950 ring-4 ring-emerald-400/50 shadow-2xl shadow-emerald-500/50 scale-[1.01]'
+            : 'bg-white hover:bg-slate-100 text-slate-950 hover:scale-[1.01] active:scale-95 shadow-xl shadow-white/10'"
         >
-          <span>LOCK</span>
+          <span v-if="isLockSuccess" class="text-base font-black">✓</span>
+          <span>{{ isLockSuccess ? (isEn ? 'SIGNAL LOCKED!' : 'ĐÃ KHÓA THÀNH CÔNG!') : 'LOCK' }}</span>
         </button>
       </div>
 
@@ -370,6 +391,7 @@
 <script setup>
 import { ref, computed, inject, onMounted, onUnmounted, nextTick } from 'vue';
 import { getCurrentWebUser, claimPromotionCode, resetClaimedPromotionCode, getPromotionStats } from '../services/supabase.js';
+import { sound } from '../services/sound.js';
 import promoData from '../data/promotions.json';
 
 const currentLang = inject('currentLang', ref('vi'));
@@ -396,6 +418,7 @@ let direction = 1;
 let windowStart = 0.35;
 let windowWidth = 0.22;
 
+const isLockSuccess = ref(false);
 const flashHit = ref(false);
 const flashMiss = ref(false);
 const attemptCount = ref(0);
@@ -499,18 +522,24 @@ function drawCanvas() {
   const winX = windowStart * w;
   const winW = windowWidth * w;
 
-  // Lit window background glow
+  // Lit window background glow (vivid emerald green if locked successfully)
   const gradient = ctx.createLinearGradient(winX, 0, winX + winW, 0);
-  gradient.addColorStop(0, 'rgba(0, 229, 255, 0.05)');
-  gradient.addColorStop(0.5, 'rgba(0, 229, 255, 0.16)');
-  gradient.addColorStop(1, 'rgba(0, 229, 255, 0.05)');
+  if (isLockSuccess.value) {
+    gradient.addColorStop(0, 'rgba(16, 185, 129, 0.2)');
+    gradient.addColorStop(0.5, 'rgba(16, 185, 129, 0.55)');
+    gradient.addColorStop(1, 'rgba(16, 185, 129, 0.2)');
+  } else {
+    gradient.addColorStop(0, 'rgba(0, 229, 255, 0.05)');
+    gradient.addColorStop(0.5, 'rgba(0, 229, 255, 0.16)');
+    gradient.addColorStop(1, 'rgba(0, 229, 255, 0.05)');
+  }
   ctx.fillStyle = gradient;
   ctx.fillRect(winX, 0, winW, h);
 
   // Lit window dashed borders
-  ctx.strokeStyle = 'rgba(0, 229, 255, 0.7)';
-  ctx.lineWidth = 1.5;
-  ctx.setLineDash([6, 6]);
+  ctx.strokeStyle = isLockSuccess.value ? '#10b981' : 'rgba(0, 229, 255, 0.7)';
+  ctx.lineWidth = isLockSuccess.value ? 2.5 : 1.5;
+  ctx.setLineDash(isLockSuccess.value ? [8, 4] : [6, 6]);
   ctx.beginPath();
   ctx.moveTo(winX, 0);
   ctx.lineTo(winX, h);
@@ -520,7 +549,7 @@ function drawCanvas() {
   ctx.setLineDash([]);
 
   // Draw Sine Wave Trace Curve
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
+  ctx.strokeStyle = isLockSuccess.value ? 'rgba(52, 211, 153, 0.35)' : 'rgba(255, 255, 255, 0.45)';
   ctx.lineWidth = 2.0;
   ctx.beginPath();
   const centerY = h / 2;
@@ -534,9 +563,11 @@ function drawCanvas() {
   }
   ctx.stroke();
 
-  // Highlight wave inside lit window
-  ctx.strokeStyle = 'rgba(0, 229, 255, 0.95)';
-  ctx.lineWidth = 3.0;
+  // Highlight wave inside lit window (vibrant emerald glow when locked)
+  ctx.strokeStyle = isLockSuccess.value ? '#34d399' : 'rgba(0, 229, 255, 0.95)';
+  ctx.shadowColor = isLockSuccess.value ? '#10b981' : '#00e5ff';
+  ctx.shadowBlur = isLockSuccess.value ? 16 : 8;
+  ctx.lineWidth = isLockSuccess.value ? 4.5 : 3.0;
   ctx.beginPath();
   let first = true;
   for (let x = Math.floor(winX); x <= Math.ceil(winX + winW); x += 2) {
@@ -549,15 +580,18 @@ function drawCanvas() {
     }
   }
   ctx.stroke();
+  ctx.shadowBlur = 0; // reset
 
-  // Update playhead position (oscillate back and forth smoothly)
-  playheadPos += playheadSpeed * direction;
-  if (playheadPos >= 1.0) {
-    playheadPos = 1.0;
-    direction = -1;
-  } else if (playheadPos <= 0.0) {
-    playheadPos = 0.0;
-    direction = 1;
+  // Update playhead position (oscillate back and forth smoothly unless locked)
+  if (!isLockSuccess.value) {
+    playheadPos += playheadSpeed * direction;
+    if (playheadPos >= 1.0) {
+      playheadPos = 1.0;
+      direction = -1;
+    } else if (playheadPos <= 0.0) {
+      playheadPos = 0.0;
+      direction = 1;
+    }
   }
 
   // Draw Playhead vertical line & glowing dot
@@ -565,19 +599,19 @@ function drawCanvas() {
   const phY = centerY + Math.sin(phX * freq) * amplitude;
 
   // Playhead line
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
-  ctx.lineWidth = 1.5;
+  ctx.strokeStyle = isLockSuccess.value ? '#34d399' : 'rgba(255, 255, 255, 0.9)';
+  ctx.lineWidth = isLockSuccess.value ? 2.5 : 1.5;
   ctx.beginPath();
   ctx.moveTo(phX, 0);
   ctx.lineTo(phX, h);
   ctx.stroke();
 
   // Playhead dot with glow
-  ctx.shadowColor = '#00e5ff';
-  ctx.shadowBlur = 14;
-  ctx.fillStyle = '#ffffff';
+  ctx.shadowColor = isLockSuccess.value ? '#10b981' : '#00e5ff';
+  ctx.shadowBlur = isLockSuccess.value ? 20 : 14;
+  ctx.fillStyle = isLockSuccess.value ? '#6ee7b7' : '#ffffff';
   ctx.beginPath();
-  ctx.arc(phX, phY, 5.5, 0, Math.PI * 2);
+  ctx.arc(phX, phY, isLockSuccess.value ? 7 : 5.5, 0, Math.PI * 2);
   ctx.fill();
   ctx.shadowBlur = 0; // reset
 
@@ -585,23 +619,27 @@ function drawCanvas() {
 }
 
 function handleLockClick() {
-  if (stage.value !== 1) return;
+  if (stage.value !== 1 || isLockSuccess.value) return;
 
   const currentX = playheadPos;
   const winEnd = windowStart + windowWidth;
 
   if (currentX >= windowStart && currentX <= winEnd) {
-    // SUCCESS!
+    // SUCCESS - Turn vibrant green, play success chime, hold 750ms
+    isLockSuccess.value = true;
     flashHit.value = true;
+    sound.playSuccess();
     setTimeout(() => {
       flashHit.value = false;
+      isLockSuccess.value = false;
       stage.value = 2; // Move to package & platform selection
       refreshStats();
-    }, 280);
+    }, 750);
   } else {
     // MISS!
     flashMiss.value = true;
     attemptCount.value++;
+    sound.playTap();
     randomizeWindow();
     setTimeout(() => {
       flashMiss.value = false;

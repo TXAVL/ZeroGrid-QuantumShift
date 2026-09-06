@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/config/txa_config.dart';
 import '../../core/localization/txa_language.dart';
 import '../../services/iap/iap_service.dart';
 import '../../services/service_providers.dart';
@@ -133,7 +134,23 @@ class _RestorePurchasesDialogState extends ConsumerState<RestorePurchasesDialog>
 
               // 3. Nội dung mô tả / Chi tiết
               _buildContent(isVi, langCode),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
+
+              // Nút mở trực tiếp trang Quản lý gói đăng ký / Lịch sử đơn hàng Google Play
+              if (!_isLoading) ...[
+                TextButton.icon(
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  ),
+                  icon: const Icon(Icons.open_in_new_rounded, size: 15, color: Color(0xFF00E5FF)),
+                  label: Text(
+                    isVi ? 'Quản lý gói đăng ký / Đơn hàng Store' : 'Manage Subscriptions & Orders',
+                    style: const TextStyle(color: Color(0xFF00E5FF), fontSize: 12.5),
+                  ),
+                  onPressed: () => TxaConfig.openStoreSubscriptions(),
+                ),
+                const SizedBox(height: 8),
+              ],
 
               // 4. Các nút thao tác
               _buildActions(isVi),
@@ -273,12 +290,40 @@ class _RestorePurchasesDialogState extends ConsumerState<RestorePurchasesDialog>
     }
 
     if (_result?.isNoPurchases ?? false) {
-      return Text(
-        isVi
-            ? 'Tài khoản Google Play hiện tại chưa từng mua bất kỳ gói vĩnh viễn nào (như Gói Gỡ Quảng Cáo hoặc Bộ Chủ Đề Pro).\n\nNếu bạn đã mua trên một tài khoản Google khác, hãy đăng nhập tài khoản đó trên ứng dụng CH Play rồi thử lại.'
-            : 'No previous non-consumable purchases (such as Ad-Free or Pro Themes) were found on this Google account.\n\nIf you purchased under another account, please switch accounts in Google Play and try again.',
-        textAlign: TextAlign.center,
-        style: const TextStyle(color: Color(0xFF90A4AE), fontSize: 13.5, height: 1.45),
+      return Column(
+        children: [
+          Text(
+            isVi
+                ? 'Tài khoản Google Play này chưa từng mua gói vĩnh viễn nào (như Gỡ Quảng Cáo hoặc Chủ Đề Pro).'
+                : 'No non-consumable purchases (such as Ad-Free or Pro Themes) were found on this account.',
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: Color(0xFF90A4AE), fontSize: 13.5, height: 1.45),
+          ),
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0xFF141E2C),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFF00E5FF).withValues(alpha: 0.2)),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(Icons.info_outline_rounded, color: Color(0xFF00E5FF), size: 18),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    isVi
+                        ? 'Lưu ý về Gói Gợi Ý (10 / 50 gợi ý):\nĐây là vật phẩm tiêu hao (Consumable). Khi đổi mã thành công hoặc mua, gợi ý đã được tự động cộng thẳng vào số dư của bạn ngay khi mở game và Google Play đánh dấu đã tiêu thụ. Do đó gói gợi ý sẽ không xuất hiện trong danh sách khôi phục này.'
+                        : 'Note on Hint Packs (10 / 50 hints):\nThese are consumable items. Once redeemed or purchased, hints are credited directly into your balance upon launch. Under Google Play Billing rules, consumed items are not returned in restore requests.',
+                    style: const TextStyle(color: Color(0xFFB0BEC5), fontSize: 11.5, height: 1.4),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       );
     }
 

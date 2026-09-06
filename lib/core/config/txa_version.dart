@@ -47,14 +47,52 @@ class TxaVersion {
   /// Danh sách các bản phát hành được khai báo (Bản mới nhất đặt ở đầu tiên)
   static final List<TxaVersionRelease> releases = [
     // =========================================================================
-    // [TXA_6] - Zero Grid: Quantum Shift v1.6.0 (Build 8) - 2026-09-06
+    // [TXA_7] - Zero Grid: Quantum Shift v1.6.1 (Build 9) - 2026-09-07
     // =========================================================================
     TxaVersionRelease(
-      id: 'txa_6',
+      id: 'txa_7',
       version: TxaConfig.version,
       buildNumber: TxaConfig.buildNumber,
       releaseDate: TxaConfig.releaseDate,
       items: const [
+        // [TXA_7_ITEM_1] - Tối ưu và khắc phục các lỗi phát sinh (Fix lỗi abc)
+        TxaChangelogItem(
+          icon: Icons.bug_report_rounded,
+          iconColor: Color(0xFF00FFA3),
+          titleKey: 'txa_7_item_1_title',
+          descKey: 'txa_7_item_1_desc',
+          badgeKey: 'txa_7_item_1_badge',
+        ),
+
+        // [TXA_7_ITEM_2] - Bổ sung gói 50 Gợi Ý Ma Trận siêu tiết kiệm
+        TxaChangelogItem(
+          icon: Icons.tips_and_updates_rounded,
+          iconColor: Color(0xFFFFD600),
+          titleKey: 'txa_7_item_2_title',
+          descKey: 'txa_7_item_2_desc',
+          badgeKey: 'txa_7_item_2_badge',
+        ),
+
+        // [TXA_7_ITEM_3] - Nâng cấp hiệu năng & độ nhạy cảm ứng
+        TxaChangelogItem(
+          icon: Icons.auto_awesome_rounded,
+          iconColor: Color(0xFF00E5FF),
+          titleKey: 'txa_7_item_3_title',
+          descKey: 'txa_7_item_3_desc',
+          badgeKey: 'txa_7_item_3_badge',
+        ),
+      ],
+    ),
+
+    // =========================================================================
+    // [TXA_6] - Zero Grid: Quantum Shift v1.6.0 (Build 8) - 2026-09-06
+    // =========================================================================
+    const TxaVersionRelease(
+      id: 'txa_6',
+      version: '1.6.0',
+      buildNumber: '8',
+      releaseDate: '2026-09-06',
+      items: [
         // [TXA_6_ITEM_1] - Dữ liệu game lưu độc lập theo từng tài khoản
         TxaChangelogItem(
           icon: Icons.cloud_sync_rounded,

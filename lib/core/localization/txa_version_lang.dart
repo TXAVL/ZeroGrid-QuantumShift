@@ -15,6 +15,26 @@ class TxaVersionLang {
       'whats_new_btn_continue': 'ĐÃ HIỂU & TIẾP TỤC',
 
       // -----------------------------------------------------------------------
+      // [TXA_7] - Phiên bản v1.6.1 (Build 9) - Ngày: 2026-09-07
+      // -----------------------------------------------------------------------
+      'txa_7_title': 'Bản Cập Nhật Sửa Lỗi & Tối Ưu 1.6.1',
+
+      // [TXA_7_ITEM_1] - Tối ưu và khắc phục các lỗi phát sinh (Fix lỗi abc)
+      'txa_7_item_1_title': 'Khắc Phục & Sửa Lỗi Nhỏ',
+      'txa_7_item_1_desc': 'Sửa các lỗi phát sinh (Fix lỗi abc các thứ), nâng cao độ ổn định hệ thống, khắc phục triệt để các lỗi phản hồi giao diện.',
+      'txa_7_item_1_badge': 'SỬA LỖI',
+
+      // [TXA_7_ITEM_2] - Bổ sung gói 50 Gợi Ý Ma Trận
+      'txa_7_item_2_title': 'Gói 50 Gợi Ý Ma Trận Siêu Tiết Kiệm',
+      'txa_7_item_2_desc': 'Đã chính thức mở bán gói 50 gợi ý thông minh trực tiếp trong Cửa Hàng game, nhận ngay 50 lượt giải ma trận với mức giá ưu đãi nhất.',
+      'txa_7_item_2_badge': 'CỬA HÀNG',
+
+      // [TXA_7_ITEM_3] - Nâng cấp hiệu năng & độ nhạy cảm ứng
+      'txa_7_item_3_title': 'Cải Thiện Trải Nghiệm & Hiệu Năng',
+      'txa_7_item_3_desc': 'Tối ưu hoá hoạt ảnh lưới ma trận, phản hồi cảm ứng mượt mà và chuyển đổi các màn hình không độ trễ.',
+      'txa_7_item_3_badge': 'TỐI ƯU',
+
+      // -----------------------------------------------------------------------
       // [TXA_6] - Phiên bản v1.6.0 (Build 8) - Ngày: 2026-09-06
       // -----------------------------------------------------------------------
       'txa_6_title': 'Bản Nâng Cấp Dữ Liệu & Bảng Xếp Hạng 1.6.0',
@@ -189,6 +209,26 @@ class TxaVersionLang {
       // -----------------------------------------------------------------------
       'whats_new_title': "WHAT'S NEW IN THIS VERSION?",
       'whats_new_btn_continue': 'GOT IT & CONTINUE',
+
+      // -----------------------------------------------------------------------
+      // [TXA_7] - Version v1.6.1 (Build 9) - Date: 2026-09-07
+      // -----------------------------------------------------------------------
+      'txa_7_title': 'Bug Fixes & System Optimization 1.6.1',
+
+      // [TXA_7_ITEM_1] - Bug fixes and stability
+      'txa_7_item_1_title': 'Bug Fixes & Minor Improvements',
+      'txa_7_item_1_desc': 'Fixed minor issues and edge cases across UI components to guarantee a polished, responsive, and crash-free gameplay experience.',
+      'txa_7_item_1_badge': 'BUG FIXES',
+
+      // [TXA_7_ITEM_2] - 50 Smart Hints Pack
+      'txa_7_item_2_title': '50 Smart Hints Value Pack',
+      'txa_7_item_2_desc': 'The 50 Smart Hints pack is now officially available directly inside the in-game store with maximum discount value.',
+      'txa_7_item_2_badge': 'STORE',
+
+      // [TXA_7_ITEM_3] - Performance enhancements
+      'txa_7_item_3_title': 'Smoother Animations & Responsiveness',
+      'txa_7_item_3_desc': 'Further tuned touch response latency, refined screen transitions, and improved framerate stability across devices.',
+      'txa_7_item_3_badge': 'POLISH',
 
       // -----------------------------------------------------------------------
       // [TXA_6] - Version v1.6.0 (Build 8) - Date: 2026-09-06

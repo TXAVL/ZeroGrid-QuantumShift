@@ -257,6 +257,18 @@ class StatsScreen extends ConsumerWidget {
                   const SizedBox(height: 10),
 
                   _IapTile(
+                    title: TxaLanguage.tr('iap_hints_50_title', langCode),
+                    subtitle: TxaLanguage.tr('iap_hints_50_desc', langCode),
+                    priceDetails: iap.getPriceDetails(TxaConfig.iapHints50, langCode: langCode),
+                    icon: Icons.tips_and_updates_rounded,
+                    palette: palette,
+                    isOwned: false,
+                    ownedLabel: TxaLanguage.tr('iap_owned', langCode),
+                    onBuy: () => iap.buyProduct(TxaConfig.iapHints50),
+                  ),
+                  const SizedBox(height: 10),
+
+                  _IapTile(
                     title: TxaLanguage.tr('iap_pro_themes_title', langCode),
                     subtitle: TxaLanguage.tr('iap_pro_themes_desc', langCode),
                     priceDetails: iap.getPriceDetails(TxaConfig.iapProThemes, langCode: langCode),
@@ -269,18 +281,31 @@ class StatsScreen extends ConsumerWidget {
 
                   const SizedBox(height: 18),
 
-                  // Nút Restore Purchases
-                  Center(
-                    child: TextButton.icon(
-                      icon: const Icon(Icons.restore_rounded, color: Colors.white70),
-                      label: Text(
-                        TxaLanguage.tr('restore_purchases', langCode),
-                        style: const TextStyle(color: Colors.white70),
+                  // Nút Restore Purchases & Quản lý đăng ký Store
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 12,
+                    runSpacing: 6,
+                    children: [
+                      TextButton.icon(
+                        icon: const Icon(Icons.restore_rounded, color: Colors.white70, size: 18),
+                        label: Text(
+                          TxaLanguage.tr('restore_purchases', langCode),
+                          style: const TextStyle(color: Colors.white70),
+                        ),
+                        onPressed: () {
+                          RestorePurchasesDialog.show(context);
+                        },
                       ),
-                      onPressed: () {
-                        RestorePurchasesDialog.show(context);
-                      },
-                    ),
+                      TextButton.icon(
+                        icon: const Icon(Icons.open_in_new_rounded, color: Colors.white70, size: 18),
+                        label: Text(
+                          TxaLanguage.tr('manage_subscriptions', langCode),
+                          style: const TextStyle(color: Colors.white70),
+                        ),
+                        onPressed: () => TxaConfig.openStoreSubscriptions(),
+                      ),
+                    ],
                   ),
                 ],
               ),

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Lớp cấu hình tập trung toàn bộ tham số của dự án Zero Grid: Quantum Shift
 /// Chuẩn bị sẵn sàng 100% cho cả Google Play Store (Android) và App Store (iOS)
@@ -11,9 +12,9 @@ class TxaConfig {
   // ==========================================
   static String appName = 'Zero Grid: Quantum Shift';
   static String packageId = 'txa.zerogrid.quantumshift';
-  static String version = '1.6.0';
-  static String buildNumber = '8';
-  static String releaseDate = '2026-09-06'; // Ngày cập nhật phiên bản tập trung
+  static String version = '1.6.1';
+  static String buildNumber = '9';
+  static String releaseDate = '2026-09-07'; // Ngày cập nhật phiên bản tập trung
 
   /// Chuỗi phiên bản đầy đủ dạng '1.0.0+1' (Tự động đồng bộ từ pubspec.yaml)
   static String get fullVersion => '$version+$buildNumber';
@@ -254,6 +255,41 @@ class TxaConfig {
       }
     } catch (e) {
       debugPrint("⚠️ [TxaConfig] syncRemoteConfig oauth apps fallback: $e");
+    }
+  }
+
+  // ==========================================
+  // 9. STORE URLs & SUBSCRIPTIONS / ORDERS
+  // ==========================================
+  /// Mở trang Quản lý gói đăng ký trên Google Play hoặc Apple App Store
+  static Future<bool> openStoreSubscriptions() async {
+    final Uri url;
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      url = Uri.parse('https://apps.apple.com/account/subscriptions');
+    } else {
+      url = Uri.parse('https://play.google.com/store/account/subscriptions');
+    }
+    try {
+      return await launchUrl(url, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      debugPrint('⚠️ [TxaConfig] Could not launch store subscriptions url: $e');
+      return false;
+    }
+  }
+
+  /// Mở trang Lịch sử đơn hàng & giao dịch (Google Play Order History / Apple Report a Problem)
+  static Future<bool> openStoreOrderHistory() async {
+    final Uri url;
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      url = Uri.parse('https://reportaproblem.apple.com/');
+    } else {
+      url = Uri.parse('https://play.google.com/store/account/orderhistory');
+    }
+    try {
+      return await launchUrl(url, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      debugPrint('⚠️ [TxaConfig] Could not launch store order history url: $e');
+      return false;
     }
   }
 }

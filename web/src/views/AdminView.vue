@@ -209,15 +209,25 @@
                 <div class="truncate">🗑️ Delete: <a :href="app.delete_account_url" target="_blank" class="text-pink-400 hover:underline">{{ app.delete_account_url }}</a></div>
               </div>
 
-              <!-- Flutter Integration Snippet Button -->
-              <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between">
+              <!-- Flutter Integration Snippet Button & Delete Button -->
+              <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between gap-2">
                 <button 
                   @click="viewSnippet(app)"
                   class="text-xs font-mono text-cyan-400 hover:text-cyan-300 underline font-bold"
                 >
                   📋 {{ isEn ? 'View Config Snippet' : 'Xem mã cấu hình' }}
                 </button>
-                <span class="text-[10px] font-mono text-slate-500">Status: {{ app.status }}</span>
+                <div class="flex items-center gap-3">
+                  <span class="text-[10px] font-mono text-slate-500">Status: {{ app.status }}</span>
+                  <button 
+                    @click="handleDeleteApp(app)"
+                    class="px-2.5 py-1 rounded-lg border border-rose-500/40 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 font-mono text-[11px] font-bold transition-all flex items-center gap-1"
+                    title="Xóa vĩnh viễn App này"
+                  >
+                    <span>🗑️</span>
+                    <span>{{ isEn ? 'Delete' : 'Xóa App' }}</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -570,6 +580,7 @@ import { useRouter } from 'vue-router';
 import { 
   adminListApps, 
   adminCreateApp, 
+  adminDeleteApp,
   adminListDeletions, 
   adminUpdateDeletion, 
   getSystemConfigs, 
@@ -788,6 +799,29 @@ async function handleCreateApp() {
     alert('Lỗi tạo app: ' + e.message);
   } finally {
     isCreatingApp.value = false;
+  }
+}
+
+async function handleDeleteApp(app) {
+  sound.playClick();
+  const confirmed = confirm(
+    isEn.value 
+      ? `Are you sure you want to permanently delete OAuth App "${app.name}" (${app.client_id})? This cannot be undone.`
+      : `Bạn có chắc chắn muốn xóa vĩnh viễn App OAuth "${app.name}" (${app.client_id})? Hành động này không thể hoàn tác.`
+  );
+  if (!confirmed) return;
+
+  try {
+    const res = await adminDeleteApp(app.client_id);
+    if (res?.success) {
+      sound.playSuccess();
+      alert(isEn.value ? `Successfully deleted app "${app.name}"!` : `Đã xóa thành công app "${app.name}"!`);
+      await loadDashboardData();
+    } else {
+      alert((isEn.value ? 'Delete failed: ' : 'Lỗi xóa app: ') + (res?.error || 'Unknown error'));
+    }
+  } catch (err) {
+    alert('Error: ' + err.message);
   }
 }
 

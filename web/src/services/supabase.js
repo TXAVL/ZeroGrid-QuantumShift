@@ -415,6 +415,21 @@ export async function adminCreateApp(payload) {
   });
 }
 
+// 7b. Admin: Delete OAuth app
+export async function adminDeleteApp(clientId) {
+  return await callRpc('txa_admin_delete_app', {
+    p_client_id: clientId
+  });
+}
+
+// 7c. Admin: Manage promo codes (lookup, reset, delete)
+export async function adminManagePromoCode(code, action = 'lookup') {
+  return await callRpc('txa_admin_manage_promo_code', {
+    p_code: code,
+    p_action: action
+  });
+}
+
 // 8. Admin: List deletion requests
 export async function adminListDeletions() {
   return await callRpc('txa_admin_list_deletions');
