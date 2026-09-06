@@ -113,6 +113,85 @@ class GameColorPalette {
     textSecondary: Color(0xFF9EABB8),
   );
 
+  static const GameColorPalette emeraldMatrix = GameColorPalette(
+    id: 'emerald_matrix',
+    name: 'Emerald Matrix',
+    background: Color(0xFF040D08),
+    boardFrame: Color(0xFF0B1F14),
+    cellInactive: Color(0xFF112E1E),
+    valueColors: [
+      Color(0xFF00FF66), // 1: Matrix Neon Green
+      Color(0xFF00FFA3), // 2: Mint Green
+      Color(0xFF76FF03), // 3: Lime Glow
+      Color(0xFF00E5FF), // 4: Cyber Cyan
+    ],
+    accentNeon: Color(0xFF00FF66),
+    textPrimary: Color(0xFFFFFFFF),
+    textSecondary: Color(0xFF8BAE97),
+  );
+
+  static const GameColorPalette synthwaveSunset = GameColorPalette(
+    id: 'synthwave_sunset',
+    name: 'Synthwave Sunset',
+    background: Color(0xFF120924),
+    boardFrame: Color(0xFF221242),
+    cellInactive: Color(0xFF331B61),
+    valueColors: [
+      Color(0xFFFF007F), // 1: Hot Neon Pink
+      Color(0xFFFF6E40), // 2: Sunset Orange
+      Color(0xFFD500F9), // 3: Electric Purple
+      Color(0xFFFFD600), // 4: Solar Gold
+    ],
+    accentNeon: Color(0xFFFF6E40),
+    textPrimary: Color(0xFFFFFFFF),
+    textSecondary: Color(0xFFB39DBE),
+  );
+
+  static const GameColorPalette arcticGlacier = GameColorPalette(
+    id: 'arctic_glacier',
+    name: 'Arctic Glacier',
+    background: Color(0xFF05131E),
+    boardFrame: Color(0xFF0C2438),
+    cellInactive: Color(0xFF143754),
+    valueColors: [
+      Color(0xFF80D8FF), // 1: Ice Cyan
+      Color(0xFF00B0FF), // 2: Pure Frost
+      Color(0xFF1DE9B6), // 3: Glacier Mint
+      Color(0xFFE0F7FA), // 4: Diamond White
+    ],
+    accentNeon: Color(0xFF80D8FF),
+    textPrimary: Color(0xFFFFFFFF),
+    textSecondary: Color(0xFF86A8C2),
+  );
+
+  static const GameColorPalette crimsonEclipse = GameColorPalette(
+    id: 'crimson_eclipse',
+    name: 'Crimson Eclipse',
+    background: Color(0xFF140507),
+    boardFrame: Color(0xFF260A0E),
+    cellInactive: Color(0xFF3B1017),
+    valueColors: [
+      Color(0xFFFF1744), // 1: Blood Neon Red
+      Color(0xFFFF5252), // 2: Fiery Coral
+      Color(0xFFFF9100), // 3: Burnished Amber
+      Color(0xFFFF80AB), // 4: Rose Quartz
+    ],
+    accentNeon: Color(0xFFFF1744),
+    textPrimary: Color(0xFFFFFFFF),
+    textSecondary: Color(0xFFBE969C),
+  );
+
+  static const List<GameColorPalette> allThemes = [
+    cyberNeon,
+    cyberMagenta,
+    monokaiDark,
+    zenGold,
+    emeraldMatrix,
+    synthwaveSunset,
+    arcticGlacier,
+    crimsonEclipse,
+  ];
+
   static GameColorPalette fromId(String id) {
     switch (id) {
       case 'cyber_magenta':
@@ -121,6 +200,14 @@ class GameColorPalette {
         return monokaiDark;
       case 'zen_gold':
         return zenGold;
+      case 'emerald_matrix':
+        return emeraldMatrix;
+      case 'synthwave_sunset':
+        return synthwaveSunset;
+      case 'arctic_glacier':
+        return arcticGlacier;
+      case 'crimson_eclipse':
+        return crimsonEclipse;
       case 'cyber_neon':
       default:
         return cyberNeon;

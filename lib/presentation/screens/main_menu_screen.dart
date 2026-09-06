@@ -500,7 +500,7 @@ class _MainMenuScreenState extends ConsumerState<MainMenuScreen> {
     final iap = ref.watch(iapServiceProvider);
 
     final bool shouldShowRemoveAds = !kIsWeb && Platform.isAndroid;
-    final String removeAdsPrice = iap.getProductPrice(TxaConfig.iapRemoveAds, defaultPrice: '25.000 ₫');
+    final removeAdsPriceDetails = iap.getPriceDetails(TxaConfig.iapRemoveAds, langCode: langCode);
 
     return Scaffold(
       backgroundColor: palette.background,
@@ -721,7 +721,13 @@ class _MainMenuScreenState extends ConsumerState<MainMenuScreen> {
                                 icon: isAdFree ? Icons.verified_rounded : Icons.block_flipped,
                                 title: isAdFree
                                     ? TxaLanguage.tr('btn_ad_free_active', langCode)
-                                    : '${TxaLanguage.tr('btn_remove_ads', langCode)} ($removeAdsPrice)',
+                                    : '${TxaLanguage.tr('btn_remove_ads', langCode)} (${removeAdsPriceDetails.discountedPrice})',
+                                originalPrice: (!isAdFree && removeAdsPriceDetails.hasDiscount)
+                                    ? removeAdsPriceDetails.originalPrice
+                                    : null,
+                                discountBadge: (!isAdFree && removeAdsPriceDetails.hasDiscount)
+                                    ? removeAdsPriceDetails.discountBadge
+                                    : null,
                                 subtitle: isAdFree
                                     ? TxaLanguage.tr('ad_free_pro_desc', langCode)
                                     : TxaLanguage.tr('remove_ads_desc', langCode),
@@ -736,6 +742,7 @@ class _MainMenuScreenState extends ConsumerState<MainMenuScreen> {
                                       },
                               );
                             },
+
                           ),
                           const SizedBox(height: 14),
                         ],
@@ -876,6 +883,8 @@ class _MenuActionButton extends StatelessWidget {
   final String subtitle;
   final dynamic palette;
   final Color? badgeColor;
+  final String? originalPrice;
+  final String? discountBadge;
   final VoidCallback onTap;
 
   const _MenuActionButton({
@@ -884,6 +893,8 @@ class _MenuActionButton extends StatelessWidget {
     required this.subtitle,
     required this.palette,
     this.badgeColor,
+    this.originalPrice,
+    this.discountBadge,
     required this.onTap,
   });
 
@@ -923,13 +934,53 @@ class _MenuActionButton extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        title,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              title,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          if (originalPrice != null) ...[
+                            const SizedBox(width: 6),
+                            Text(
+                              originalPrice!,
+                              style: const TextStyle(
+                                fontSize: 11,
+                                color: Colors.white38,
+                                decoration: TextDecoration.lineThrough,
+                                decorationColor: Color(0xFFFF5252),
+                                decorationThickness: 2.0,
+                              ),
+                            ),
+                          ],
+                          if (discountBadge != null) ...[
+                            const SizedBox(width: 6),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [Color(0xFFFF0055), Color(0xFFFF5E3A)],
+                                ),
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              child: Text(
+                                discountBadge!,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
                       const SizedBox(height: 2),
                       Text(
@@ -950,4 +1001,5 @@ class _MenuActionButton extends StatelessWidget {
       ),
     );
   }
+
 }

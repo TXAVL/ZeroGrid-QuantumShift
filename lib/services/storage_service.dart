@@ -323,8 +323,19 @@ class StorageService {
     }
   }
 
+  static const List<String> allThemeIds = [
+    'cyber_neon',
+    'cyber_magenta',
+    'monokai_dark',
+    'zen_gold',
+    'emerald_matrix',
+    'synthwave_sunset',
+    'arctic_glacier',
+    'crimson_eclipse',
+  ];
+
   void unlockAllThemes() {
-    _settingsBox.put('unlocked_themes', ['cyber_neon', 'cyber_magenta', 'monokai_dark', 'zen_gold']);
+    _settingsBox.put('unlocked_themes', List<String>.from(allThemeIds));
   }
 
   void Function(Map<String, dynamic> saveData)? onSaveDataChanged;

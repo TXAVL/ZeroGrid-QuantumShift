@@ -30,5 +30,15 @@ class NoopIapService implements IapService {
   String getProductPrice(String productId, {String defaultPrice = ''}) => defaultPrice;
 
   @override
+  IapPriceDetails getPriceDetails(String productId, {String? langCode}) {
+    return IapPricingHelper.calculate(
+      productId: productId,
+      product: null,
+      langCode: langCode,
+    );
+  }
+
+  @override
   dynamic getProduct(String productId) => null;
+
 }

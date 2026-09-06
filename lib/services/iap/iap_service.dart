@@ -1,4 +1,6 @@
 import '../../core/config/txa_config.dart';
+import 'iap_pricing.dart';
+export 'iap_pricing.dart';
 
 /// Danh sách Product IDs cho In-App Purchase định nghĩa trong TxaConfig
 class IapProductIds {
@@ -36,5 +38,7 @@ abstract class IapService {
   List<dynamic> get availableProducts;
   bool get isAvailable;
   String getProductPrice(String productId, {String defaultPrice = ''});
+  IapPriceDetails getPriceDetails(String productId, {String? langCode});
   dynamic getProduct(String productId);
 }
+

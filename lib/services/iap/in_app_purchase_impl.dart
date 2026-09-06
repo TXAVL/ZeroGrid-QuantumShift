@@ -34,6 +34,15 @@ class InAppPurchaseServiceImpl implements IapService {
   }
 
   @override
+  IapPriceDetails getPriceDetails(String productId, {String? langCode}) {
+    return IapPricingHelper.calculate(
+      productId: productId,
+      product: getProduct(productId),
+      langCode: langCode,
+    );
+  }
+
+  @override
   ProductDetails? getProduct(String productId) {
     try {
       return _products.firstWhere((p) => p.id == productId);
@@ -41,6 +50,7 @@ class InAppPurchaseServiceImpl implements IapService {
       return null;
     }
   }
+
 
   @override
   Future<void> initialize() async {
@@ -220,10 +230,8 @@ class InAppPurchaseServiceImpl implements IapService {
       _storageService.addHints(50);
       TXALogger.logIap('IAP Entitlement: Added 50 Hints');
     } else if (productId == IapProductIds.proThemes) {
-      _storageService.unlockTheme('cyber_magenta');
-      _storageService.unlockTheme('monokai_dark');
-      _storageService.unlockTheme('zen_gold');
-      TXALogger.logIap('IAP Entitlement: Unlocked All Pro Themes');
+      _storageService.unlockAllThemes();
+      TXALogger.logIap('IAP Entitlement: Unlocked All 8 Pro Themes');
     }
   }
 
