@@ -301,10 +301,16 @@ export function setCurrentWebUser(user) {
   } else {
     localStorage.setItem('txa_web_session', JSON.stringify(user));
   }
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event('txa-auth-change'));
+  }
 }
 
 export function clearCurrentWebUser() {
   localStorage.removeItem('txa_web_session');
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event('txa-auth-change'));
+  }
 }
 
 // Call RPC helper

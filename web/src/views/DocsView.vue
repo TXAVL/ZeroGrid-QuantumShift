@@ -36,6 +36,7 @@
           </button>
 
           <router-link 
+            v-if="isAdmin"
             to="/admin" 
             class="px-4 py-2.5 rounded-xl border border-pink-500/40 bg-pink-500/10 hover:bg-pink-500/20 text-pink-300 font-mono text-xs font-bold transition-all flex items-center gap-2"
           >
@@ -44,8 +45,64 @@
         </div>
       </div>
 
-      <!-- Main Layout: Sidebar TOC + Content Area -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <!-- =================================================================== -->
+      <!-- AUTHENTICATION GATE: ADMIN ONLY                                     -->
+      <!-- =================================================================== -->
+
+      <!-- STATE A: NOT LOGGED IN -->
+      <div v-if="!currentUser" class="max-w-md mx-auto my-12 p-8 rounded-3xl border border-slate-800 bg-[#090d1a]/95 backdrop-blur-xl shadow-2xl text-center space-y-6">
+        <div class="inline-flex p-4 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-3xl">
+          🔐
+        </div>
+        <div class="space-y-2">
+          <h2 class="text-xl font-display font-black text-white">
+            {{ isEn ? 'Admin Access Required' : 'Yêu Cầu Quyền Quản Trị Viên' }}
+          </h2>
+          <p class="text-xs text-slate-400 leading-relaxed font-mono">
+            {{ isEn ? 'This API and OAuth 2.0 documentation contains sensitive system integration specifications. Please sign in with an Admin account to access.' : 'Tài liệu kỹ thuật API và quy chuẩn OAuth 2.0 nội bộ chỉ dành cho Quản trị viên (Admin) của hệ sinh thái TXA Studio.' }}
+          </p>
+        </div>
+        <div class="pt-2">
+          <router-link 
+            :to="{ path: '/login', query: { redirect: '/docs' } }" 
+            class="inline-flex items-center justify-center w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-cyan-400 via-sky-500 to-pink-500 text-slate-950 font-display font-black text-xs uppercase tracking-wider shadow-lg shadow-cyan-500/25 hover:shadow-cyan-400/40 hover:scale-[1.02] active:scale-95 transition-all"
+          >
+            {{ isEn ? 'SIGN IN WITH ADMIN ACCOUNT' : 'ĐĂNG NHẬP TÀI KHOẢN ADMIN' }}
+          </router-link>
+        </div>
+      </div>
+
+      <!-- STATE B: LOGGED IN BUT NOT ADMIN (403) -->
+      <div v-else-if="!isAdmin" class="max-w-md mx-auto my-12 p-8 rounded-3xl border border-rose-500/30 bg-[#090d1a]/95 backdrop-blur-xl shadow-2xl text-center space-y-6">
+        <div class="inline-flex p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-3xl">
+          ⛔
+        </div>
+        <div class="space-y-2">
+          <h2 class="text-xl font-display font-black text-white">
+            {{ isEn ? '403 - Permission Denied' : '403 - Quyền Truy Cập Bị Từ Chối' }}
+          </h2>
+          <p class="text-xs text-slate-400 leading-relaxed font-mono">
+            {{ isEn ? `Logged in as ${currentUser?.email} (${currentUser?.role}). Only accounts with 'admin' role can access Developer API docs.` : `Bạn đang đăng nhập bằng ${currentUser?.email} (Vai trò: ${currentUser?.role}). Chỉ tài khoản Quản trị viên (Admin) mới được phép xem tài liệu kỹ thuật.` }}
+          </p>
+        </div>
+        <div class="pt-2 flex flex-col sm:flex-row gap-3">
+          <router-link 
+            :to="{ path: '/login', query: { redirect: '/docs' } }" 
+            class="w-full py-3 px-4 rounded-2xl border border-cyan-500/40 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 font-mono text-xs font-bold transition-all text-center"
+          >
+            {{ isEn ? 'Switch Admin Account' : 'Đổi Tài Khoản Admin' }}
+          </router-link>
+          <router-link 
+            to="/" 
+            class="w-full py-3 px-4 rounded-2xl border border-slate-700 bg-slate-800/60 hover:bg-slate-800 text-slate-300 font-mono text-xs text-center transition-all"
+          >
+            {{ isEn ? 'Back Home' : 'Về Trang Chủ' }}
+          </router-link>
+        </div>
+      </div>
+
+      <!-- STATE C: ADMIN CONFIRMED -> Main Layout -->
+      <div v-else class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
         <!-- SIDEBAR TOC (DESKTOP) -->
         <aside 
@@ -301,8 +358,16 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, inject } from 'vue';
+import { ref, computed, onMounted, onUnmounted, inject } from 'vue';
 import { sound } from '../services/sound.js';
+import { getCurrentWebUser } from '../services/supabase.js';
+
+const currentUser = ref(getCurrentWebUser());
+const isAdmin = computed(() => currentUser.value?.role === 'admin');
+
+function syncUser() {
+  currentUser.value = getCurrentWebUser();
+}
 
 const currentLang = inject('currentLang', ref('vi'));
 const isEn = computed(() => currentLang.value === 'en');
@@ -352,9 +417,16 @@ async function copyText(txt) {
 }
 
 onMounted(() => {
+  window.addEventListener('storage', syncUser);
+  window.addEventListener('txa-auth-change', syncUser);
   if (window.location.hash) {
     const target = window.location.hash.replace('#', '');
     scrollTo(target);
   }
+});
+
+onUnmounted(() => {
+  window.removeEventListener('storage', syncUser);
+  window.removeEventListener('txa-auth-change', syncUser);
 });
 </script>

@@ -23,7 +23,7 @@
               TXA STUDIO
             </span>
             <span class="text-[9px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 uppercase tracking-widest">
-              Live v1.4
+              Live v1.5.0
             </span>
           </div>
           <div class="text-[11px] text-slate-400 font-mono tracking-tight flex items-center gap-1.5">
@@ -85,19 +85,48 @@
           {{ isEn ? 'Terms' : 'Điều Khoản' }}
         </router-link>
 
-        <router-link 
-          to="/docs" 
-          class="px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all duration-200 border"
-          :class="$route.path.startsWith('/docs') ? 'text-cyan-300 bg-cyan-500/20 border-cyan-500/40' : 'text-slate-400 border-slate-800 hover:text-cyan-300 hover:border-slate-700'"
-          @mouseenter="sound.playHover()"
-          @click="sound.playClick()"
-        >
-          API Docs
-        </router-link>
+        <!-- Admin Only Menu: Admin Dashboard & API Docs -->
+        <template v-if="isAdmin">
+          <router-link 
+            to="/admin" 
+            class="px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all duration-200 border border-pink-500/40 bg-pink-500/10 text-pink-300 hover:bg-pink-500/20 flex items-center gap-1.5"
+            :class="$route.path.startsWith('/admin') ? 'ring-1 ring-pink-400' : ''"
+            @mouseenter="sound.playHover()"
+            @click="sound.playClick()"
+          >
+            <span>🛡️ Admin</span>
+          </router-link>
+
+          <router-link 
+            to="/docs" 
+            class="px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all duration-200 border"
+            :class="$route.path.startsWith('/docs') ? 'text-cyan-300 bg-cyan-500/20 border-cyan-500/40' : 'text-slate-400 border-slate-800 hover:text-cyan-300 hover:border-slate-700'"
+            @mouseenter="sound.playHover()"
+            @click="sound.playClick()"
+          >
+            📖 API Docs
+          </router-link>
+        </template>
+
+        <!-- Account Pill & Session Actions -->
+        <div v-if="currentUser" class="flex items-center gap-2 pl-1">
+          <div class="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-slate-800 bg-slate-900/90 text-xs font-mono text-slate-300">
+            <span class="w-1.5 h-1.5 rounded-full" :class="isAdmin ? 'bg-pink-400 animate-pulse' : 'bg-cyan-400'"></span>
+            <span class="truncate max-w-[120px]">{{ currentUser.display_name || currentUser.email }}</span>
+          </div>
+          <button 
+            @click="handleLogout"
+            class="px-2.5 py-1.5 rounded-lg text-xs font-mono font-medium text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 border border-slate-800 hover:border-rose-500/30 transition-all"
+            title="Đăng xuất khỏi tài khoản"
+          >
+            {{ isEn ? 'Logout' : 'Thoát' }}
+          </button>
+        </div>
 
         <router-link 
+          v-else
           to="/login" 
-          class="px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all duration-200 border border-pink-500/30 bg-pink-500/10 text-pink-300 hover:bg-pink-500/20"
+          class="px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all duration-200 border border-cyan-500/40 bg-cyan-500/10 text-cyan-300 hover:bg-cyan-500/20"
           @mouseenter="sound.playHover()"
           @click="sound.playClick()"
         >
@@ -200,20 +229,49 @@
       >
         {{ isEn ? 'Terms of Service' : 'Điều Khoản Dịch Vụ' }}
       </router-link>
+      <!-- Admin & API Docs for Mobile (Only shown if Admin) -->
+      <template v-if="isAdmin">
+        <router-link 
+          to="/admin" 
+          @click="mobileMenuOpen = false; sound.playClick()"
+          class="block px-3 py-2 rounded-lg text-base font-medium text-pink-300 bg-pink-500/10 border border-pink-500/30 font-mono"
+        >
+          🛡️ {{ isEn ? 'Admin Management Terminal' : 'Quản Trị Hệ Thống Admin' }}
+        </router-link>
+        <router-link 
+          to="/docs" 
+          @click="mobileMenuOpen = false; sound.playClick()"
+          class="block px-3 py-2 rounded-lg text-base font-medium text-cyan-300 hover:bg-cyan-500/10 font-mono"
+        >
+          📖 {{ isEn ? 'API & OAuth Docs' : 'Tài Liệu Kỹ Thuật & API' }}
+        </router-link>
+      </template>
+
+      <!-- Account Session in Mobile -->
+      <div v-if="currentUser" class="pt-2 border-t border-slate-800 flex items-center justify-between px-3">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full" :class="isAdmin ? 'bg-pink-400 animate-pulse' : 'bg-cyan-400'"></span>
+          <span class="text-xs font-mono text-slate-300">
+            {{ currentUser.display_name || currentUser.email }}
+          </span>
+        </div>
+        <button 
+          @click="handleLogout"
+          class="px-3 py-1.5 text-xs font-mono text-rose-400 border border-rose-500/30 bg-rose-500/10 rounded-lg"
+        >
+          {{ isEn ? 'Sign Out' : 'Đăng Xuất' }}
+        </button>
+      </div>
+
       <router-link 
-        to="/docs" 
+        v-else
+        to="/login" 
         @click="mobileMenuOpen = false; sound.playClick()"
         class="block px-3 py-2 rounded-lg text-base font-medium text-cyan-300 hover:bg-cyan-500/10 font-mono"
       >
-        📖 {{ isEn ? 'API & OAuth Docs' : 'Tài Liệu Kỹ Thuật & API' }}
-      </router-link>
-      <router-link 
-        to="/login" 
-        @click="mobileMenuOpen = false; sound.playClick()"
-        class="block px-3 py-2 rounded-lg text-base font-medium text-pink-300 hover:bg-pink-500/10 font-mono"
-      >
         🆔 {{ isEn ? 'TXA Studio ID Account' : 'Tài Khoản TXA Studio ID' }}
       </router-link>
+
       <button 
         @click="mobileMenuOpen = false; openDownloadModal()"
         class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-cyan-400 via-sky-500 to-pink-500 text-slate-950 font-display font-black text-xs uppercase tracking-wider shadow-lg shadow-cyan-500/20"
@@ -226,12 +284,40 @@
 </template>
 
 <script setup>
-import { ref, computed, inject } from 'vue';
+import { ref, computed, inject, onMounted, onUnmounted } from 'vue';
+import { useRouter } from 'vue-router';
 import GooglePlayIcon from './GooglePlayIcon.vue';
 import { sound } from '../services/sound.js';
+import { getCurrentWebUser, clearCurrentWebUser } from '../services/supabase.js';
 
+const router = useRouter();
 const mobileMenuOpen = ref(false);
 const isMuted = ref(sound.isMuted());
+
+const currentUser = ref(getCurrentWebUser());
+const isAdmin = computed(() => currentUser.value?.role === 'admin');
+
+function syncUser() {
+  currentUser.value = getCurrentWebUser();
+}
+
+function handleLogout() {
+  sound.playClick();
+  clearCurrentWebUser();
+  currentUser.value = null;
+  mobileMenuOpen.value = false;
+  router.push('/');
+}
+
+onMounted(() => {
+  window.addEventListener('storage', syncUser);
+  window.addEventListener('txa-auth-change', syncUser);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('storage', syncUser);
+  window.removeEventListener('txa-auth-change', syncUser);
+});
 
 const currentLang = inject('currentLang', ref('vi'));
 const setLang = inject('setLang', () => {});
