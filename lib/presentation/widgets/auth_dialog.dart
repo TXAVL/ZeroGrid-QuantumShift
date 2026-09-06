@@ -291,12 +291,24 @@ class _AuthDialogState extends ConsumerState<AuthDialog> with WidgetsBindingObse
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(4),
+                        width: 26,
+                        height: 26,
                         decoration: BoxDecoration(
-                          color: palette.accentNeon.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(6),
+                          borderRadius: BorderRadius.circular(7),
+                          border: Border.all(color: palette.accentNeon.withValues(alpha: 0.4), width: 1),
                         ),
-                        child: Icon(Icons.verified_user_rounded, size: 16, color: palette.accentNeon),
+                        clipBehavior: Clip.antiAlias,
+                        child: Image.asset(
+                          'assets/branding/txa_logo.png',
+                          width: 26,
+                          height: 26,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => Icon(
+                            Icons.verified_user_rounded,
+                            size: 16,
+                            color: palette.accentNeon,
+                          ),
+                        ),
                       ),
                       const SizedBox(width: 10),
                       Text(
