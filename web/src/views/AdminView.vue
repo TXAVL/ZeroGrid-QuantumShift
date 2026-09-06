@@ -25,68 +25,95 @@
           </div>
         </div>
 
-        <div class="flex items-center gap-3">
-          <!-- Link to Docs API -->
-          <router-link 
-            to="/docs" 
-            class="px-4 py-2.5 rounded-xl border border-cyan-500/40 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 font-mono text-xs font-bold transition-all flex items-center gap-2"
-          >
-            <span>📖</span>
-            <span>{{ isEn ? 'API & Integration Docs' : 'Tài Liệu API & Hướng Dẫn' }}</span>
-          </router-link>
+          <!-- Admin info & Logout -->
+          <div v-if="isAdmin" class="flex items-center gap-3">
+            <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl border border-pink-500/30 bg-pink-500/10 text-xs font-mono">
+              <span class="w-2 h-2 rounded-full bg-pink-400 animate-pulse"></span>
+              <span class="text-pink-300 font-bold">ADMIN: {{ currentUser?.display_name || currentUser?.email }}</span>
+            </div>
 
-          <button 
-            v-if="isAdminAuthenticated"
-            @click="adminLogout" 
-            class="px-3 py-2 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-slate-700 text-slate-300 font-mono text-xs transition-all"
-          >
-            {{ isEn ? 'Lock Terminal' : 'Khóa Terminal' }}
-          </button>
+            <!-- Link to Docs API -->
+            <router-link 
+              to="/docs" 
+              class="px-4 py-2.5 rounded-xl border border-cyan-500/40 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 font-mono text-xs font-bold transition-all flex items-center gap-2"
+            >
+              <span>📖</span>
+              <span>{{ isEn ? 'API & Integration Docs' : 'Tài Liệu API & Hướng Dẫn' }}</span>
+            </router-link>
+
+            <button 
+              @click="adminLogout" 
+              class="px-3 py-2 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white font-mono text-xs transition-all"
+            >
+              {{ isEn ? 'Sign Out Admin' : 'Đăng Xuất Admin' }}
+            </button>
+          </div>
         </div>
-      </div>
 
       <!-- =================================================================== -->
-      <!-- AUTHENTICATION GATE (PIN ENTRY)                                     -->
+      <!-- AUTHENTICATION GATE (WEBSITE ACCOUNT WITH ROLE: ADMIN)              -->
       <!-- =================================================================== -->
-      <div v-if="!isAdminAuthenticated" class="max-w-md mx-auto p-6 sm:p-8 rounded-3xl border border-slate-800 bg-[#090d1a]/95 backdrop-blur-xl shadow-2xl text-center space-y-6">
-        <div class="inline-flex p-3 rounded-2xl bg-pink-500/10 border border-pink-500/30 text-pink-400 text-2xl">
-          🔒
+      
+      <!-- STATE A: NOT LOGGED IN -->
+      <div v-if="!currentUser" class="max-w-md mx-auto p-6 sm:p-8 rounded-3xl border border-slate-800 bg-[#090d1a]/95 backdrop-blur-xl shadow-2xl text-center space-y-6">
+        <div class="inline-flex p-4 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-3xl">
+          🔐
         </div>
-        <div class="space-y-1">
-          <h2 class="text-lg font-display font-bold text-white">
-            {{ isEn ? 'Enter Admin Access PIN' : 'Nhập Mã PIN Quản Trị' }}
+        <div class="space-y-2">
+          <span class="px-3 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-widest bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+            ADMIN ACCESS REQUIRED
+          </span>
+          <h2 class="text-xl font-display font-black text-white">
+            {{ isEn ? 'Master Admin Login Required' : 'Yêu Cầu Đăng Nhập Quản Trị' }}
           </h2>
-          <p class="text-xs text-slate-400 font-mono">
-            {{ isEn ? 'Default PIN: 888888 (Changeable in settings)' : 'Mã PIN bảo mật mặc định: 888888' }}
+          <p class="text-xs text-slate-300 font-mono leading-relaxed">
+            {{ isEn 
+              ? 'You must sign in with a TXA Studio account that has the "admin" role to access this control terminal.' 
+              : 'Bạn cần đăng nhập bằng tài khoản TXA Studio có vai trò Quản trị viên (role: admin) để truy cập Bảng Điều Khiển này.' }}
           </p>
         </div>
 
-        <form @submit.prevent="handlePinAuth" class="space-y-4">
-          <input 
-            type="password" 
-            v-model="pinInput" 
-            maxlength="10"
-            required
-            placeholder="••••••"
-            class="w-full text-center tracking-[0.5em] text-lg font-mono px-4 py-3 rounded-xl bg-black/60 border border-slate-700 focus:border-pink-500 text-pink-300 outline-none transition-all"
-          />
-
-          <div v-if="pinError" class="text-xs text-rose-400 font-mono">
-            {{ pinError }}
-          </div>
-
-          <button 
-            type="submit" 
-            class="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-400 text-white font-display font-black text-xs uppercase tracking-wider shadow-lg shadow-pink-500/30 hover:scale-[1.02] active:scale-95 transition-all"
-          >
-            {{ isEn ? 'UNLOCK ADMIN TERMINAL' : 'MỞ KHÓA BẢNG QUẢN TRỊ' }}
-          </button>
-        </form>
+        <router-link 
+          to="/login?redirect=/admin"
+          class="block w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-cyan-400 via-sky-500 to-pink-500 text-slate-950 font-display font-black text-xs uppercase tracking-wider shadow-lg shadow-cyan-500/30 hover:scale-[1.02] active:scale-95 transition-all text-center"
+        >
+          {{ isEn ? 'SIGN IN WITH ADMIN ACCOUNT' : 'ĐĂNG NHẬP TÀI KHOẢN ADMIN' }}
+        </router-link>
       </div>
 
-      <!-- =================================================================== -->
-      <!-- AUTHENTICATED ADMIN DASHBOARD                                       -->
-      <!-- =================================================================== -->
+      <!-- STATE B: LOGGED IN BUT NOT ADMIN -->
+      <div v-else-if="!isAdmin" class="max-w-md mx-auto p-6 sm:p-8 rounded-3xl border border-rose-500/30 bg-[#090d1a]/95 backdrop-blur-xl shadow-2xl text-center space-y-6">
+        <div class="inline-flex p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-3xl">
+          🚫
+        </div>
+        <div class="space-y-2">
+          <span class="px-3 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-widest bg-rose-500/20 text-rose-300 border border-rose-500/30">
+            ACCESS RESTRICTED // 403 FORBIDDEN
+          </span>
+          <h2 class="text-xl font-display font-black text-white">
+            {{ isEn ? 'Insufficient Privileges' : 'Từ Chối Truy Cập' }}
+          </h2>
+          <p class="text-xs text-slate-300 font-mono leading-relaxed">
+            {{ isEn 
+              ? `Your account (${currentUser.email}) has role "${currentUser.role || 'player'}". Only accounts with role "admin" can access the system terminal.` 
+              : `Tài khoản hiện tại (${currentUser.email}) chỉ có vai trò "${currentUser.role || 'player'}". Chỉ tài khoản có vai trò "admin" mới có quyền truy cập bảng điều khiển này.` }}
+          </p>
+        </div>
+
+        <div class="space-y-3 pt-2">
+          <button 
+            @click="switchAdminAccount"
+            class="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-400 text-white font-display font-black text-xs uppercase tracking-wider shadow-lg shadow-pink-500/30 hover:scale-[1.02] active:scale-95 transition-all"
+          >
+            {{ isEn ? 'SWITCH TO ADMIN ACCOUNT' : 'ĐỔI SANG TÀI KHOẢN ADMIN' }}
+          </button>
+          <router-link to="/" class="inline-block text-xs font-mono text-slate-500 hover:text-slate-300 underline">
+            ← {{ isEn ? 'Return to Home Portal' : 'Quay về trang chủ TXA Studio' }}
+          </router-link>
+        </div>
+      </div>
+
+      <!-- STATE C: LOGGED IN AND ROLE === 'admin' -->
       <div v-else class="space-y-6">
         
         <!-- Navigation Tabs -->
@@ -292,25 +319,34 @@
               </p>
             </div>
 
-            <!-- PIN Config -->
-            <div class="space-y-2 pt-4 border-t border-slate-800">
-              <label class="block text-xs font-mono uppercase tracking-wider text-slate-400 font-bold">
-                Đổi Mã PIN Truy Cập Admin
-              </label>
+            <!-- Promote User to Admin -->
+            <div class="space-y-3 pt-4 border-t border-slate-800">
+              <div>
+                <h3 class="text-xs font-mono uppercase tracking-wider text-pink-400 font-bold">
+                  Thăng Cấp Tài Khoản Lên Admin
+                </h3>
+                <p class="text-[11px] font-mono text-slate-500 mt-0.5">
+                  Cấp vai trò "admin" cho tài khoản website khác để cùng quản trị hệ sinh thái.
+                </p>
+              </div>
+
               <div class="flex items-center gap-3">
                 <input 
-                  type="password" 
-                  v-model="newPinInput" 
-                  maxlength="10"
-                  placeholder="Mã PIN mới"
-                  class="w-36 px-4 py-2.5 rounded-xl bg-black/60 border border-slate-700 text-pink-300 font-mono text-sm outline-none focus:border-pink-400 text-center font-bold"
+                  type="email" 
+                  v-model="promoteEmailInput" 
+                  placeholder="member@example.com"
+                  class="flex-1 px-4 py-2.5 rounded-xl bg-black/60 border border-slate-700 text-pink-300 font-mono text-xs outline-none focus:border-pink-400"
                 />
                 <button 
-                  @click="savePinConfig"
-                  class="px-4 py-2.5 rounded-xl bg-pink-500/20 hover:bg-pink-500/30 border border-pink-500/40 text-pink-300 text-xs font-mono font-bold transition-all ml-auto"
+                  @click="handlePromoteUser"
+                  class="px-4 py-2.5 rounded-xl bg-pink-500/20 hover:bg-pink-500/30 border border-pink-500/40 text-pink-300 text-xs font-mono font-bold transition-all shrink-0"
                 >
-                  Cập Nhật PIN
+                  Thăng Cấp Admin
                 </button>
+              </div>
+
+              <div v-if="promoteNotice" class="text-xs font-mono text-emerald-400">
+                {{ promoteNotice }}
               </div>
             </div>
 
@@ -457,16 +493,19 @@ import {
   adminUpdateDeletion, 
   getSystemConfigs, 
   updateSystemConfig,
-  formatSecondsToHumanLabel
+  formatSecondsToHumanLabel,
+  getCurrentWebUser,
+  clearCurrentWebUser,
+  promoteToAdmin
 } from '../services/supabase.js';
 import { sound } from '../services/sound.js';
 
+const router = useRouter();
 const currentLang = inject('currentLang', ref('vi'));
 const isEn = computed(() => currentLang.value === 'en');
 
-const isAdminAuthenticated = ref(sessionStorage.getItem('txa_admin_auth') === 'true');
-const pinInput = ref('');
-const pinError = ref('');
+const currentUser = ref(getCurrentWebUser());
+const isAdmin = computed(() => currentUser.value && currentUser.value.role === 'admin');
 
 const activeTab = ref('apps');
 const appList = ref([]);
@@ -475,7 +514,8 @@ const systemConfigs = ref({});
 
 const expirySecondsInput = ref('300');
 const previewExpiryLabel = computed(() => formatSecondsToHumanLabel(expirySecondsInput.value, isEn.value));
-const newPinInput = ref('');
+const promoteEmailInput = ref('');
+const promoteNotice = ref('');
 const settingsNotice = ref('');
 
 const showCreateModal = ref(false);
@@ -508,29 +548,37 @@ const generatedSnippetCode = computed(() => {
 }`;
 });
 
-async function handlePinAuth() {
-  sound.playClick();
-  pinError.value = '';
-  
-  // Verify with saved pin in configs or default '888888'
-  const cfgs = await getSystemConfigs();
-  const currentPin = cfgs['admin_pin'] || '888888';
-
-  if (pinInput.value.trim() === currentPin) {
-    isAdminAuthenticated.value = true;
-    sessionStorage.setItem('txa_admin_auth', 'true');
-    sound.playSuccess();
-    loadDashboardData();
-  } else {
-    sound.playClick();
-    pinError.value = 'Mã PIN không chính xác!';
-  }
-}
-
 function adminLogout() {
   sound.playClick();
-  isAdminAuthenticated.value = false;
-  sessionStorage.removeItem('txa_admin_auth');
+  clearCurrentWebUser();
+  currentUser.value = null;
+  router.push('/login?redirect=/admin');
+}
+
+function switchAdminAccount() {
+  sound.playClick();
+  clearCurrentWebUser();
+  currentUser.value = null;
+  router.push('/login?redirect=/admin');
+}
+
+async function handlePromoteUser() {
+  const email = promoteEmailInput.value.trim();
+  if (!email) return;
+  sound.playClick();
+  try {
+    const res = await promoteToAdmin(email);
+    if (res?.success) {
+      promoteNotice.value = `✓ Đã thăng cấp ${email} thành Admin thành công!`;
+      promoteEmailInput.value = '';
+      sound.playSuccess();
+    } else {
+      promoteNotice.value = `⚠️ ${res?.error || 'Lỗi thăng cấp'}`;
+    }
+  } catch (e) {
+    promoteNotice.value = `⚠️ ${e.message}`;
+  }
+  setTimeout(() => { promoteNotice.value = ''; }, 4000);
 }
 
 async function loadDashboardData() {
@@ -626,7 +674,8 @@ async function copy(text) {
 }
 
 onMounted(() => {
-  if (isAdminAuthenticated.value) {
+  currentUser.value = getCurrentWebUser();
+  if (isAdmin.value) {
     loadDashboardData();
   }
 });

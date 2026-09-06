@@ -445,6 +445,13 @@ export async function updateSystemConfig(key, value) {
   });
 }
 
+// 11. Promote User to Admin
+export async function promoteToAdmin(email) {
+  return await callRpc('txa_promote_to_admin', {
+    p_email: email
+  });
+}
+
 // Convert seconds into standard formatted human label (e.g. 360 -> "06 phút")
 export function formatSecondsToHumanLabel(totalSeconds, isEn = false) {
   const s = parseInt(totalSeconds, 10) || 300;
