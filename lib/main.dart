@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/config/txa_config.dart';
 import 'presentation/screens/splash_screen.dart';
 import 'presentation/screens/txa_crash_screen.dart';
+import 'presentation/widgets/txa_toast.dart';
 import 'services/auth/txa_auth_service.dart';
 import 'services/service_providers.dart';
 import 'services/storage_service.dart';
@@ -78,6 +79,7 @@ class ZeroGridApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: TxaToast.navigatorKey,
       title: 'Zero Grid: Quantum Shift',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(

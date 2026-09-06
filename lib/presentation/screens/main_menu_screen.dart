@@ -30,17 +30,34 @@ class MainMenuScreen extends ConsumerStatefulWidget {
   ConsumerState<MainMenuScreen> createState() => _MainMenuScreenState();
 }
 
-class _MainMenuScreenState extends ConsumerState<MainMenuScreen> {
+class _MainMenuScreenState extends ConsumerState<MainMenuScreen> with WidgetsBindingObserver {
   int _secretTapCount = 0;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkBannedStatus();
       _fetchUserProfile();
       _checkWhatsNew();
     });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // Tự động kiểm tra và nhận ngay các mã đổi thưởng / gói mua ngoài CH Play
+      try {
+        ref.read(iapServiceProvider).restorePurchases();
+      } catch (_) {}
+    }
   }
 
   void _checkWhatsNew() {

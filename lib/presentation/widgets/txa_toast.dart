@@ -10,8 +10,46 @@ enum TxaToastType {
 
 /// Hệ thống thông báo Toast phong cách Cyberpunk (TxaToast) dùng cho toàn bộ ứng dụng
 class TxaToast {
+  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+  static BuildContext? get globalContext => navigatorKey.currentContext;
+
   static OverlayEntry? _currentEntry;
   static Timer? _timer;
+
+  /// Hiển thị Toast trên bất kỳ màn hình nào thông qua Navigator Key toàn cục
+  static void showGlobal({
+    required String message,
+    TxaToastType type = TxaToastType.info,
+    Duration duration = const Duration(milliseconds: 3200),
+  }) {
+    final ctx = globalContext;
+    if (ctx != null) {
+      show(ctx, message: message, type: type, duration: duration);
+    } else {
+      Future.delayed(const Duration(milliseconds: 800), () {
+        final retryCtx = globalContext;
+        if (retryCtx != null && retryCtx.mounted) {
+          show(retryCtx, message: message, type: type, duration: duration);
+        }
+      });
+    }
+  }
+
+  static void successGlobal(String message, {Duration duration = const Duration(milliseconds: 3200)}) {
+    showGlobal(message: message, type: TxaToastType.success, duration: duration);
+  }
+
+  static void infoGlobal(String message, {Duration duration = const Duration(milliseconds: 3200)}) {
+    showGlobal(message: message, type: TxaToastType.info, duration: duration);
+  }
+
+  static void warningGlobal(String message, {Duration duration = const Duration(milliseconds: 3200)}) {
+    showGlobal(message: message, type: TxaToastType.warning, duration: duration);
+  }
+
+  static void errorGlobal(String message, {Duration duration = const Duration(milliseconds: 3200)}) {
+    showGlobal(message: message, type: TxaToastType.error, duration: duration);
+  }
 
   static void show(
     BuildContext context, {

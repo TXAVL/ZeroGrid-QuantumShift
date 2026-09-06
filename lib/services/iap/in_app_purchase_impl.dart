@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'iap_service.dart';
+import '../../core/localization/txa_language.dart';
+import '../../presentation/widgets/txa_toast.dart';
 import '../storage_service.dart';
 import '../txa_logger.dart';
 
@@ -220,18 +222,40 @@ class InAppPurchaseServiceImpl implements IapService {
   }
 
   void _deliverProduct(String productId) {
+    final isVi = TxaLanguage.isVietnamese(_storageService.languageCode);
+
     if (productId == IapProductIds.removeAds) {
       _storageService.isAdFree = true;
       TXALogger.logIap('IAP Entitlement: Granted AD-FREE lifetime status');
+      TxaToast.successGlobal(
+        isVi
+            ? '🎉 Kích hoạt thành công: Gói Gỡ Quảng Cáo Vĩnh Viễn!'
+            : '🎉 Activated: Ad-Free Lifetime Pass!',
+      );
     } else if (productId == IapProductIds.hints10) {
       _storageService.addHints(10);
       TXALogger.logIap('IAP Entitlement: Added 10 Hints');
+      TxaToast.successGlobal(
+        isVi
+            ? '🎁 CH Play: Đã nhận thành công +10 Lượt Gợi Ý!'
+            : '🎁 Google Play: Successfully credited +10 Hints!',
+      );
     } else if (productId == IapProductIds.hints50) {
       _storageService.addHints(50);
       TXALogger.logIap('IAP Entitlement: Added 50 Hints');
+      TxaToast.successGlobal(
+        isVi
+            ? '🎁 CH Play: Đã nhận thành công +50 Lượt Gợi Ý!'
+            : '🎁 Google Play: Successfully credited +50 Hints!',
+      );
     } else if (productId == IapProductIds.proThemes) {
       _storageService.unlockAllThemes();
       TXALogger.logIap('IAP Entitlement: Unlocked All 8 Pro Themes');
+      TxaToast.successGlobal(
+        isVi
+            ? '🎉 Mở khóa thành công: Toàn bộ 8 Giao Diện Pro!'
+            : '🎉 Unlocked: All 8 Pro Cyber Themes!',
+      );
     }
   }
 
