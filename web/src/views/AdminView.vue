@@ -172,7 +172,11 @@
               <div class="flex items-start justify-between gap-3">
                 <div class="flex items-center gap-3">
                   <div class="w-12 h-12 rounded-2xl border border-slate-700 bg-black/60 p-1 flex items-center justify-center shrink-0">
-                    <img :src="app.logo_url || '/icons/Icon-512.png'" class="w-full h-full object-contain rounded-xl" />
+                    <img 
+                      :src="app.logo_url || '/icons/Icon-512.png'" 
+                      class="w-full h-full object-contain rounded-xl" 
+                      @error="$event.target.src = '/icons/Icon-512.png'"
+                    />
                   </div>
                   <div>
                     <h3 class="font-display font-bold text-white text-sm">{{ app.name }}</h3>
@@ -374,66 +378,138 @@
             </div>
 
             <form @submit.prevent="handleCreateApp" class="space-y-4 text-xs font-mono">
+              <!-- Preset Selector Dropdown -->
               <div>
-                <label class="block text-slate-400 mb-1">TÊN ỨNG DỤNG / GAME:</label>
+                <label class="block text-slate-400 mb-1 font-bold">CHỌN GAME / APP CÓ SẴN (HOẶC NHẬP MỚI):</label>
+                <select 
+                  v-model="selectedPreset" 
+                  @change="onPresetChange"
+                  class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 focus:border-cyan-400 text-cyan-300 font-bold outline-none cursor-pointer"
+                >
+                  <option v-for="g in availableGames" :key="g.slug" :value="g.slug">
+                    🎮 {{ g.title }} (slug: {{ g.slug }})
+                  </option>
+                  <option value="custom">✨ + Nhập Tên Ứng Dụng / Game Mới Tùy Chọn</option>
+                </select>
+              </div>
+
+              <!-- App Name Input (The only required manual field when creating custom!) -->
+              <div>
+                <label class="block text-slate-400 mb-1 font-bold">TÊN ỨNG DỤNG / GAME:</label>
                 <input 
                   type="text" 
                   v-model="newAppForm.name" 
+                  @input="onNameInput"
                   required 
-                  placeholder="Zero Grid: Quantum Shift"
-                  class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 focus:border-cyan-400 text-white outline-none"
+                  placeholder="Ví dụ: Zero Grid: Quantum Shift"
+                  class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 focus:border-cyan-400 text-white font-bold outline-none"
                 />
               </div>
 
+              <!-- App Type Dropdown -->
               <div class="grid grid-cols-2 gap-3">
                 <div>
-                  <label class="block text-slate-400 mb-1">LOẠI PHẦN MỀM:</label>
+                  <label class="block text-slate-400 mb-1 font-bold">LOẠI PHẦN MỀM:</label>
                   <select 
                     v-model="newAppForm.app_type"
-                    class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 focus:border-cyan-400 text-white outline-none"
+                    @change="onTypeChange"
+                    class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 focus:border-cyan-400 text-white outline-none cursor-pointer"
                   >
                     <option value="game">game (Trò chơi)</option>
                     <option value="app">app (Ứng dụng)</option>
                   </select>
                 </div>
                 <div>
-                  <label class="block text-slate-400 mb-1">VIẾT TẮT CHỮ ĐẦU:</label>
-                  <input 
-                    type="text" 
-                    v-model="newAppForm.app_abbr" 
-                    required 
-                    placeholder="zgqs"
-                    class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 focus:border-cyan-400 text-white outline-none lowercase"
-                  />
+                  <label class="block text-slate-400 mb-1 font-bold">LOGO ĐẠI DIỆN:</label>
+                  <div class="flex items-center gap-2 p-1.5 rounded-xl bg-slate-900 border border-slate-700">
+                    <img 
+                      :src="newAppForm.logo_url || '/icons/Icon-512.png'" 
+                      class="w-7 h-7 rounded-lg object-contain bg-black/60 shrink-0" 
+                      @error="$event.target.src = '/icons/Icon-512.png'"
+                    />
+                    <span class="text-[10px] text-slate-400 truncate">
+                      {{ newAppForm.logo_url ? 'Đã gán Logo' : 'Logo mặc định' }}
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              <div>
-                <label class="block text-slate-400 mb-1">LIÊN KẾT GAME ĐÃ CÓ TRONG TXA_GAMES:</label>
-                <input 
-                  type="text" 
-                  v-model="newAppForm.game_slug" 
-                  required 
-                  placeholder="quantumshift"
-                  class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 focus:border-cyan-400 text-cyan-300 font-bold outline-none"
-                />
+              <!-- Auto-Generated Parameters Summary Card -->
+              <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-2">
+                <div class="flex items-center justify-between text-[11px]">
+                  <span class="text-slate-400 font-bold">THÔNG SỐ HỆ THỐNG TỰ ĐỘNG SINH:</span>
+                  <span class="px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 text-[10px] font-bold">✓ TỰ ĐỘNG SINH</span>
+                </div>
+                <div class="grid grid-cols-2 gap-2 text-[11px]">
+                  <div>
+                    <span class="text-slate-500">Viết tắt:</span>
+                    <span class="text-cyan-400 font-bold ml-1">{{ newAppForm.app_abbr || 'app' }}</span>
+                  </div>
+                  <div>
+                    <span class="text-slate-500">Mã Slug:</span>
+                    <span class="text-cyan-400 font-bold ml-1">{{ newAppForm.game_slug || 'slug' }}</span>
+                  </div>
+                </div>
+                <div class="text-[11px] truncate">
+                  <span class="text-slate-500">Deep link:</span>
+                  <span class="text-pink-400 font-bold ml-1">{{ newAppForm.redirect_uri || 'Chưa thiết lập' }}</span>
+                </div>
               </div>
 
+              <!-- Toggle Advanced Customization (Optional) -->
               <div>
-                <label class="block text-slate-400 mb-1">DEEP LINK CALLBACK URI (TÙY CHỌN):</label>
-                <input 
-                  type="text" 
-                  v-model="newAppForm.redirect_uri" 
-                  placeholder="txa.zerogrid.quantumshift://oauth/callback"
-                  class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 focus:border-cyan-400 text-white outline-none"
-                />
+                <button 
+                  type="button" 
+                  @click="showAdvancedFields = !showAdvancedFields"
+                  class="text-[11px] text-slate-400 hover:text-cyan-400 font-bold flex items-center gap-1.5 transition-all"
+                >
+                  <span>{{ showAdvancedFields ? '▲ Ẩn thông số chi tiết' : '▼ ⚙️ Chỉnh sửa thông số chi tiết (Tùy chọn nâng cao)' }}</span>
+                </button>
+                
+                <div v-if="showAdvancedFields" class="mt-2.5 p-3 rounded-2xl bg-black/50 border border-slate-800 space-y-3">
+                  <div class="grid grid-cols-2 gap-3">
+                    <div>
+                      <label class="block text-slate-500 text-[10px] mb-1">VIẾT TẮT CHỮ ĐẦU:</label>
+                      <input 
+                        type="text" 
+                        v-model="newAppForm.app_abbr" 
+                        class="w-full px-2.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs lowercase outline-none" 
+                      />
+                    </div>
+                    <div>
+                      <label class="block text-slate-500 text-[10px] mb-1">SLUG HỆ THỐNG:</label>
+                      <input 
+                        type="text" 
+                        v-model="newAppForm.game_slug" 
+                        class="w-full px-2.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-cyan-300 text-xs font-bold outline-none" 
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block text-slate-500 text-[10px] mb-1">DEEP LINK CALLBACK URI:</label>
+                    <input 
+                      type="text" 
+                      v-model="newAppForm.redirect_uri" 
+                      class="w-full px-2.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs outline-none" 
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-slate-500 text-[10px] mb-1">LOGO URL:</label>
+                    <input 
+                      type="text" 
+                      v-model="newAppForm.logo_url" 
+                      class="w-full px-2.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs outline-none" 
+                    />
+                  </div>
+                </div>
               </div>
 
+              <!-- 3 Legal Links Auto-Generated -->
               <div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-[11px] text-emerald-300 space-y-1">
-                <div class="font-bold">✓ Tự động cấp 3 link từ website hiện tại:</div>
-                <div>• https://txastudio.click/privacy?game={{ newAppForm.game_slug || 'slug' }}</div>
-                <div>• https://txastudio.click/terms?game={{ newAppForm.game_slug || 'slug' }}</div>
-                <div>• https://txastudio.click/delete-account?game={{ newAppForm.game_slug || 'slug' }}</div>
+                <div class="font-bold">✓ Tự động cấp 3 link pháp lý chuẩn domain:</div>
+                <div class="truncate">• https://txastudio.click/privacy?game={{ newAppForm.game_slug || 'slug' }}</div>
+                <div class="truncate">• https://txastudio.click/terms?game={{ newAppForm.game_slug || 'slug' }}</div>
+                <div class="truncate">• https://txastudio.click/delete-account?game={{ newAppForm.game_slug || 'slug' }}</div>
               </div>
 
               <button 
@@ -501,7 +577,8 @@ import {
   formatSecondsToHumanLabel,
   getCurrentWebUser,
   clearCurrentWebUser,
-  promoteToAdmin
+  promoteToAdmin,
+  getAllGames
 } from '../services/supabase.js';
 import { sound } from '../services/sound.js';
 
@@ -516,6 +593,7 @@ const activeTab = ref('apps');
 const appList = ref([]);
 const deletionList = ref([]);
 const systemConfigs = ref({});
+const availableGames = ref([]);
 
 const expirySecondsInput = ref('300');
 const previewExpiryLabel = computed(() => formatSecondsToHumanLabel(expirySecondsInput.value, isEn.value));
@@ -525,13 +603,79 @@ const settingsNotice = ref('');
 
 const showCreateModal = ref(false);
 const isCreatingApp = ref(false);
+const showAdvancedFields = ref(false);
+const selectedPreset = ref('quantumshift');
+
 const newAppForm = ref({
-  name: '',
+  name: 'Zero Grid: Quantum Shift',
   game_slug: 'quantumshift',
   app_type: 'game',
   app_abbr: 'zgqs',
-  redirect_uri: 'txa.zerogrid.quantumshift://oauth/callback'
+  redirect_uri: 'txa.zerogrid.quantumshift://oauth/callback',
+  logo_url: 'https://txastudio.click/icons/Icon-512.png'
 });
+
+function computeAbbr(str) {
+  if (!str) return 'app';
+  const clean = str.replace(/[^a-zA-Z0-9\s]/g, ' ').trim();
+  const words = clean.split(/\s+/).filter(Boolean);
+  if (words.length === 1) {
+    return words[0].substring(0, 4).toLowerCase();
+  }
+  return words.map(w => w[0]).join('').toLowerCase();
+}
+
+function computeSlug(str) {
+  if (!str) return 'app';
+  return str
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '') || 'app';
+}
+
+function applyGamePreset(game) {
+  if (!game) return;
+  newAppForm.value.name = game.title;
+  newAppForm.value.app_type = 'game';
+  newAppForm.value.game_slug = game.slug;
+  newAppForm.value.app_abbr = computeAbbr(game.title);
+  newAppForm.value.redirect_uri = `${game.package_id || ('txa.' + game.slug)}://oauth/callback`;
+  newAppForm.value.logo_url = 'https://txastudio.click/icons/Icon-512.png';
+}
+
+function onPresetChange() {
+  sound.playClick();
+  if (selectedPreset.value === 'custom') {
+    newAppForm.value.name = '';
+    newAppForm.value.app_type = 'game';
+    newAppForm.value.app_abbr = 'app';
+    newAppForm.value.game_slug = 'app';
+    newAppForm.value.redirect_uri = 'txa.app://oauth/callback';
+    newAppForm.value.logo_url = 'https://txastudio.click/icons/Icon-512.png';
+  } else {
+    const found = availableGames.value.find(g => g.slug === selectedPreset.value);
+    if (found) applyGamePreset(found);
+  }
+}
+
+function onNameInput() {
+  if (selectedPreset.value === 'custom') {
+    const val = newAppForm.value.name;
+    const abbr = computeAbbr(val);
+    const slug = computeSlug(val);
+    newAppForm.value.app_abbr = abbr;
+    newAppForm.value.game_slug = slug;
+    newAppForm.value.redirect_uri = `txa.${abbr}.${slug}://oauth/callback`;
+  }
+}
+
+function onTypeChange() {
+  if (selectedPreset.value === 'custom') {
+    onNameInput();
+  }
+}
 
 const selectedAppSnippet = ref(null);
 
@@ -588,15 +732,24 @@ async function handlePromoteUser() {
 
 async function loadDashboardData() {
   try {
-    const [apps, deletions, configs] = await Promise.all([
+    const [apps, deletions, configs, games] = await Promise.all([
       adminListApps(),
       adminListDeletions(),
-      getSystemConfigs()
+      getSystemConfigs(),
+      getAllGames()
     ]);
     appList.value = apps || [];
     deletionList.value = deletions || [];
     systemConfigs.value = configs || {};
+    availableGames.value = games || [];
     expirySecondsInput.value = configs['oauth_expiry_seconds'] || (configs['oauth_expiry_minutes'] ? String(parseInt(configs['oauth_expiry_minutes'], 10) * 60) : '300');
+
+    // Auto initialize preset if available
+    if (availableGames.value.length > 0 && selectedPreset.value !== 'custom') {
+      const found = availableGames.value.find(g => g.slug === selectedPreset.value) || availableGames.value[0];
+      selectedPreset.value = found.slug;
+      applyGamePreset(found);
+    }
   } catch (e) {
     console.error('Failed to load admin data', e);
   }
@@ -624,12 +777,12 @@ async function handleCreateApp() {
       game_slug: newAppForm.value.game_slug,
       app_type: newAppForm.value.app_type,
       app_abbr: newAppForm.value.app_abbr,
+      logo_url: newAppForm.value.logo_url || 'https://txastudio.click/icons/Icon-512.png',
       redirect_uris: newAppForm.value.redirect_uri ? [newAppForm.value.redirect_uri] : []
     });
 
     sound.playSuccess();
     showCreateModal.value = false;
-    newAppForm.value.name = '';
     await loadDashboardData();
   } catch (e) {
     alert('Lỗi tạo app: ' + e.message);

@@ -216,6 +216,7 @@
               :src="appInfo.logo_url || '/icons/Icon-512.png'" 
               :alt="appInfo.name" 
               class="w-full h-full object-contain rounded-2xl" 
+              @error="$event.target.src = '/icons/Icon-512.png'"
             />
           </div>
 
