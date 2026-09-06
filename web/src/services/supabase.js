@@ -567,4 +567,9 @@ export async function resetClaimedPromotionCode({
   });
 }
 
+export async function getPromotionStats() {
+  return await callRpc('get_promotion_stats');
+}
+
+
 

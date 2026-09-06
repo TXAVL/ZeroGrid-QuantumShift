@@ -1,0 +1,28 @@
+{
+  "packages": [
+    {
+      "campaign_name": "10_hints_free_1",
+      "package_id": "zero_grid_hints_10",
+      "name_en": "10 Hints Starter Pack",
+      "name_vi": "Gói 10 Gợi Ý Khởi Đầu",
+      "badge": "FREE 10 HINTS",
+      "badge_vi": "10 GỢI Ý",
+      "icon": "💡",
+      "hints_count": 10,
+      "description_en": "Instantly reveal optimal moves when facing challenging quantum matrices.",
+      "description_vi": "Mở khóa giải pháp tối ưu tức thì khi gặp các ma trận lượng tử hóc búa."
+    },
+    {
+      "campaign_name": "50_hints_free_1",
+      "package_id": "zero_grid_hints_50",
+      "name_en": "50 Hints Quantum Vault",
+      "name_vi": "Kho 50 Gợi Ý Lượng Tử",
+      "badge": "EPIC 50 HINTS",
+      "badge_vi": "50 GỢI Ý",
+      "icon": "⚡",
+      "hints_count": 50,
+      "description_en": "Massive supply of quantum hints for marathon endless mode and master levels.",
+      "description_vi": "Kho gợi ý dồi dào thỏa sức chinh phục chế độ Vô Tận và các màn chơi Bậc Thầy."
+    }
+  ]
+}

@@ -8,12 +8,12 @@
         <span>SIGNAL LOCK • PROMOTION CAMPAIGN</span>
       </div>
       <h1 class="text-3xl sm:text-4xl lg:text-5xl font-display font-black text-white tracking-tight leading-tight mb-4">
-        {{ isEn ? 'One tap, and 10 Hints is yours for life' : 'Chạm một lần, nhận vĩnh viễn 10 Gợi Ý miễn phí' }}
+        {{ isEn ? 'One tap, and Hints are yours for life' : 'Chạm một lần, nhận vĩnh viễn Gói Gợi Ý miễn phí' }}
       </h1>
       <p class="text-slate-400 text-sm sm:text-base max-w-2xl leading-relaxed">
         {{ isEn
-          ? 'A playhead sweeps across the trace. Hit Lock while it sits inside the lit window and the page hands you a promo code for 10 Hints. Lifetime — the whole app, forever, no subscription. One round, one code, Android.'
-          : 'Vạch quét sẽ chạy qua lại trên biểu đồ sóng lượng tử. Nhấn Lock đúng lúc vạch nằm trong khung sáng và hệ thống sẽ tặng bạn 1 mã kích hoạt gói 10 Gợi Ý trọn đời. Một lượt chơi, một mã, Google Play.'
+          ? 'A playhead sweeps across the trace. Hit Lock while it sits inside the lit window and the page hands you an exclusive promo code. Lifetime — the whole app, forever, no subscription. One round, one code, Google Play.'
+          : 'Vạch quét sẽ chạy qua lại trên biểu đồ sóng lượng tử. Nhấn Lock đúng lúc vạch nằm trong khung sáng và hệ thống sẽ tặng bạn mã kích hoạt gói Gợi Ý trọn đời. Một lượt chơi, một mã, Google Play.'
         }}
       </p>
     </div>
@@ -107,83 +107,151 @@
         </button>
       </div>
 
-      <!-- STAGE 2: PLATFORM SELECTION (Screenshot 2) -->
+      <!-- STAGE 2: PACKAGE & PLATFORM SELECTION (Screenshot 2) -->
       <div v-else-if="stage === 2" class="space-y-6 py-4">
         <div>
           <h2 class="text-xl sm:text-2xl font-display font-bold text-white mb-2">
-            {{ isEn ? 'Locked. Where do you use Zero Grid?' : 'Đã khóa tín hiệu! Bạn chơi Zero Grid trên nền tảng nào?' }}
+            {{ isEn ? 'Locked. Select your gift package & store:' : 'Đã khóa tín hiệu! Chọn gói quà tặng & kho ứng dụng:' }}
           </h2>
           <p class="text-slate-400 text-xs sm:text-sm">
             {{ isEn 
-              ? 'The two stores use completely different codes, so pick the one you actually installed the app from.' 
-              : 'Hai kho ứng dụng dùng định dạng mã hoàn toàn khác nhau, hãy chọn đúng kho ứng dụng bạn đã cài đặt game.' 
+              ? 'Pick the promotional package you want and the store you installed the game from.' 
+              : 'Chọn gói khuyến mãi bạn muốn nhận và chọn kho ứng dụng bạn đã cài đặt game.' 
             }}
           </p>
         </div>
 
-        <!-- Platform Cards Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          
-          <!-- App Store Card (Coming Soon) -->
-          <div 
-            class="relative rounded-2xl border border-slate-800 bg-slate-900/40 p-5 opacity-60 cursor-not-allowed select-none transition-all flex flex-col justify-between"
-          >
-            <div class="flex items-start justify-between mb-6">
-              <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-white text-xl">
-                  
-                </div>
-                <div>
-                  <h3 class="text-white font-bold text-base">App Store</h3>
-                  <p class="text-slate-400 text-xs font-mono">iPhone • iPad</p>
-                </div>
-              </div>
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30 uppercase tracking-wide">
-                {{ isEn ? 'COMING SOON' : 'SẮP RA MẮT' }}
-              </span>
-            </div>
-            <p class="text-[11px] text-slate-500 font-mono">
-              {{ isEn ? 'iOS version is currently in final App Store review.' : 'Bản iOS đang trong giai đoạn duyệt cuối trên App Store.' }}
-            </p>
+        <!-- 1. Package Selection Cards -->
+        <div class="space-y-2 text-left">
+          <div class="text-xs font-mono uppercase tracking-wider text-slate-400 flex items-center justify-between font-bold">
+            <span class="flex items-center gap-1.5">
+              <span>🎁</span>
+              <span>{{ isEn ? '1. Select Promotional Package' : '1. Chọn gói quà tặng khuyến mãi' }}</span>
+            </span>
+            <span class="text-[11px] text-cyan-400/80 lowercase">
+              {{ isEn ? 'Single unique code per pack' : 'Mỗi gói gán 1 mã duy nhất' }}
+            </span>
           </div>
 
-          <!-- Google Play Card (Active) -->
-          <button 
-            @click="selectPlatform('android')"
-            class="group text-left rounded-2xl border border-cyan-500/40 hover:border-cyan-400 bg-cyan-500/5 hover:bg-cyan-500/10 p-5 cursor-pointer transition-all duration-200 hover:scale-[1.02] active:scale-95 shadow-lg shadow-cyan-500/10 hover:shadow-cyan-500/20 flex flex-col justify-between"
-          >
-            <div class="flex items-start justify-between mb-6">
-              <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-emerald-400 flex items-center justify-center text-slate-950 font-black text-xl shadow-md">
-                  ▶
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <button
+              v-for="pkg in availablePackages"
+              :key="pkg.campaign_name"
+              type="button"
+              @click="selectPackage(pkg.campaign_name)"
+              class="p-4 rounded-2xl border text-left transition-all duration-200 flex items-start gap-3 relative overflow-hidden"
+              :class="selectedCampaign === pkg.campaign_name
+                ? 'bg-cyan-500/15 border-cyan-400 shadow-lg shadow-cyan-500/10 ring-1 ring-cyan-400'
+                : 'bg-slate-900/60 border-slate-800 hover:border-slate-700 opacity-80 hover:opacity-100'"
+            >
+              <div class="text-2xl p-2.5 rounded-xl bg-slate-800/90 border border-slate-700/60 flex items-center justify-center shrink-0">
+                {{ pkg.icon }}
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between mb-1 gap-2">
+                  <h4 class="text-white font-bold text-sm truncate">
+                    {{ isEn ? pkg.name_en : pkg.name_vi }}
+                  </h4>
+                  <span 
+                    class="text-[10px] font-mono px-2 py-0.5 rounded-full font-bold uppercase shrink-0"
+                    :class="selectedCampaign === pkg.campaign_name ? 'bg-cyan-400 text-slate-950' : 'bg-slate-800 text-slate-400'"
+                  >
+                    {{ isEn ? pkg.badge : pkg.badge_vi }}
+                  </span>
                 </div>
-                <div>
-                  <h3 class="text-white group-hover:text-cyan-400 font-bold text-base transition-colors">
-                    Google Play
-                  </h3>
-                  <p class="text-slate-400 text-xs font-mono">Android & PC</p>
+                <p class="text-[11px] text-slate-400 font-mono line-clamp-2 mb-2">
+                  {{ isEn ? pkg.description_en : pkg.description_vi }}
+                </p>
+                <div class="flex items-center gap-2 text-[10px] font-mono font-bold">
+                  <span :class="getPackageStock(pkg.campaign_name) > 0 ? 'text-emerald-400' : 'text-rose-400'">
+                    ● {{ getPackageStockText(pkg.campaign_name) }}
+                  </span>
                 </div>
               </div>
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 uppercase tracking-wide">
-                {{ isEn ? 'AVAILABLE' : 'KHẢ DỤNG' }}
-              </span>
-            </div>
-            <div class="flex items-center justify-between text-xs font-mono text-cyan-400 font-bold">
-              <span>{{ isEn ? 'Claim Promo Code' : 'Nhận Mã Ngay' }}</span>
-              <span class="group-hover:translate-x-1 transition-transform">→</span>
-            </div>
-          </button>
-
+            </button>
+          </div>
         </div>
+
+        <!-- 2. Platform Selection Grid -->
+        <div class="space-y-2 text-left pt-2">
+          <div class="text-xs font-mono uppercase tracking-wider text-slate-400 flex items-center gap-1.5 font-bold">
+            <span>📱</span>
+            <span>{{ isEn ? '2. Choose Application Store' : '2. Chọn kho ứng dụng đã cài đặt' }}</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            
+            <!-- App Store Card (Coming Soon) -->
+            <div 
+              class="relative rounded-2xl border border-slate-800 bg-slate-900/40 p-5 opacity-60 cursor-not-allowed select-none transition-all flex flex-col justify-between"
+            >
+              <div class="flex items-start justify-between mb-6">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-white text-xl">
+                    
+                  </div>
+                  <div>
+                    <h3 class="text-white font-bold text-base">App Store</h3>
+                    <p class="text-slate-400 text-xs font-mono">iPhone • iPad</p>
+                  </div>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30 uppercase tracking-wide">
+                  {{ isEn ? 'COMING SOON' : 'SẮP RA MẮT' }}
+                </span>
+              </div>
+              <p class="text-[11px] text-slate-500 font-mono">
+                {{ isEn ? 'iOS version is currently in final App Store review.' : 'Bản iOS đang trong giai đoạn duyệt cuối trên App Store.' }}
+              </p>
+            </div>
+
+            <!-- Google Play Card (Active) -->
+            <button 
+              @click="selectPlatform('android')"
+              :disabled="currentSelectedStock === 0"
+              class="group text-left rounded-2xl border border-cyan-500/40 hover:border-cyan-400 bg-cyan-500/5 hover:bg-cyan-500/10 p-5 cursor-pointer transition-all duration-200 hover:scale-[1.02] active:scale-95 shadow-lg shadow-cyan-500/10 hover:shadow-cyan-500/20 flex flex-col justify-between"
+              :class="currentSelectedStock === 0 ? 'opacity-60 cursor-not-allowed' : ''"
+            >
+              <div class="flex items-start justify-between mb-6">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-emerald-400 flex items-center justify-center text-slate-950 font-black text-xl shadow-md">
+                    ▶
+                  </div>
+                  <div>
+                    <h3 class="text-white group-hover:text-cyan-400 font-bold text-base transition-colors">
+                      Google Play
+                    </h3>
+                    <p class="text-slate-400 text-xs font-mono">Android & PC</p>
+                  </div>
+                </div>
+                <span 
+                  class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wide"
+                  :class="currentSelectedStock > 0 
+                    ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' 
+                    : 'bg-rose-500/10 text-rose-400 border border-rose-500/30'"
+                >
+                  {{ currentSelectedStock > 0 ? (isEn ? 'AVAILABLE' : 'KHẢ DỤNG') : (isEn ? 'OUT OF CODES' : 'TẠM HẾT MÃ') }}
+                </span>
+              </div>
+              <div class="flex items-center justify-between text-xs font-mono text-cyan-400 font-bold">
+                <span>{{ isEn ? 'Claim Promo Code' : 'Nhận Mã Khuyến Mãi' }}</span>
+                <span class="group-hover:translate-x-1 transition-transform">→</span>
+              </div>
+            </button>
+
+          </div>
+        </div>
+
       </div>
 
       <!-- STAGE 3: CODE PRESENTATION (Screenshot 3) -->
       <div v-else-if="stage === 3" class="space-y-6 text-center py-2">
-        <div class="text-xs font-mono tracking-widest uppercase text-slate-400">
-          GOOGLE PLAY • ANDROID
+        <div class="text-xs font-mono tracking-widest uppercase text-slate-400 flex items-center justify-center gap-2">
+          <span>GOOGLE PLAY • ANDROID</span>
+          <span>•</span>
+          <span class="text-cyan-400 font-bold">{{ currentPackageBadge }}</span>
         </div>
         <h2 class="text-2xl sm:text-3xl font-display font-black text-white">
-          {{ isEn ? 'Zero Grid: 10 Hints, on us.' : 'Zero Grid: 10 Gợi Ý miễn phí từ chúng tôi.' }}
+          {{ isEn ? `Zero Grid: ${currentPackageNameEn}, on us.` : `Zero Grid: ${currentPackageNameVi} miễn phí từ chúng tôi.` }}
         </h2>
 
         <!-- Code Box Container -->
@@ -200,7 +268,7 @@
           <div v-else-if="promoError" class="py-4 text-rose-400 font-mono text-sm">
             <p class="font-bold mb-1">⚠️ {{ promoError }}</p>
             <p class="text-xs text-slate-400">
-              {{ isEn ? 'All 20 codes of this batch have been claimed.' : 'Toàn bộ 20 mã đợt này đã được phát hết. Hãy theo dõi các đợt tặng tiếp theo!' }}
+              {{ isEn ? 'All codes of this batch have been claimed.' : 'Toàn bộ mã đợt này đã được phát hết. Hãy theo dõi các đợt tặng tiếp theo!' }}
             </p>
           </div>
 
@@ -212,7 +280,7 @@
             <div v-if="isReclaimed" class="text-[11px] font-mono text-amber-400/90">
               {{ isEn 
                 ? 'ℹ️ You already claimed this code previously. Returning your assigned token.' 
-                : 'ℹ️ Bạn đã nhận mã này trước đó. Hệ thống hiển thị lại đúng mã của bạn.' 
+                : 'ℹ️ Bạn đã nhận mã của gói này trước đó. Hệ thống hiển thị lại đúng mã của bạn.' 
               }}
             </div>
           </div>
@@ -248,7 +316,7 @@
           <p>
             {{ isEn
               ? 'This connection has already taken its codes. Let someone else have a turn.'
-              : 'Thiết bị & tài khoản này đã được gán mã thành công.'
+              : 'Thiết bị & tài khoản này đã được gán mã thành công cho gói này.'
             }}
           </p>
 
@@ -263,13 +331,14 @@
           </div>
         </div>
 
-        <!-- Return to platform selection -->
-        <div class="pt-4">
+        <!-- Return to package / platform selection -->
+        <div class="pt-4 flex items-center justify-center gap-3">
           <button
-            @click="stage = 2"
-            class="px-4 py-2 rounded-full border border-slate-800 hover:border-slate-700 bg-slate-900/60 hover:bg-slate-800 text-xs font-mono text-slate-400 hover:text-white transition-all"
+            @click="returnToSelection"
+            class="px-4 py-2 rounded-full border border-slate-800 hover:border-slate-700 bg-slate-900/60 hover:bg-slate-800 text-xs font-mono text-slate-400 hover:text-white transition-all flex items-center gap-1.5"
           >
-            {{ isEn ? 'I need the other store' : 'Chọn nền tảng khác' }}
+            <span>←</span>
+            <span>{{ isEn ? 'Choose another package or store' : 'Chọn gói khác hoặc nền tảng khác' }}</span>
           </button>
         </div>
       </div>
@@ -284,7 +353,7 @@
       <p class="text-xs sm:text-sm text-slate-400 leading-relaxed font-sans">
         {{ isEn
           ? 'The Android code is single-use and yours alone — the server takes one off the top of the pile, writes down that it is gone, and never hands it out twice. Play it again and you get the same code back, not a second one. The iPhone code is a single shared offer code, so it is the same string for everybody; it stops working when the offer runs out.'
-          : 'Mã Android là loại sử dụng một lần và thuộc về riêng bạn — máy chủ chọn ngẫu nhiên một mã từ kho, ghi nhận và không bao giờ phát lại cho người khác. Nếu bạn quay lại trang này, hệ thống sẽ trả lại đúng mã bạn đã nhận. Mã iPhone sẽ được cập nhật khi game ra mắt chính thức trên App Store.'
+          : 'Mã Android là loại sử dụng một lần và thuộc về riêng bạn — máy chủ chọn ngẫu nhiên một mã từ kho, ghi nhận và không bao giờ phát lại cho người khác. Nếu bạn quay lại trang này, hệ thống sẽ trả lại đúng mã bạn đã nhận cho gói tương ứng. Mã iPhone sẽ được cập nhật khi game ra mắt chính thức trên App Store.'
         }}
       </p>
       <p class="text-xs sm:text-sm text-slate-400 leading-relaxed font-sans">
@@ -300,14 +369,19 @@
 
 <script setup>
 import { ref, computed, inject, onMounted, onUnmounted, nextTick } from 'vue';
-import { getCurrentWebUser, claimPromotionCode, resetClaimedPromotionCode } from '../services/supabase.js';
+import { getCurrentWebUser, claimPromotionCode, resetClaimedPromotionCode, getPromotionStats } from '../services/supabase.js';
+import promoData from '../data/promotions.json';
 
 const currentLang = inject('currentLang', ref('vi'));
 const isEn = computed(() => currentLang.value === 'en');
 
 const currentUser = ref(getCurrentWebUser());
 
-// Stages: 1 = Mini-game, 2 = Platform Selection, 3 = Code Presentation
+// Packages metadata loaded from single JSON configuration
+const availablePackages = ref(promoData.packages || []);
+const selectedCampaign = ref('10_hints_free_1');
+
+// Stages: 1 = Mini-game, 2 = Platform & Package Selection, 3 = Code Presentation
 const stage = ref(1);
 
 // Mini-game State
@@ -326,7 +400,7 @@ const flashHit = ref(false);
 const flashMiss = ref(false);
 const attemptCount = ref(0);
 
-// Code State
+// Code & Platform State
 const selectedPlatform = ref('android');
 const isLoadingCode = ref(false);
 const claimedCode = ref('');
@@ -334,10 +408,64 @@ const isReclaimed = ref(false);
 const promoError = ref('');
 const isCopied = ref(false);
 
+// Real-time Database Availability Stats
+const promoStats = ref({});
+
+const currentPkg = computed(() => {
+  return availablePackages.value.find(p => p.campaign_name === selectedCampaign.value) || availablePackages.value[0];
+});
+
+const currentPackageNameEn = computed(() => currentPkg.value?.name_en || 'Hints Pack');
+const currentPackageNameVi = computed(() => currentPkg.value?.name_vi || 'Gói Gợi Ý');
+const currentPackageBadge = computed(() => isEn.value ? currentPkg.value?.badge : currentPkg.value?.badge_vi);
+
+const currentSelectedStock = computed(() => {
+  return getPackageStock(selectedCampaign.value);
+});
+
+function getPackageStock(campaignName) {
+  const stat = promoStats.value[`${campaignName}:android`];
+  if (!stat) return 0;
+  return stat.available ?? 0;
+}
+
+function getPackageStockText(campaignName) {
+  const stat = promoStats.value[`${campaignName}:android`];
+  if (!stat) {
+    return isEn.value ? 'Checking vault...' : 'Đang kiểm tra kho...';
+  }
+  const avail = stat.available ?? 0;
+  const total = stat.total ?? 0;
+  if (avail <= 0) {
+    return isEn.value ? 'Out of codes' : 'Tạm hết mã';
+  }
+  return isEn.value ? `${avail}/${total} codes left` : `Còn ${avail}/${total} mã`;
+}
+
 const redeemUrl = computed(() => {
   if (!claimedCode.value) return 'https://play.google.com/store/apps/details?id=txa.zerogrid.quantumshift';
   return `https://play.google.com/redeem?code=${encodeURIComponent(claimedCode.value)}`;
 });
+
+function selectPackage(campaignName) {
+  selectedCampaign.value = campaignName;
+}
+
+function returnToSelection() {
+  stage.value = 2;
+  refreshStats();
+}
+
+async function refreshStats() {
+  try {
+    const stats = await getPromotionStats();
+    if (stats && typeof stats === 'object') {
+      promoStats.value = stats;
+    }
+  } catch (err) {
+    console.warn('Failed to load promotion stats:', err);
+  }
+}
 
 function randomizeWindow() {
   windowWidth = 0.20 + Math.random() * 0.08;
@@ -467,7 +595,8 @@ function handleLockClick() {
     flashHit.value = true;
     setTimeout(() => {
       flashHit.value = false;
-      stage.value = 2; // Move to platform selection
+      stage.value = 2; // Move to package & platform selection
+      refreshStats();
     }, 280);
   } else {
     // MISS!
@@ -499,7 +628,7 @@ async function fetchPromoCode() {
   try {
     const user = currentUser.value;
     const res = await claimPromotionCode({
-      campaign: '10_hints_free_1',
+      campaign: selectedCampaign.value,
       platform: selectedPlatform.value,
       userId: user?.id || user?.user_id,
       email: user?.email
@@ -515,11 +644,12 @@ async function fetchPromoCode() {
     promoError.value = err.message || 'Lỗi kết nối máy chủ.';
   } finally {
     isLoadingCode.value = false;
+    refreshStats();
   }
 }
 
 async function handleReRollCode() {
-  if (!confirm(isEn.value ? 'Are you sure you want to re-roll and get a new promo code?' : 'Bạn có chắc chắn muốn hủy mã cũ và xin cấp 1 mã mới ngẫu nhiên không?')) {
+  if (!confirm(isEn.value ? 'Are you sure you want to re-roll and get a new promo code for this package?' : 'Bạn có chắc chắn muốn hủy mã cũ và xin cấp 1 mã mới ngẫu nhiên cho gói này không?')) {
     return;
   }
 
@@ -528,7 +658,7 @@ async function handleReRollCode() {
   try {
     const user = currentUser.value;
     const res = await resetClaimedPromotionCode({
-      campaign: '10_hints_free_1',
+      campaign: selectedCampaign.value,
       platform: selectedPlatform.value,
       userId: user?.id || user?.user_id
     });
@@ -544,6 +674,7 @@ async function handleReRollCode() {
     promoError.value = err.message || 'Lỗi kết nối máy chủ.';
   } finally {
     isLoadingCode.value = false;
+    refreshStats();
   }
 }
 
@@ -589,6 +720,8 @@ onMounted(() => {
   window.addEventListener('txa-auth-change', onAuthChange);
   window.addEventListener('keydown', handleKeyDown);
 
+  refreshStats();
+
   if (currentUser.value) {
     nextTick(() => {
       initCanvas();
@@ -604,9 +737,3 @@ onUnmounted(() => {
   }
 });
 </script>
-
-<style scoped>
-.font-display {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
-</style>
