@@ -449,7 +449,7 @@ class _MainMenuScreenState extends ConsumerState<MainMenuScreen> with WidgetsBin
                           child: Icon(Icons.rocket_launch_rounded, color: palette.accentNeon, size: 22),
                         ),
                         title: Text(
-                          TxaLanguage.isVietnamese(langCode) ? 'Có gì mới ở phiên bản này' : "What's New in this Version",
+                          TxaLanguage.tr('whats_new_title', langCode),
                           style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
                         ),
                         subtitle: Text(

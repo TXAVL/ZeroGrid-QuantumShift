@@ -121,7 +121,7 @@ class _RestorePurchasesDialogState extends ConsumerState<RestorePurchasesDialog>
 
               // 2. Tiêu đề
               Text(
-                _getTitle(isVi),
+                _getTitle(langCode),
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   color: Colors.white,
@@ -144,7 +144,7 @@ class _RestorePurchasesDialogState extends ConsumerState<RestorePurchasesDialog>
                   ),
                   icon: const Icon(Icons.open_in_new_rounded, size: 15, color: Color(0xFF00E5FF)),
                   label: Text(
-                    isVi ? 'Quản lý gói đăng ký / Đơn hàng Store' : 'Manage Subscriptions & Orders',
+                    TxaLanguage.tr('restore_dialog_open_store', langCode),
                     style: const TextStyle(color: Color(0xFF00E5FF), fontSize: 12.5),
                   ),
                   onPressed: () => TxaConfig.openStoreSubscriptions(),
@@ -217,17 +217,17 @@ class _RestorePurchasesDialogState extends ConsumerState<RestorePurchasesDialog>
     );
   }
 
-  String _getTitle(bool isVi) {
+  String _getTitle(String langCode) {
     if (_isLoading) {
-      return isVi ? 'Đang Khôi Phục Giao Dịch...' : 'Restoring Purchases...';
+      return TxaLanguage.tr('restore_dialog_title_loading', langCode);
     }
     if (_result?.isSuccess ?? false) {
-      return isVi ? 'Khôi Phục Thành Công!' : 'Restored Successfully!';
+      return TxaLanguage.tr('restore_dialog_title_success', langCode);
     }
     if (_result?.isNoPurchases ?? false) {
-      return isVi ? 'Không Tìm Thấy Giao Dịch' : 'No Purchases Found';
+      return TxaLanguage.tr('restore_dialog_title_empty', langCode);
     }
-    return isVi ? 'Khôi Phục Thất Bại' : 'Restore Failed';
+    return TxaLanguage.tr('restore_dialog_title_failed', langCode);
   }
 
   Widget _buildContent(bool isVi, String langCode) {
@@ -293,9 +293,7 @@ class _RestorePurchasesDialogState extends ConsumerState<RestorePurchasesDialog>
       return Column(
         children: [
           Text(
-            isVi
-                ? 'Tài khoản Google Play này chưa từng mua gói vĩnh viễn nào (như Gỡ Quảng Cáo hoặc Chủ Đề Pro).'
-                : 'No non-consumable purchases (such as Ad-Free or Pro Themes) were found on this account.',
+            TxaLanguage.tr('restore_dialog_empty_desc', langCode),
             textAlign: TextAlign.center,
             style: const TextStyle(color: Color(0xFF90A4AE), fontSize: 13.5, height: 1.45),
           ),
@@ -314,9 +312,7 @@ class _RestorePurchasesDialogState extends ConsumerState<RestorePurchasesDialog>
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    isVi
-                        ? 'Lưu ý về Gói Gợi Ý (10 / 50 gợi ý):\nĐây là vật phẩm tiêu hao (Consumable). Khi đổi mã thành công hoặc mua, gợi ý đã được tự động cộng thẳng vào số dư của bạn ngay khi mở game và Google Play đánh dấu đã tiêu thụ. Do đó gói gợi ý sẽ không xuất hiện trong danh sách khôi phục này.'
-                        : 'Note on Hint Packs (10 / 50 hints):\nThese are consumable items. Once redeemed or purchased, hints are credited directly into your balance upon launch. Under Google Play Billing rules, consumed items are not returned in restore requests.',
+                    TxaLanguage.tr('restore_dialog_consumable_notice', langCode),
                     style: const TextStyle(color: Color(0xFFB0BEC5), fontSize: 11.5, height: 1.4),
                   ),
                 ),
