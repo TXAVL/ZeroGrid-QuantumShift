@@ -83,7 +83,7 @@ class TxaConfig {
   // ==========================================
   // 4. GOOGLE PLAY GAMES (GPGS) & APPLE GAME CENTER
   // ==========================================
-  static const String gpgsAppId = '000000000000';
+  static const String gpgsAppId = '604733865006';
   
   // Campaign Progression Milestones
   static const String achFirstClear = 'CgkI_sample_first_clear';
