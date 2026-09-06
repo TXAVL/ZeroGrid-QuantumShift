@@ -49,6 +49,10 @@ class StorageService {
     return id;
   }
 
+  set playerId(String value) {
+    _settingsBox.put('player_id', value);
+  }
+
   String get playerUsername {
     String? name = _settingsBox.get('player_username');
     if (name == null || name.isEmpty) {

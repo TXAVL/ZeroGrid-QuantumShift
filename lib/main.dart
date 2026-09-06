@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/config/txa_config.dart';
 import 'presentation/screens/splash_screen.dart';
 import 'presentation/screens/txa_crash_screen.dart';
+import 'services/auth/txa_auth_service.dart';
 import 'services/service_providers.dart';
 import 'services/storage_service.dart';
 import 'services/txa_logger.dart';
@@ -22,7 +23,7 @@ void main() {
   };
 
   runZonedGuarded(() async {
-    // 1. Tự động đồng bộ version & build code từ pubspec.yaml
+    // 1. Tự động đồng bộ version & build code từ pubspec.yaml và Supabase Remote Config
     await TxaConfig.init();
 
     // 2. Khởi tạo logger trung tâm & bắt lỗi toàn cục
@@ -33,14 +34,19 @@ void main() {
       DeviceOrientation.portraitUp,
     ]);
 
-    // 3. Khởi tạo Storage (Hive + SharedPreferences)
+    // 4. Khởi tạo Storage (Hive + SharedPreferences)
     final storageService = StorageService();
     await storageService.initialize();
+
+    // 5. Khởi tạo Auth Service & Deep Link listener cho TXA Studio ID OAuth
+    final authService = TxaAuthService(storageService);
+    authService.initDeepLinkListener();
 
     runApp(
       ProviderScope(
         overrides: [
           storageServiceProvider.overrideWithValue(storageService),
+          authServiceProvider.overrideWithValue(authService),
         ],
         child: const ZeroGridApp(),
       ),

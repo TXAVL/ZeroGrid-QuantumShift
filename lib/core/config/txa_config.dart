@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
 import 'package:package_info_plus/package_info_plus.dart';
 
 /// Lớp cấu hình tập trung toàn bộ tham số của dự án Zero Grid: Quantum Shift
@@ -38,6 +40,8 @@ class TxaConfig {
     } catch (e) {
       debugPrint("⚠️ [TxaConfig] Failed to read PackageInfo, fallback to: $fullVersion ($e)");
     }
+    // Tự động đồng bộ cấu hình từ xa khi khởi động game
+    await syncRemoteConfig();
   }
 
   // ==========================================
@@ -173,8 +177,83 @@ class TxaConfig {
   static const String txaAppType = 'game';
   static const String txaAppAbbr = 'zgqs';
   static const String txaGameSlug = 'quantumshift';
-  static const String txaClientId = 'txa_game_zgqs_9k2m7x8p4q1w3v5z';
+  static String _dynamicClientId = 'txa_game_zgqs_9k2m7x8p4q1w3v5z';
+  static String get txaClientId => _dynamicClientId;
+
+  static String _dynamicPrivacyUrl = 'https://txastudio.click/privacy?game=quantumshift';
+  static String get privacyPolicyUrl => _dynamicPrivacyUrl;
+
+  static String _dynamicTermsUrl = 'https://txastudio.click/terms?game=quantumshift';
+  static String get termsUrl => _dynamicTermsUrl;
+
+  static String _dynamicDeleteAccountUrl = 'https://txastudio.click/delete-account?game=quantumshift';
+  static String get deleteAccountUrl => _dynamicDeleteAccountUrl;
+
   static const String txaRedirectUri = 'txa.zerogrid.quantumshift://oauth/callback';
   static const String txaAuthEndpoint = 'https://txastudio.click/oauth/authorize';
-  static const int txaSessionTimeoutMinutes = 5;
+  static int txaSessionTimeoutSeconds = 300; // Mặc định 300 giây, tự động đồng bộ từ Supabase
+
+  /// Chuỗi hiển thị thời hạn phiên động (ví dụ: "06 phút" hoặc "05 phút")
+  static String get formattedSessionTimeout {
+    final m = txaSessionTimeoutSeconds ~/ 60;
+    final s = txaSessionTimeoutSeconds % 60;
+    final mm = m < 10 ? '0$m' : '$m';
+    if (s == 0) return '$mm phút';
+    final ss = s < 10 ? '0$s' : '$s';
+    return '$mm phút $ss giây';
+  }
+
+  /// Tự động đồng bộ thời hạn phiên OAuth và cấu hình ứng dụng từ Supabase
+  static Future<void> syncRemoteConfig() async {
+    try {
+      // 1. Đồng bộ thời hạn phiên OAuth từ txa_system_configs
+      final url = Uri.parse('$supabaseUrl/rest/v1/txa_system_configs?key=eq.oauth_expiry_seconds&select=value');
+      final res = await http.get(url, headers: {
+        'apikey': supabaseAnonKey,
+        'Authorization': 'Bearer $supabaseAnonKey',
+      });
+      if (res.statusCode == 200) {
+        final list = jsonDecode(res.body) as List;
+        if (list.isNotEmpty) {
+          final val = int.tryParse(list[0]['value']?.toString() ?? '');
+          if (val != null && val > 0) {
+            txaSessionTimeoutSeconds = val;
+            debugPrint("🚀 [TxaConfig] Synced remote oauth_expiry_seconds: $val seconds ($formattedSessionTimeout)");
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint("⚠️ [TxaConfig] syncRemoteConfig system configs fallback: $e");
+    }
+
+    try {
+      // 2. Đồng bộ thông tin Client ID và Legal URLs từ txa_oauth_apps
+      final appUrl = Uri.parse('$supabaseUrl/rest/v1/txa_oauth_apps?game_slug=eq.$txaGameSlug&select=*');
+      final appRes = await http.get(appUrl, headers: {
+        'apikey': supabaseAnonKey,
+        'Authorization': 'Bearer $supabaseAnonKey',
+      });
+      if (appRes.statusCode == 200) {
+        final list = jsonDecode(appRes.body) as List;
+        if (list.isNotEmpty) {
+          final app = list[0] as Map<String, dynamic>;
+          if (app['client_id'] != null && app['client_id'].toString().isNotEmpty) {
+            _dynamicClientId = app['client_id'].toString();
+          }
+          if (app['privacy_policy_url'] != null) {
+            _dynamicPrivacyUrl = app['privacy_policy_url'].toString();
+          }
+          if (app['terms_url'] != null) {
+            _dynamicTermsUrl = app['terms_url'].toString();
+          }
+          if (app['delete_account_url'] != null) {
+            _dynamicDeleteAccountUrl = app['delete_account_url'].toString();
+          }
+          debugPrint("🚀 [TxaConfig] Synced remote txa_oauth_apps: clientId=$_dynamicClientId (Status: ${app['status']})");
+        }
+      }
+    } catch (e) {
+      debugPrint("⚠️ [TxaConfig] syncRemoteConfig oauth apps fallback: $e");
+    }
+  }
 }

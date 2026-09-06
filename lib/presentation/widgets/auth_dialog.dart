@@ -1,8 +1,11 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/config/txa_config.dart';
 import '../../core/localization/txa_language.dart';
 import '../../core/utils/txa_device.dart';
+import '../../services/auth/txa_auth_service.dart';
 import '../../services/service_providers.dart';
 import '../theme/cyber_palette.dart';
 import 'txa_toast.dart';
@@ -29,7 +32,7 @@ class AuthDialog extends ConsumerStatefulWidget {
   ConsumerState<AuthDialog> createState() => _AuthDialogState();
 }
 
-class _AuthDialogState extends ConsumerState<AuthDialog> {
+class _AuthDialogState extends ConsumerState<AuthDialog> with WidgetsBindingObserver {
   bool _isRegisterMode = false;
   bool _isLoading = false;
   bool _showOauthCodeInput = false;
@@ -40,17 +43,54 @@ class _AuthDialogState extends ConsumerState<AuthDialog> {
   final TextEditingController _oauthCodeController = TextEditingController();
 
   String _deviceDisplayName = '...';
+  StreamSubscription<Map<String, dynamic>>? _authSub;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     TxaDevice.getDeviceDisplayName().then((name) {
       if (mounted) setState(() => _deviceDisplayName = name);
     });
+
+    // Lắng nghe sự kiện xác thực thành công từ Deep Link
+    _authSub = TxaAuthService.authEventStream.listen((event) {
+      if (mounted && event['success'] == true) {
+        TxaToast.success(context, 'Đăng nhập TXA Studio ID thành công!');
+        Navigator.of(context).pop(true);
+      }
+    });
+
+    // Kiểm tra clipboard ngay khi mở dialog
+    _checkClipboardForOAuthCode();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _checkClipboardForOAuthCode();
+    }
+  }
+
+  Future<void> _checkClipboardForOAuthCode() async {
+    try {
+      final data = await Clipboard.getData(Clipboard.kTextPlain);
+      final text = data?.text?.trim() ?? '';
+      if (text.startsWith('txa_code_') && text.length > 15) {
+        if (mounted && _oauthCodeController.text != text) {
+          setState(() {
+            _showOauthCodeInput = true;
+            _oauthCodeController.text = text;
+          });
+        }
+      }
+    } catch (_) {}
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _authSub?.cancel();
     _usernameController.dispose();
     _passwordController.dispose();
     _emailController.dispose();
@@ -292,8 +332,8 @@ class _AuthDialogState extends ConsumerState<AuthDialog> {
                           Expanded(
                             child: Text(
                               widget.langCode == 'vi'
-                                  ? 'Đã mở cổng xác thực web (hiệu lực 5 phút)'
-                                  : 'Opened web auth portal (5 min TTL)',
+                                  ? 'Đã mở cổng xác thực web (hiệu lực ${TxaConfig.formattedSessionTimeout})'
+                                  : 'Opened web auth portal (${TxaConfig.formattedSessionTimeout} TTL)',
                               style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: palette.accentNeon),
                             ),
                           ),

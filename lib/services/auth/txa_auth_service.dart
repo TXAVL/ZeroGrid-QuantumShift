@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
+import 'package:app_links/app_links.dart';
 import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
@@ -17,6 +19,13 @@ enum TxaAuthStatus {
 /// Dịch vụ Xác thực & Đăng nhập (TxaAuthService)
 class TxaAuthService {
   final StorageService _storage;
+
+  static final StreamController<Map<String, dynamic>> _authEventController =
+      StreamController<Map<String, dynamic>>.broadcast();
+  static Stream<Map<String, dynamic>> get authEventStream => _authEventController.stream;
+
+  static AppLinks? _appLinks;
+  static StreamSubscription<Uri>? _linkSubscription;
 
   static const String supabaseUrl = TxaConfig.supabaseUrl;
   static final String supabaseAnonKey = TxaConfig.supabaseAnonKey;
@@ -175,7 +184,51 @@ class TxaAuthService {
           _storage.avatarUrl = user?['avatar_url'] ?? '';
           _storage.userRole = 'player';
           TXALogger.logApi('TXA Studio OAuth success: ${_storage.playerUsername} (${_storage.authEmail})');
-          return {'success': true, 'user': user};
+
+          // Tự động đồng bộ và liên kết hồ sơ vào cơ sở dữ liệu game (zg_users)
+          try {
+            if (user?['id'] != null) {
+              _storage.playerId = 'zg_txa_${user!['id']}';
+            }
+            final deviceInfo = await TxaDevice.getDeviceInfoSummary();
+            final deviceId = await TxaDevice.getUniqueDeviceId();
+            final platform = TxaDevice.getPlatformName();
+            final syncUrl = Uri.parse('$supabaseUrl/rest/v1/rpc/auth_register_or_login');
+            final syncRes = await http.post(
+              syncUrl,
+              headers: _headers,
+              body: jsonEncode({
+                'p_username': _storage.playerUsername,
+                'p_password_hash': 'txa_studio_oauth_${user?['id']}',
+                'p_email': _storage.authEmail,
+                'p_auth_provider': 'txa_studio',
+                'p_device_id': deviceId,
+                'p_device_info': deviceInfo,
+                'p_platform': platform,
+                'p_avatar_url': _storage.avatarUrl.isNotEmpty ? _storage.avatarUrl : null,
+              }),
+            );
+            if (syncRes.statusCode == 200) {
+              final syncData = jsonDecode(syncRes.body) as Map<String, dynamic>;
+              if (syncData['success'] == true) {
+                if (syncData['user_id'] != null) {
+                  _storage.playerId = syncData['user_id'].toString();
+                }
+                if (syncData['role'] != null) {
+                  _storage.userRole = syncData['role'].toString();
+                }
+                if (syncData['avatar_url'] != null && (syncData['avatar_url'] as String).isNotEmpty) {
+                  _storage.avatarUrl = syncData['avatar_url'].toString();
+                }
+              }
+            }
+          } catch (syncErr) {
+            TXALogger.logError('Failed to sync txa_studio user to zg_users: $syncErr');
+          }
+
+          final authResult = {'success': true, 'user': user};
+          _authEventController.add(authResult);
+          return authResult;
         } else {
           return {'success': false, 'error': data['error'] ?? 'Mã ủy quyền không hợp lệ hoặc đã hết hạn'};
         }
@@ -184,6 +237,43 @@ class TxaAuthService {
     } catch (e, stack) {
       TXALogger.logError('TxaAuthService loginWithTxaOAuthCode error: $e', stackTrace: stack);
       return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  /// Khởi tạo bộ lắng nghe Deep Link tự động (txa.zerogrid.quantumshift://oauth/callback?code=...)
+  void initDeepLinkListener() {
+    if (_linkSubscription != null) return;
+    try {
+      _appLinks = AppLinks();
+
+      // 1. Lắng nghe link khi app đang mở hoặc resume
+      _linkSubscription = _appLinks?.uriLinkStream.listen((uri) async {
+        TXALogger.logApi('Received deep link: $uri');
+        if (uri.scheme == 'txa.zerogrid.quantumshift') {
+          final code = uri.queryParameters['code'];
+          if (code != null && code.startsWith('txa_code_')) {
+            TXALogger.logApi('Auto-exchanging deep link OAuth code: $code');
+            await loginWithTxaOAuthCode(code);
+          }
+        }
+      }, onError: (err) {
+        TXALogger.logError('AppLinks stream error: $err');
+      });
+
+      // 2. Kiểm tra initial link nếu app được mở từ cold start qua deep link
+      _appLinks?.getInitialLink().then((uri) async {
+        if (uri != null && uri.scheme == 'txa.zerogrid.quantumshift') {
+          final code = uri.queryParameters['code'];
+          if (code != null && code.startsWith('txa_code_')) {
+            TXALogger.logApi('Auto-exchanging initial deep link OAuth code: $code');
+            await loginWithTxaOAuthCode(code);
+          }
+        }
+      }).catchError((err) {
+        TXALogger.logError('AppLinks getInitialLink error: $err');
+      });
+    } catch (e) {
+      TXALogger.logError('Failed to initialize AppLinks: $e');
     }
   }
 
