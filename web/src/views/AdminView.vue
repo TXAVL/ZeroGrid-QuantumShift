@@ -428,7 +428,7 @@
             </div>
 
             <p class="text-xs text-slate-300 font-mono">
-              Dán đoạn mã sau vào file <span class="text-cyan-400 font-bold">lib/config/txa_config.dart</span> trong dự án game của bạn:
+              Dán đoạn mã sau vào file <span class="text-cyan-400 font-bold">lib/core/config/txa_config.dart</span> trong dự án game của bạn:
             </p>
 
             <div class="relative p-4 rounded-2xl bg-black/80 border border-slate-800 font-mono text-xs">

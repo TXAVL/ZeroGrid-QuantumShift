@@ -247,13 +247,13 @@
               Cấu Hình Flutter Thông Qua txa_config.dart
             </h2>
             <p class="text-sm text-slate-300 leading-relaxed">
-              Trong mã nguồn game, bạn tạo file <code>lib/config/txa_config.dart</code> để quản lý tập trung mã Client ID và Deep Link:
+              Trong mã nguồn game, bạn tạo file <code>lib/core/config/txa_config.dart</code> để quản lý tập trung mã Client ID và Deep Link:
             </p>
 
             <!-- Code Block with Copy -->
             <div class="relative p-4 rounded-2xl bg-black/60 border border-slate-800 font-mono text-xs text-cyan-300">
               <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-800 text-[11px] text-slate-500">
-                <span>lib/config/txa_config.dart</span>
+                <span>lib/core/config/txa_config.dart</span>
                 <button @click="copyText(flutterConfigCode)" class="text-cyan-400 hover:text-cyan-300 font-bold">Copy Code</button>
               </div>
               <pre class="overflow-x-auto text-[11px] text-slate-300"><code>{{ flutterConfigCode }}</code></pre>
