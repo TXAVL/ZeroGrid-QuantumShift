@@ -15,7 +15,7 @@
             <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 shadow-neon-cyan">
               <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
               <span class="text-xs font-mono font-bold tracking-widest text-cyan-300 uppercase">
-                TXA STUDIO // ZERO GRID RELEASE 1.4.0+6
+                TXA STUDIO // ZERO GRID RELEASE 1.5.0+7
               </span>
             </div>
 

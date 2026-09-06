@@ -47,14 +47,61 @@ class TxaVersion {
   /// Danh sách các bản phát hành được khai báo (Bản mới nhất đặt ở đầu tiên)
   static final List<TxaVersionRelease> releases = [
     // =========================================================================
-    // [TXA_4] - Zero Grid: Quantum Shift v1.4.0 (Build 6) - 2026-09-05
+    // [TXA_5] - Zero Grid: Quantum Shift v1.5.0 (Build 7) - 2026-09-06
     // =========================================================================
     TxaVersionRelease(
-      id: 'txa_4',
+      id: 'txa_5',
       version: TxaConfig.version,
       buildNumber: TxaConfig.buildNumber,
       releaseDate: TxaConfig.releaseDate,
       items: const [
+        // [TXA_5_ITEM_1] - Đăng nhập tài khoản TXA Studio ID
+        TxaChangelogItem(
+          icon: Icons.fingerprint_rounded,
+          iconColor: Color(0xFF00E5FF),
+          titleKey: 'txa_5_item_1_title',
+          descKey: 'txa_5_item_1_desc',
+          badgeKey: 'txa_5_item_1_badge',
+        ),
+
+        // [TXA_5_ITEM_2] - Tự động quay lại ứng dụng khi cấp quyền
+        TxaChangelogItem(
+          icon: Icons.sync_alt_rounded,
+          iconColor: Color(0xFF00FFA3),
+          titleKey: 'txa_5_item_2_title',
+          descKey: 'txa_5_item_2_desc',
+          badgeKey: 'txa_5_item_2_badge',
+        ),
+
+        // [TXA_5_ITEM_3] - Đa ngôn ngữ đồng bộ toàn diện
+        TxaChangelogItem(
+          icon: Icons.translate_rounded,
+          iconColor: Color(0xFFFFD600),
+          titleKey: 'txa_5_item_3_title',
+          descKey: 'txa_5_item_3_desc',
+          badgeKey: 'txa_5_item_3_badge',
+        ),
+
+        // [TXA_5_ITEM_4] - Lưu trữ đám mây & Bảo vệ tài khoản
+        TxaChangelogItem(
+          icon: Icons.cloud_done_rounded,
+          iconColor: Color(0xFFFF007F),
+          titleKey: 'txa_5_item_4_title',
+          descKey: 'txa_5_item_4_desc',
+          badgeKey: 'txa_5_item_4_badge',
+        ),
+      ],
+    ),
+
+    // =========================================================================
+    // [TXA_4] - Zero Grid: Quantum Shift v1.4.0 (Build 6) - 2026-09-05
+    // =========================================================================
+    const TxaVersionRelease(
+      id: 'txa_4',
+      version: '1.4.0',
+      buildNumber: '6',
+      releaseDate: '2026-09-05',
+      items: [
         // [TXA_4_ITEM_1] - Điểm số nhảy tức thì Real-time
         TxaChangelogItem(
           icon: Icons.sports_score_rounded,

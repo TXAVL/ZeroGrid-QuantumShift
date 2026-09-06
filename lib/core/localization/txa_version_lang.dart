@@ -15,6 +15,31 @@ class TxaVersionLang {
       'whats_new_btn_continue': 'ĐÃ HIỂU & TIẾP TỤC',
 
       // -----------------------------------------------------------------------
+      // [TXA_5] - Phiên bản v1.5.0 (Build 7) - Ngày: 2026-09-06
+      // -----------------------------------------------------------------------
+      'txa_5_title': 'Bản Nâng Cấp Hệ Thống TXA Studio ID 1.5.0',
+
+      // [TXA_5_ITEM_1] - Đăng nhập tài khoản TXA Studio ID
+      'txa_5_item_1_title': 'Đăng Nhập TXA Studio ID Mới',
+      'txa_5_item_1_desc': 'Dùng chung một tài khoản TXA Studio duy nhất để liên kết dữ liệu game. Đăng nhập tiện lợi, bảo mật qua trình duyệt chỉ với một chạm.',
+      'txa_5_item_1_badge': 'MỚI CỰC ĐỈNH',
+
+      // [TXA_5_ITEM_2] - Tự động quay lại ứng dụng khi cấp quyền
+      'txa_5_item_2_title': 'Tự Động Mở Lại Game Siêu Tốc',
+      'txa_5_item_2_desc': 'Sau khi xác nhận đăng nhập trên trình duyệt, ứng dụng sẽ tự động mở lại game ngay lập tức mà không cần bạn phải sao chép mã thủ công.',
+      'txa_5_item_2_badge': 'TIỆN LỢI',
+
+      // [TXA_5_ITEM_3] - Đa ngôn ngữ đồng bộ toàn diện
+      'txa_5_item_3_title': 'Đa Ngôn Ngữ Đồng Bộ Toàn Diện',
+      'txa_5_item_3_desc': 'Toàn bộ thông báo đăng nhập, hướng dẫn kết nối và trạng thái tài khoản đều hiển thị chuẩn xác theo ngôn ngữ Tiếng Việt hoặc Tiếng Anh bạn đã chọn.',
+      'txa_5_item_3_badge': 'ĐA NGÔN NGỮ',
+
+      // [TXA_5_ITEM_4] - Lưu trữ đám mây & Bảo vệ tài khoản
+      'txa_5_item_4_title': 'Lưu Trữ Đám Mây An Toàn',
+      'txa_5_item_4_desc': 'Hồ sơ và điểm kỷ lục của bạn được lưu an toàn trên máy chủ TXA Studio, an tâm tiếp tục màn chơi trên bất kỳ thiết bị nào.',
+      'txa_5_item_4_badge': 'BẢO MẬT',
+
+      // -----------------------------------------------------------------------
       // [TXA_4] - Phiên bản v1.4.0 (Build 6) - Ngày: 2026-09-05
       // -----------------------------------------------------------------------
       'txa_4_title': 'Bản Cập Nhật Điểm Số Real-Time 1.4.0',
@@ -139,6 +164,31 @@ class TxaVersionLang {
       // -----------------------------------------------------------------------
       'whats_new_title': "WHAT'S NEW IN THIS VERSION?",
       'whats_new_btn_continue': 'GOT IT & CONTINUE',
+
+      // -----------------------------------------------------------------------
+      // [TXA_5] - Version v1.5.0 (Build 7) - Date: 2026-09-06
+      // -----------------------------------------------------------------------
+      'txa_5_title': 'TXA Studio ID Ecosystem Update 1.5.0',
+
+      // [TXA_5_ITEM_1] - Brand new TXA Studio ID
+      'txa_5_item_1_title': 'Brand-New TXA Studio ID Sign-In',
+      'txa_5_item_1_desc': 'Use a single unified TXA Studio account to link all your game progress. Fast, secure web sign-in with just a single tap.',
+      'txa_5_item_1_badge': 'BRAND NEW',
+
+      // [TXA_5_ITEM_2] - Seamless Deep Link Return
+      'txa_5_item_2_title': 'Instant Auto-Return to Game',
+      'txa_5_item_2_desc': 'Once authorized in your browser, you are seamlessly brought straight back into the game without having to copy or paste any tokens manually.',
+      'txa_5_item_2_badge': 'SEAMLESS',
+
+      // [TXA_5_ITEM_3] - Fully Synced Multi-Language
+      'txa_5_item_3_title': 'Comprehensive Bilingual Polish',
+      'txa_5_item_3_desc': 'All authentication dialogues, status messages, and hints are fully localized in Vietnamese and English matching your in-game preference.',
+      'txa_5_item_3_badge': 'LOCALIZED',
+
+      // [TXA_5_ITEM_4] - Secure Cloud Profile & Sync
+      'txa_5_item_4_title': 'Safe Cloud Sync & Security',
+      'txa_5_item_4_desc': 'Your player data and high scores are securely preserved on the TXA Studio cloud, so you can safely play across different devices.',
+      'txa_5_item_4_badge': 'SECURITY',
 
       // -----------------------------------------------------------------------
       // [TXA_4] - Version v1.4.0 (Build 6) - Date: 2026-09-05
