@@ -280,3 +280,167 @@ export async function checkDeletionStatus(ticketId) {
   const data = await res.json();
   return (data && data.length > 0) ? data[0] : null;
 }
+
+// =========================================================================
+// TXA STUDIO ID - WEB AUTH & SESSION MANAGEMENT
+// =========================================================================
+
+export function getCurrentWebUser() {
+  try {
+    const raw = localStorage.getItem('txa_web_session');
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+export function setCurrentWebUser(user) {
+  if (!user) {
+    localStorage.removeItem('txa_web_session');
+  } else {
+    localStorage.setItem('txa_web_session', JSON.stringify(user));
+  }
+}
+
+export function clearCurrentWebUser() {
+  localStorage.removeItem('txa_web_session');
+}
+
+// Call RPC helper
+async function callRpc(fnName, params = {}) {
+  const res = await safeFetch(`${SUPABASE_URL}/rest/v1/rpc/${fnName}`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(params)
+  }, 12000);
+
+  if (!res.ok) {
+    let errorDetail = '';
+    try {
+      const errJson = await res.json();
+      errorDetail = errJson?.message || errJson?.hint || '';
+    } catch {}
+    throw new SupabaseApiError('RPC_ERROR', { status: res.status, message: errorDetail });
+  }
+
+  return await res.json();
+}
+
+// 1. Verify Player ID in game database before submitting deletion request
+export async function verifyGamePlayer(playerId) {
+  try {
+    return await callRpc('txa_verify_game_player', { p_player_id: playerId });
+  } catch (e) {
+    // If network fails or check encounters error, gracefully fallback
+    return { exists: true, error: e.message };
+  }
+}
+
+// 2. Web User Register
+export async function webRegister(email, password, displayName) {
+  return await callRpc('txa_web_register', {
+    p_email: email,
+    p_password: password,
+    p_display_name: displayName
+  });
+}
+
+// 3. Web User Login
+export async function webLogin(email, password) {
+  const res = await callRpc('txa_web_login', {
+    p_email: email,
+    p_password: password
+  });
+  if (res?.success && res?.user) {
+    setCurrentWebUser(res.user);
+  }
+  return res;
+}
+
+// 4. Get OAuth App Info
+export async function getOAuthAppInfo(clientId) {
+  if (!clientId) return null;
+  const res = await safeFetch(
+    `${SUPABASE_URL}/rest/v1/txa_oauth_apps?client_id=eq.${encodeURIComponent(clientId)}&select=*`,
+    { headers },
+    10000
+  );
+  if (!res.ok) return null;
+  const data = await res.json();
+  if (data && data.length > 0) {
+    const app = data[0];
+    // Evaluate automatic verification criteria
+    app.is_verified = (
+      app.created_by_admin === true &&
+      Boolean(app.game_slug) &&
+      Boolean(app.privacy_policy_url) &&
+      Boolean(app.terms_url) &&
+      app.status === 'active'
+    );
+    return app;
+  }
+  return null;
+}
+
+// 5. Generate OAuth Code (Live authorization by user)
+export async function generateOAuthCode(clientId, userId, scopes = ['profile', 'leaderboard', 'cloud_save']) {
+  return await callRpc('txa_generate_oauth_code', {
+    p_client_id: clientId,
+    p_user_id: userId,
+    p_scopes: scopes
+  });
+}
+
+// 6. Admin: List all registered apps
+export async function adminListApps() {
+  return await callRpc('txa_admin_list_apps');
+}
+
+// 7. Admin: Create new OAuth app
+export async function adminCreateApp(payload) {
+  return await callRpc('txa_admin_create_app', {
+    p_name: payload.name,
+    p_game_slug: payload.game_slug,
+    p_app_type: payload.app_type || 'game',
+    p_app_abbr: payload.app_abbr || 'app',
+    p_logo_url: payload.logo_url || '',
+    p_redirect_uris: payload.redirect_uris || []
+  });
+}
+
+// 8. Admin: List deletion requests
+export async function adminListDeletions() {
+  return await callRpc('txa_admin_list_deletions');
+}
+
+// 9. Admin: Update deletion request status
+export async function adminUpdateDeletion(ticketId, status) {
+  return await callRpc('txa_admin_update_deletion', {
+    p_ticket_id: ticketId,
+    p_status: status
+  });
+}
+
+// 10. System Configs
+export async function getSystemConfigs() {
+  const res = await safeFetch(
+    `${SUPABASE_URL}/rest/v1/txa_system_configs?select=*`,
+    { headers },
+    8000
+  );
+  if (!res.ok) return {};
+  const data = await res.json();
+  const map = {};
+  (data || []).forEach(row => {
+    map[row.key] = row.value;
+  });
+  return map;
+}
+
+export async function updateSystemConfig(key, value) {
+  return await callRpc('txa_update_system_config', {
+    p_key: key,
+    p_value: String(value)
+  });
+}

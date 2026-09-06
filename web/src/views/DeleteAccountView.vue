@@ -490,6 +490,7 @@ import {
   checkDeletionStatus, 
   getGameInfo, 
   getFriendlyErrorMessage, 
+  verifyGamePlayer,
   DEFAULT_GAME 
 } from '../services/supabase.js';
 import { sound } from '../services/sound.js';
@@ -603,6 +604,24 @@ async function handleSubmit() {
   submitNotice.value = null;
 
   try {
+    // 1. Kiểm tra mã người chơi có thực tế tồn tại trong cơ sở dữ liệu game không
+    const verifyRes = await verifyGamePlayer(form.userId);
+    if (verifyRes && verifyRes.exists === false) {
+      sound.playClick();
+      submitNotice.value = {
+        type: 'error',
+        diagType: 'data',
+        title: isEn.value ? 'Player ID Not Found in Database' : 'Mã Người Chơi Không Tồn Tại Trong Game',
+        text: isEn.value
+          ? `We could not find any active player account matching ID "${form.userId}" in the game database. Please open ${currentGame.value.title}, go to Settings, and copy your exact Player ID or Device UDID.`
+          : `Hệ thống kiểm tra và không tìm thấy hồ sơ người chơi nào với mã "${form.userId}" trong cơ sở dữ liệu của game ${currentGame.value.title}. Bạn vui lòng mở game, vào mục Cài đặt để kiểm tra lại chính xác Mã người chơi hoặc UDID nhé.`,
+        code: 'ERR_PLAYER_NOT_FOUND',
+        canRetry: false
+      };
+      isSubmitting.value = false;
+      return;
+    }
+
     const { ticketId } = await submitDeletionRequest({
       gameSlug: currentSlug.value,
       email: form.email,

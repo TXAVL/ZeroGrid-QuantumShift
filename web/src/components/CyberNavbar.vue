@@ -42,7 +42,7 @@
           @mouseenter="sound.playHover()"
           @click="sound.playClick()"
         >
-          Trang Chủ
+          {{ isEn ? 'Home' : 'Trang Chủ' }}
         </router-link>
 
         <a 
@@ -52,7 +52,7 @@
           @click="sound.playClick()"
         >
           <span class="w-2 h-2 rounded-full bg-pink-500"></span>
-          Zero Grid Game
+          <span>Zero Grid Game</span>
         </a>
 
         <router-link 
@@ -62,7 +62,7 @@
           @mouseenter="sound.playHover()"
           @click="sound.playClick()"
         >
-          Quyền Riêng Tư
+          {{ isEn ? 'Privacy Policy' : 'Quyền Riêng Tư' }}
         </router-link>
 
         <router-link 
@@ -72,7 +72,7 @@
           @mouseenter="sound.playHover()"
           @click="sound.playClick()"
         >
-          Xóa Tài Khoản
+          {{ isEn ? 'Delete Account' : 'Xóa Tài Khoản' }}
         </router-link>
 
         <router-link 
@@ -82,7 +82,26 @@
           @mouseenter="sound.playHover()"
           @click="sound.playClick()"
         >
-          Điều Khoản
+          {{ isEn ? 'Terms' : 'Điều Khoản' }}
+        </router-link>
+
+        <router-link 
+          to="/docs" 
+          class="px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all duration-200 border"
+          :class="$route.path.startsWith('/docs') ? 'text-cyan-300 bg-cyan-500/20 border-cyan-500/40' : 'text-slate-400 border-slate-800 hover:text-cyan-300 hover:border-slate-700'"
+          @mouseenter="sound.playHover()"
+          @click="sound.playClick()"
+        >
+          API Docs
+        </router-link>
+
+        <router-link 
+          to="/login" 
+          class="px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all duration-200 border border-pink-500/30 bg-pink-500/10 text-pink-300 hover:bg-pink-500/20"
+          @mouseenter="sound.playHover()"
+          @click="sound.playClick()"
+        >
+          TXA ID
         </router-link>
       </nav>
 
@@ -117,12 +136,12 @@
 
         <!-- Play Store / Platform Dispatch CTA -->
         <button 
-          @click="openDownloadModal('android')"
+          @click="openDownloadModal()"
           class="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-400 via-sky-500 to-pink-500 text-slate-950 font-display font-black text-xs uppercase tracking-wider hover:opacity-95 shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:scale-[1.02] active:scale-95 transition-all"
           @mouseenter="sound.playHover()"
         >
           <GooglePlayIcon customClass="w-3.5 h-3.5" />
-          <span>CH PLAY</span>
+          <span>{{ isEn ? 'GET APP' : 'TẢI APP' }}</span>
         </button>
 
         <!-- Mobile Hamburger Toggle -->
@@ -151,7 +170,7 @@
         @click="mobileMenuOpen = false; sound.playClick()"
         class="block px-3 py-2 rounded-lg text-base font-medium text-slate-200 hover:text-cyan-400 hover:bg-slate-800/50"
       >
-        Trang Chủ (Index)
+        {{ isEn ? 'Home (Index)' : 'Trang Chủ (Index)' }}
       </router-link>
       <a 
         href="/#showcase" 
@@ -165,35 +184,49 @@
         @click="mobileMenuOpen = false; sound.playClick()"
         class="block px-3 py-2 rounded-lg text-base font-medium text-slate-200 hover:text-cyan-400 hover:bg-slate-800/50"
       >
-        Chính Sách Quyền Riêng Tư
+        {{ isEn ? 'Privacy Policy' : 'Chính Sách Quyền Riêng Tư' }}
       </router-link>
       <router-link 
         to="/delete-account" 
         @click="mobileMenuOpen = false; sound.playClick()"
         class="block px-3 py-2 rounded-lg text-base font-medium text-pink-400 bg-pink-500/10 rounded-lg"
       >
-        Cổng Xóa Dữ Liệu / Tài Khoản
+        {{ isEn ? 'Data Erasure / Delete Account' : 'Cổng Xóa Dữ Liệu / Tài Khoản' }}
       </router-link>
       <router-link 
         to="/terms" 
         @click="mobileMenuOpen = false; sound.playClick()"
         class="block px-3 py-2 rounded-lg text-base font-medium text-slate-200 hover:text-cyan-400 hover:bg-slate-800/50"
       >
-        Điều Khoản Dịch Vụ
+        {{ isEn ? 'Terms of Service' : 'Điều Khoản Dịch Vụ' }}
+      </router-link>
+      <router-link 
+        to="/docs" 
+        @click="mobileMenuOpen = false; sound.playClick()"
+        class="block px-3 py-2 rounded-lg text-base font-medium text-cyan-300 hover:bg-cyan-500/10 font-mono"
+      >
+        📖 {{ isEn ? 'API & OAuth Docs' : 'Tài Liệu Kỹ Thuật & API' }}
+      </router-link>
+      <router-link 
+        to="/login" 
+        @click="mobileMenuOpen = false; sound.playClick()"
+        class="block px-3 py-2 rounded-lg text-base font-medium text-pink-300 hover:bg-pink-500/10 font-mono"
+      >
+        🆔 {{ isEn ? 'TXA Studio ID Account' : 'Tài Khoản TXA Studio ID' }}
       </router-link>
       <button 
-        @click="mobileMenuOpen = false; openDownloadModal('android')"
+        @click="mobileMenuOpen = false; openDownloadModal()"
         class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-cyan-400 via-sky-500 to-pink-500 text-slate-950 font-display font-black text-xs uppercase tracking-wider shadow-lg shadow-cyan-500/20"
       >
         <GooglePlayIcon customClass="w-4 h-4" />
-        <span>Kiểm Thử Google Play / Nền Tảng</span>
+        <span>{{ isEn ? 'App Availability & Platform Check' : 'Kiểm Thử Google Play / Nền Tảng' }}</span>
       </button>
     </div>
   </header>
 </template>
 
 <script setup>
-import { ref, inject } from 'vue';
+import { ref, computed, inject } from 'vue';
 import GooglePlayIcon from './GooglePlayIcon.vue';
 import { sound } from '../services/sound.js';
 
@@ -203,6 +236,8 @@ const isMuted = ref(sound.isMuted());
 const currentLang = inject('currentLang', ref('vi'));
 const setLang = inject('setLang', () => {});
 const openDownloadModal = inject('openDownloadModal', () => {});
+
+const isEn = computed(() => currentLang.value === 'en');
 
 function toggleAudio() {
   isMuted.value = sound.toggleMute();

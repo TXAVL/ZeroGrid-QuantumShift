@@ -274,20 +274,26 @@ const detectedPlatform = ref('unknown');
 
 function detectOS() {
   if (typeof window === 'undefined') return 'unknown';
-  const ua = navigator.userAgent || '';
-  if (/iPhone|iPad|iPod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) {
+  const ua = (navigator.userAgent || '').toLowerCase();
+  const platform = (navigator.platform || '').toLowerCase();
+
+  // 1. iOS detection
+  if (/iphone|ipad|ipod/.test(ua) || (platform.includes('mac') && navigator.maxTouchPoints > 1)) {
     return 'ios';
   }
-  if (/Android/i.test(ua)) {
+  // 2. Android detection
+  if (/android/.test(ua)) {
     return 'android';
   }
-  if (/Windows/i.test(ua)) {
+  // 3. Windows detection
+  if (platform.includes('win') || /windows/.test(ua)) {
     return 'windows';
   }
-  if (/Macintosh|Mac OS/i.test(ua) || /Linux/i.test(ua)) {
-    return 'windows'; // Desktop class
+  // 4. Desktop / Mac / Linux fallback to desktop class
+  if (platform.includes('mac') || platform.includes('linux') || /macintosh|linux/.test(ua)) {
+    return 'windows';
   }
-  return 'unknown';
+  return 'windows';
 }
 
 const detectedPlatformLabel = computed(() => {
@@ -321,14 +327,20 @@ const activePlatformSummary = computed(() => {
 
 function open(preferredTab) {
   sound.playClick();
-  detectedPlatform.value = detectOS();
-  if (preferredTab) {
+  const os = detectOS();
+  detectedPlatform.value = os;
+
+  if (typeof preferredTab === 'string' && ['android', 'ios', 'windows'].includes(preferredTab)) {
     activeTab.value = preferredTab;
   } else {
-    // Default tab to the user's detected operating system
-    if (detectedPlatform.value === 'ios') activeTab.value = 'ios';
-    else if (detectedPlatform.value === 'windows') activeTab.value = 'windows';
-    else activeTab.value = 'android';
+    // Automatically jump to the user's detected operating system!
+    if (os === 'ios') {
+      activeTab.value = 'ios';
+    } else if (os === 'windows') {
+      activeTab.value = 'windows';
+    } else {
+      activeTab.value = 'android';
+    }
   }
   isOpen.value = true;
 }

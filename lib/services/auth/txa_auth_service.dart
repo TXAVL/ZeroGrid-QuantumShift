@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 import '../../core/config/txa_config.dart';
 import '../../core/utils/txa_device.dart';
 import '../storage_service.dart';
@@ -133,13 +134,66 @@ class TxaAuthService {
     }
   }
 
-  /// 3. Tiếp tục dưới dạng Chế độ Khách (Guest Mode)
+  /// 3. Mở cổng web ủy quyền TXA Studio ID
+  Future<bool> openTxaAuthPortal() async {
+    final uri = Uri.parse(
+      '${TxaConfig.txaAuthEndpoint}?client_id=${Uri.encodeComponent(TxaConfig.txaClientId)}&redirect_uri=${Uri.encodeComponent(TxaConfig.txaRedirectUri)}'
+    );
+    try {
+      TXALogger.logApi('Opening TXA Studio OAuth Portal: $uri');
+      return await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      TXALogger.logError('Failed to open TXA Auth Portal: $e');
+      return false;
+    }
+  }
+
+  /// 4. Đăng nhập bằng mã ủy quyền TXA Studio ID (txa_code_...)
+  Future<Map<String, dynamic>> loginWithTxaOAuthCode(String code) async {
+    final cleanCode = code.trim();
+    if (!cleanCode.startsWith('txa_code_')) {
+      return {'success': false, 'error': 'Mã không đúng định dạng (phải bắt đầu bằng txa_code_)'};
+    }
+
+    final url = Uri.parse('$supabaseUrl/rest/v1/rpc/txa_exchange_oauth_code');
+    final body = jsonEncode({
+      'p_client_id': TxaConfig.txaClientId,
+      'p_auth_code': cleanCode,
+    });
+
+    try {
+      TXALogger.logApi('Exchanging TXA OAuth code: $cleanCode');
+      final res = await http.post(url, headers: _headers, body: body);
+      if (res.statusCode == 200) {
+        final data = jsonDecode(res.body) as Map<String, dynamic>;
+        if (data['success'] == true) {
+          final user = data['user'] as Map<String, dynamic>?;
+          _storage.isGuestMode = false;
+          _storage.authProviderName = 'txa_studio';
+          _storage.playerUsername = user?['display_name'] ?? 'TXA Player';
+          _storage.authEmail = user?['email'] ?? '';
+          _storage.avatarUrl = user?['avatar_url'] ?? '';
+          _storage.userRole = 'player';
+          TXALogger.logApi('TXA Studio OAuth success: ${_storage.playerUsername} (${_storage.authEmail})');
+          return {'success': true, 'user': user};
+        } else {
+          return {'success': false, 'error': data['error'] ?? 'Mã ủy quyền không hợp lệ hoặc đã hết hạn'};
+        }
+      }
+      return {'success': false, 'error': 'Lỗi kết nối máy chủ (${res.statusCode})'};
+    } catch (e, stack) {
+      TXALogger.logError('TxaAuthService loginWithTxaOAuthCode error: $e', stackTrace: stack);
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  /// 5. Tiếp tục dưới dạng Chế độ Khách (Guest Mode)
   void continueAsGuest() {
     _storage.resetToGuestSession();
     TXALogger.logApi('User continued as Guest');
   }
 
-  /// 4. Đăng xuất (Cho cả Google lẫn tài khoản thủ công)
+  /// 6. Đăng xuất (Cho cả Google lẫn TXA Studio và tài khoản thủ công)
   Future<void> logout() async {
     try {
       if (_storage.authProviderName == 'google') {

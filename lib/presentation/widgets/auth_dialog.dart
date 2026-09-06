@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/localization/txa_language.dart';
 import '../../core/utils/txa_device.dart';
@@ -31,10 +32,12 @@ class AuthDialog extends ConsumerStatefulWidget {
 class _AuthDialogState extends ConsumerState<AuthDialog> {
   bool _isRegisterMode = false;
   bool _isLoading = false;
+  bool _showOauthCodeInput = false;
 
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _oauthCodeController = TextEditingController();
 
   String _deviceDisplayName = '...';
 
@@ -51,7 +54,39 @@ class _AuthDialogState extends ConsumerState<AuthDialog> {
     _usernameController.dispose();
     _passwordController.dispose();
     _emailController.dispose();
+    _oauthCodeController.dispose();
     super.dispose();
+  }
+
+  Future<void> _handleTxaStudioOAuth() async {
+    final auth = ref.read(authServiceProvider);
+    setState(() => _showOauthCodeInput = true);
+    final launched = await auth.openTxaAuthPortal();
+    if (!launched && mounted) {
+      TxaToast.error(context, 'Không thể mở trình duyệt. Vui lòng mở thủ công https://txastudio.click');
+    }
+  }
+
+  Future<void> _submitTxaOAuthCode() async {
+    final code = _oauthCodeController.text.trim();
+    if (code.isEmpty) {
+      TxaToast.warning(context, 'Vui lòng dán mã txa_code_... từ trang web');
+      return;
+    }
+
+    setState(() => _isLoading = true);
+    final auth = ref.read(authServiceProvider);
+    final res = await auth.loginWithTxaOAuthCode(code);
+
+    if (mounted) {
+      setState(() => _isLoading = false);
+      if (res['success'] == true) {
+        TxaToast.success(context, 'Đăng nhập TXA Studio ID thành công!');
+        Navigator.of(context).pop(true);
+      } else {
+        TxaToast.error(context, res['error'] ?? 'Xác thực mã thất bại');
+      }
+    }
   }
 
   Future<void> _handleCustomAuth() async {
@@ -198,6 +233,112 @@ class _AuthDialogState extends ConsumerState<AuthDialog> {
                 ),
               ),
               const SizedBox(height: 14),
+
+              // TXA Studio ID Sign-In Button
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF0B132B),
+                    foregroundColor: Colors.white,
+                    elevation: 2,
+                    side: BorderSide(color: palette.accentNeon.withValues(alpha: 0.6), width: 1.2),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  ),
+                  onPressed: _isLoading ? null : _handleTxaStudioOAuth,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: palette.accentNeon.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Icon(Icons.verified_user_rounded, size: 16, color: palette.accentNeon),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        widget.langCode == 'vi' ? 'Đăng Nhập Bằng TXA Studio ID' : 'Sign in with TXA Studio ID',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13.5,
+                          letterSpacing: 0.2,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              if (_showOauthCodeInput) ...[
+                const SizedBox(height: 10),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: palette.background.withValues(alpha: 0.95),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: palette.accentNeon.withValues(alpha: 0.4)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.open_in_browser_rounded, size: 14, color: palette.accentNeon),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              widget.langCode == 'vi'
+                                  ? 'Đã mở cổng xác thực web (hiệu lực 5 phút)'
+                                  : 'Opened web auth portal (5 min TTL)',
+                              style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: palette.accentNeon),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: _oauthCodeController,
+                        style: const TextStyle(color: Colors.white, fontSize: 11.5, fontFamily: 'monospace'),
+                        decoration: InputDecoration(
+                          hintText: 'Dán mã txa_code_... vào đây',
+                          hintStyle: TextStyle(fontSize: 11, color: palette.textSecondary.withValues(alpha: 0.5)),
+                          suffixIcon: IconButton(
+                            icon: const Icon(Icons.paste_rounded, size: 16),
+                            onPressed: () async {
+                              final data = await Clipboard.getData(Clipboard.kTextPlain);
+                              if (data?.text != null) {
+                                _oauthCodeController.text = data!.text!.trim();
+                              }
+                            },
+                          ),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 36,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: palette.accentNeon,
+                            foregroundColor: palette.background,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          ),
+                          onPressed: _isLoading ? null : _submitTxaOAuthCode,
+                          child: const Text('XÁC NHẬN MÃ ĐĂNG NHẬP', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+
+              const SizedBox(height: 10),
 
               // Google Sign-In Button
               SizedBox(

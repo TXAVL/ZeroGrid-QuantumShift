@@ -166,4 +166,15 @@ class TxaConfig {
   static const int dailyChallengeUnlockLevel = 3;
   static const int endlessModeUnlockLevel = 5;
   static const int asyncChallengeUnlockLevel = 8;
+
+  // ==========================================
+  // 8. TXA STUDIO ID OAUTH 2.0 CONFIGURATION
+  // ==========================================
+  static const String txaAppType = 'game';
+  static const String txaAppAbbr = 'zgqs';
+  static const String txaGameSlug = 'quantumshift';
+  static const String txaClientId = 'txa_game_zgqs_9k2m7x8p4q1w3v5z';
+  static const String txaRedirectUri = 'txa.zerogrid.quantumshift://oauth/callback';
+  static const String txaAuthEndpoint = 'https://txastudio.click/oauth/authorize';
+  static const int txaSessionTimeoutMinutes = 5;
 }

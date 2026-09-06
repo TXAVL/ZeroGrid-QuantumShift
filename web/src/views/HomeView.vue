@@ -37,7 +37,7 @@
             <div class="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-2">
               <!-- Play Store Button -->
               <button 
-                @click="openDownloadModal('android')"
+                @click="openDownloadModal()"
                 class="inline-flex items-center gap-3 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-cyan-400 via-sky-500 to-pink-500 text-slate-950 font-display font-black text-sm uppercase tracking-wider shadow-lg shadow-cyan-500/30 hover:shadow-cyan-400/50 hover:scale-[1.03] active:scale-95 transition-all"
                 @mouseenter="sound.playHover()"
               >
