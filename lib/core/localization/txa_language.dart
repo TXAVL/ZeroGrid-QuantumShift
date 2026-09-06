@@ -218,6 +218,19 @@ class TxaLanguage extends ChangeNotifier {
       'auth_or_use_zero_grid': 'HOẶC DÙNG TÀI KHOẢN ZERO GRID',
       'auth_already_have_acc': 'Đã có tài khoản? Đăng nhập ngay',
       'auth_dont_have_acc': 'Chưa có tài khoản? Đăng ký ngay',
+
+      // TXA Studio ID OAuth & Auth Service
+      'oauth_btn_login': 'ĐĂNG NHẬP BẰNG TXA STUDIO ID',
+      'oauth_portal_opened_notice': 'Đã mở cổng xác thực web (hiệu lực %time%)',
+      'oauth_paste_code_hint': 'Dán mã txa_code_... vào đây',
+      'oauth_btn_confirm_code': 'XÁC NHẬN MÃ ĐĂNG NHẬP',
+      'oauth_toast_paste_prompt': 'Vui lòng dán mã txa_code_... từ trang web!',
+      'oauth_toast_login_success': 'Đăng nhập TXA Studio ID thành công!',
+      'oauth_toast_login_failed': 'Xác thực mã thất bại!',
+      'oauth_err_invalid_format': 'Mã không đúng định dạng (phải bắt đầu bằng txa_code_)!',
+      'oauth_err_invalid_or_expired': 'Mã ủy quyền không hợp lệ hoặc đã hết hạn!',
+      'oauth_err_server_status': 'Lỗi máy chủ (%code%)!',
+      'oauth_err_browser_launch': 'Không thể mở trình duyệt. Vui lòng mở thủ công https://txastudio.click',
       'profile_name_updated': 'Đã đổi tên thành công!',
       'profile_saved_locally': 'Đã lưu tên trên máy!',
       'profile_id_copied': 'Đã sao chép Player ID!',
@@ -719,6 +732,19 @@ class TxaLanguage extends ChangeNotifier {
       'auth_or_use_zero_grid': 'OR USE ZERO GRID ACCOUNT',
       'auth_already_have_acc': 'Already have an account? Sign In',
       'auth_dont_have_acc': "Don't have an account? Register",
+
+      // TXA Studio ID OAuth & Auth Service
+      'oauth_btn_login': 'SIGN IN WITH TXA STUDIO ID',
+      'oauth_portal_opened_notice': 'Web auth portal opened (TTL: %time%)',
+      'oauth_paste_code_hint': 'Paste txa_code_... here',
+      'oauth_btn_confirm_code': 'CONFIRM AUTH CODE',
+      'oauth_toast_paste_prompt': 'Please paste the txa_code_... from web portal!',
+      'oauth_toast_login_success': 'Signed in with TXA Studio ID successfully!',
+      'oauth_toast_login_failed': 'Auth code verification failed!',
+      'oauth_err_invalid_format': 'Invalid code format (must start with txa_code_)!',
+      'oauth_err_invalid_or_expired': 'Invalid or expired authorization code!',
+      'oauth_err_server_status': 'Server error (%code%)!',
+      'oauth_err_browser_launch': 'Could not launch browser. Please visit https://txastudio.click manually',
       'profile_name_updated': 'Username updated!',
       'profile_saved_locally': 'Saved locally!',
       'profile_id_copied': 'Player ID copied!',
@@ -1048,6 +1074,17 @@ class TxaLanguage extends ChangeNotifier {
 
     final langDict = _translations[effectiveLang] ?? _translations['en']!;
     return langDict[key] ?? _translations['en']![key] ?? key;
+  }
+
+  /// Tra cứu bản dịch kèm thay thế tham số định dạng
+  static String trWithParams(String key, String langCode, [Map<String, String>? params]) {
+    String text = tr(key, langCode);
+    if (params != null) {
+      params.forEach((k, v) {
+        text = text.replaceAll('%$k%', v);
+      });
+    }
+    return text;
   }
 
   static bool isVietnamese(String langCode) {

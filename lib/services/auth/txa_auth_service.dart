@@ -5,6 +5,7 @@ import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/config/txa_config.dart';
+import '../../core/localization/txa_language.dart';
 import '../../core/utils/txa_device.dart';
 import '../storage_service.dart';
 import '../txa_logger.dart';
@@ -37,6 +38,10 @@ class TxaAuthService {
         'Authorization': 'Bearer $supabaseAnonKey',
         'Content-Type': 'application/json',
       };
+
+  String _tr(String key, [Map<String, String>? params]) {
+    return TxaLanguage.trWithParams(key, _storage.languageCode, params);
+  }
 
   TxaAuthStatus get status =>
       _storage.isAuthenticated ? TxaAuthStatus.authenticated : TxaAuthStatus.guest;
@@ -88,7 +93,7 @@ class TxaAuthService {
         return data;
       }
       TXALogger.logApi('Custom auth failed with status: ${res.statusCode}');
-      return {'success': false, 'error': 'Lỗi máy chủ (${res.statusCode})'};
+      return {'success': false, 'error': _tr('oauth_err_server_status', {'code': res.statusCode.toString()})};
     } catch (e, stack) {
       TXALogger.logError('TxaAuthService loginOrRegisterCustom error: $e', stackTrace: stack);
       return {'success': false, 'error': e.toString()};
@@ -161,7 +166,7 @@ class TxaAuthService {
   Future<Map<String, dynamic>> loginWithTxaOAuthCode(String code) async {
     final cleanCode = code.trim();
     if (!cleanCode.startsWith('txa_code_')) {
-      return {'success': false, 'error': 'Mã không đúng định dạng (phải bắt đầu bằng txa_code_)'};
+      return {'success': false, 'error': _tr('oauth_err_invalid_format')};
     }
 
     final url = Uri.parse('$supabaseUrl/rest/v1/rpc/txa_exchange_oauth_code');
@@ -230,10 +235,10 @@ class TxaAuthService {
           _authEventController.add(authResult);
           return authResult;
         } else {
-          return {'success': false, 'error': data['error'] ?? 'Mã ủy quyền không hợp lệ hoặc đã hết hạn'};
+          return {'success': false, 'error': data['error'] ?? _tr('oauth_err_invalid_or_expired')};
         }
       }
-      return {'success': false, 'error': 'Lỗi kết nối máy chủ (${res.statusCode})'};
+      return {'success': false, 'error': _tr('oauth_err_server_status', {'code': res.statusCode.toString()})};
     } catch (e, stack) {
       TXALogger.logError('TxaAuthService loginWithTxaOAuthCode error: $e', stackTrace: stack);
       return {'success': false, 'error': e.toString()};

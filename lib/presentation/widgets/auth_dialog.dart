@@ -56,7 +56,7 @@ class _AuthDialogState extends ConsumerState<AuthDialog> with WidgetsBindingObse
     // Lắng nghe sự kiện xác thực thành công từ Deep Link
     _authSub = TxaAuthService.authEventStream.listen((event) {
       if (mounted && event['success'] == true) {
-        TxaToast.success(context, 'Đăng nhập TXA Studio ID thành công!');
+        TxaToast.success(context, TxaLanguage.tr('oauth_toast_login_success', widget.langCode));
         Navigator.of(context).pop(true);
       }
     });
@@ -103,14 +103,14 @@ class _AuthDialogState extends ConsumerState<AuthDialog> with WidgetsBindingObse
     setState(() => _showOauthCodeInput = true);
     final launched = await auth.openTxaAuthPortal();
     if (!launched && mounted) {
-      TxaToast.error(context, 'Không thể mở trình duyệt. Vui lòng mở thủ công https://txastudio.click');
+      TxaToast.error(context, TxaLanguage.tr('oauth_err_browser_launch', widget.langCode));
     }
   }
 
   Future<void> _submitTxaOAuthCode() async {
     final code = _oauthCodeController.text.trim();
     if (code.isEmpty) {
-      TxaToast.warning(context, 'Vui lòng dán mã txa_code_... từ trang web');
+      TxaToast.warning(context, TxaLanguage.tr('oauth_toast_paste_prompt', widget.langCode));
       return;
     }
 
@@ -121,10 +121,10 @@ class _AuthDialogState extends ConsumerState<AuthDialog> with WidgetsBindingObse
     if (mounted) {
       setState(() => _isLoading = false);
       if (res['success'] == true) {
-        TxaToast.success(context, 'Đăng nhập TXA Studio ID thành công!');
+        TxaToast.success(context, TxaLanguage.tr('oauth_toast_login_success', widget.langCode));
         Navigator.of(context).pop(true);
       } else {
-        TxaToast.error(context, res['error'] ?? 'Xác thực mã thất bại');
+        TxaToast.error(context, res['error'] ?? TxaLanguage.tr('oauth_toast_login_failed', widget.langCode));
       }
     }
   }
@@ -300,7 +300,7 @@ class _AuthDialogState extends ConsumerState<AuthDialog> with WidgetsBindingObse
                       ),
                       const SizedBox(width: 10),
                       Text(
-                        widget.langCode == 'vi' ? 'Đăng Nhập Bằng TXA Studio ID' : 'Sign in with TXA Studio ID',
+                        TxaLanguage.tr('oauth_btn_login', widget.langCode),
                         style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -331,9 +331,7 @@ class _AuthDialogState extends ConsumerState<AuthDialog> with WidgetsBindingObse
                           const SizedBox(width: 6),
                           Expanded(
                             child: Text(
-                              widget.langCode == 'vi'
-                                  ? 'Đã mở cổng xác thực web (hiệu lực ${TxaConfig.formattedSessionTimeout})'
-                                  : 'Opened web auth portal (${TxaConfig.formattedSessionTimeout} TTL)',
+                              TxaLanguage.trWithParams('oauth_portal_opened_notice', widget.langCode, {'time': TxaConfig.formattedSessionTimeout}),
                               style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: palette.accentNeon),
                             ),
                           ),
@@ -344,7 +342,7 @@ class _AuthDialogState extends ConsumerState<AuthDialog> with WidgetsBindingObse
                         controller: _oauthCodeController,
                         style: const TextStyle(color: Colors.white, fontSize: 11.5, fontFamily: 'monospace'),
                         decoration: InputDecoration(
-                          hintText: 'Dán mã txa_code_... vào đây',
+                          hintText: TxaLanguage.tr('oauth_paste_code_hint', widget.langCode),
                           hintStyle: TextStyle(fontSize: 11, color: palette.textSecondary.withValues(alpha: 0.5)),
                           suffixIcon: IconButton(
                             icon: const Icon(Icons.paste_rounded, size: 16),
@@ -370,7 +368,7 @@ class _AuthDialogState extends ConsumerState<AuthDialog> with WidgetsBindingObse
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                           ),
                           onPressed: _isLoading ? null : _submitTxaOAuthCode,
-                          child: const Text('XÁC NHẬN MÃ ĐĂNG NHẬP', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),
+                          child: Text(TxaLanguage.tr('oauth_btn_confirm_code', widget.langCode), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),
                         ),
                       ),
                     ],
