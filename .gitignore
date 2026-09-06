@@ -51,4 +51,5 @@ hs_err_pid*.log
 .DS_Store
 Thumbs.db
 
-# NOTE: Thư mục "production/" ĐƯỢC GIỮ LẠI ĐỂ TRACKING (schema SQL & docs)
+# Production binaries, setup APK/AAB and assets (Chỉ giữ local, không đẩy lên Git)
+production/
