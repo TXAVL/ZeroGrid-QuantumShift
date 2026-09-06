@@ -15,6 +15,31 @@ class TxaVersionLang {
       'whats_new_btn_continue': 'ĐÃ HIỂU & TIẾP TỤC',
 
       // -----------------------------------------------------------------------
+      // [TXA_6] - Phiên bản v1.6.0 (Build 8) - Ngày: 2026-09-06
+      // -----------------------------------------------------------------------
+      'txa_6_title': 'Bản Nâng Cấp Dữ Liệu & Bảng Xếp Hạng 1.6.0',
+
+      // [TXA_6_ITEM_1] - Dữ liệu game theo tài khoản
+      'txa_6_item_1_title': 'Tiến Trình Chơi Đi Cùng Tài Khoản',
+      'txa_6_item_1_desc': 'Tiến trình game, số màn đã vượt, số sao và điểm tích lũy nay gắn liền theo từng tài khoản riêng biệt. Khi đăng xuất hoặc chuyển đổi tài khoản, dữ liệu được chuyển đổi chính xác mà không lo bị lẫn lộn.',
+      'txa_6_item_1_badge': 'ĐỘT PHÁ',
+
+      // [TXA_6_ITEM_2] - Bảng xếp hạng 100% người chơi thực tế
+      'txa_6_item_2_title': 'Bảng Xếp Hạng Người Chơi Thật',
+      'txa_6_item_2_desc': 'Loại bỏ hoàn toàn người chơi ảo giả lập! Giờ đây toàn bộ thứ hạng trên Bảng Xếp Hạng Toàn Cầu và Bảng Đấu Tuần đều là những game thủ thật thi đấu và ghi điểm công bằng.',
+      'txa_6_item_2_badge': 'CÔNG BẰNG',
+
+      // [TXA_6_ITEM_3] - Đăng nhập Google khôi phục chuẩn xác
+      'txa_6_item_3_title': 'Đăng Nhập Google Liền Mạch',
+      'txa_6_item_3_desc': 'Hệ thống tự động nhận diện và khôi phục đúng tài khoản Google bạn đã từng chơi trước đây, đồng bộ ngay lập tức toàn bộ số sao và kỷ lục mà không tạo tài khoản trùng lặp.',
+      'txa_6_item_3_badge': 'TIỆN LỢI',
+
+      // [TXA_6_ITEM_4] - Đăng ký thông minh & Kiểm tra trực tiếp thời gian thực
+      'txa_6_item_4_title': 'Đăng Ký Tài Khoản Trực Quan',
+      'txa_6_item_4_desc': 'Giao diện đăng ký mới với viền màu báo hiệu trực tiếp thời gian thực: viền đỏ khi cần sửa, vàng khi đang kiểm tra tính khả dụng, và xanh neon khi sẵn sàng khởi tạo tài khoản an toàn.',
+      'txa_6_item_4_badge': 'TRẢI NGHIỆM',
+
+      // -----------------------------------------------------------------------
       // [TXA_5] - Phiên bản v1.5.0 (Build 7) - Ngày: 2026-09-06
       // -----------------------------------------------------------------------
       'txa_5_title': 'Bản Nâng Cấp Hệ Thống TXA Studio ID 1.5.0',
@@ -164,6 +189,31 @@ class TxaVersionLang {
       // -----------------------------------------------------------------------
       'whats_new_title': "WHAT'S NEW IN THIS VERSION?",
       'whats_new_btn_continue': 'GOT IT & CONTINUE',
+
+      // -----------------------------------------------------------------------
+      // [TXA_6] - Version v1.6.0 (Build 8) - Date: 2026-09-06
+      // -----------------------------------------------------------------------
+      'txa_6_title': 'Account Progress & Real Leaderboards 1.6.0',
+
+      // [TXA_6_ITEM_1] - Account-Scoped Cloud Saves
+      'txa_6_item_1_title': 'Account-Isolated Game Progress',
+      'txa_6_item_1_desc': 'Your levels, stars, and records are now strictly tied to each individual account. Switching accounts automatically restores each player\'s own progress cleanly without overlap.',
+      'txa_6_item_1_badge': 'BREAKTHROUGH',
+
+      // [TXA_6_ITEM_2] - 100% Real Competitors
+      'txa_6_item_2_title': '100% Real-Player Leaderboards',
+      'txa_6_item_2_desc': 'All simulated bots have been removed! Every competitor you see on the Global and Weekly Tournament leaderboards is a real player competing honestly on the matrix.',
+      'txa_6_item_2_badge': 'FAIR PLAY',
+
+      // [TXA_6_ITEM_3] - Seamless Google Sign-In Restoration
+      'txa_6_item_3_title': 'Seamless Google Account Recovery',
+      'txa_6_item_3_desc': 'Google Sign-In now reliably detects and recovers your existing account profile and cloud saves with zero accidental duplicates or demo user names.',
+      'txa_6_item_3_badge': 'SEAMLESS',
+
+      // [TXA_6_ITEM_4] - Smart Registration with Real-Time Validation
+      'txa_6_item_4_title': 'Smart & Reactive Registration',
+      'txa_6_item_4_desc': 'Real-time responsive input borders and clear visual feedback: instant feedback on username availability, password strength, and account verification before submitting.',
+      'txa_6_item_4_badge': 'POLISH',
 
       // -----------------------------------------------------------------------
       // [TXA_5] - Version v1.5.0 (Build 7) - Date: 2026-09-06
