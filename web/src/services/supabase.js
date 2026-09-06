@@ -477,3 +477,94 @@ export function formatSecondsToHumanLabel(totalSeconds, isEn = false) {
   return isEn ? `${mm}m ${ss}s` : `${mm} phút ${ss} giây`;
 }
 
+// =========================================================================
+// PROMOTION CODES & DEVICE FINGERPRINTING (Signal Lock / Promo Claim)
+// =========================================================================
+
+export function getDeviceOS() {
+  if (typeof navigator === 'undefined') return 'Unknown';
+  const ua = navigator.userAgent || navigator.vendor || '';
+  if (/android/i.test(ua)) return 'Android';
+  if (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) return 'iOS';
+  if (/Win/i.test(ua)) return 'Windows';
+  if (/Mac/i.test(ua)) return 'macOS';
+  if (/Linux/i.test(ua)) return 'Linux';
+  return 'Desktop';
+}
+
+export function getDeviceFingerprint() {
+  if (typeof window === 'undefined') return 'server_render';
+  let fp = localStorage.getItem('txa_device_fp');
+  if (fp && fp.length > 8) return fp;
+
+  // Synthesize rich browser telemetry into a deterministic fingerprint
+  try {
+    const raw = [
+      navigator.userAgent,
+      screen.width + 'x' + screen.height + 'x' + (screen.colorDepth || 24),
+      navigator.language || 'en',
+      new Date().getTimezoneOffset(),
+      navigator.hardwareConcurrency || 4,
+      Math.random().toString(36).substring(2, 10)
+    ].join('###');
+
+    // Simple fast 64-bit string hash
+    let h1 = 0xdeadbeef ^ 0, h2 = 0x41c64e6d ^ 0;
+    for (let i = 0; i < raw.length; i++) {
+      const ch = raw.charCodeAt(i);
+      h1 = Math.imul(h1 ^ ch, 2654435761);
+      h2 = Math.imul(h2 ^ ch, 1597334677);
+    }
+    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507);
+    h1 ^= Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+    h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507);
+    h2 ^= Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+    
+    fp = 'fp_' + (h2 >>> 0).toString(16) + (h1 >>> 0).toString(16);
+  } catch {
+    fp = 'fp_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 8);
+  }
+
+  localStorage.setItem('txa_device_fp', fp);
+  return fp;
+}
+
+export async function claimPromotionCode({
+  campaign = '10_hints_free_1',
+  platform = 'android',
+  fingerprint,
+  os,
+  userId,
+  email
+} = {}) {
+  const fp = fingerprint || getDeviceFingerprint();
+  const deviceOs = os || getDeviceOS();
+  return await callRpc('claim_promotion_code', {
+    p_campaign: campaign,
+    p_platform: platform,
+    p_fingerprint: fp,
+    p_os: deviceOs,
+    p_user_id: userId || null,
+    p_email: email || null
+  });
+}
+
+export async function resetClaimedPromotionCode({
+  campaign = '10_hints_free_1',
+  platform = 'android',
+  fingerprint,
+  os,
+  userId
+} = {}) {
+  const fp = fingerprint || getDeviceFingerprint();
+  const deviceOs = os || getDeviceOS();
+  return await callRpc('reset_claimed_promotion_code', {
+    p_campaign: campaign,
+    p_platform: platform,
+    p_fingerprint: fp,
+    p_os: deviceOs,
+    p_user_id: userId || null
+  });
+}
+
+

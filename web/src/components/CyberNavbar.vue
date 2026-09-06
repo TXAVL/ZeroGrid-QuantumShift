@@ -85,6 +85,20 @@
           {{ isEn ? 'Terms' : 'Điều Khoản' }}
         </router-link>
 
+        <!-- Unlock Promo / Mở Khóa Gói 10 Hints -->
+        <router-link 
+          to="/unlock" 
+          class="px-3.5 py-2 rounded-xl text-sm font-medium transition-all duration-200 flex items-center gap-1.5 border"
+          :class="$route.path.startsWith('/unlock') 
+            ? 'text-emerald-300 bg-emerald-500/20 border-emerald-400 shadow-neon-green' 
+            : 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 hover:border-emerald-400'"
+          @mouseenter="sound.playHover()"
+          @click="sound.playClick()"
+        >
+          <span>🎁</span>
+          <span>{{ isEn ? 'Unlock 10 Hints' : 'Mở Khóa Gói' }}</span>
+        </router-link>
+
         <!-- Admin Only Menu: Admin Dashboard & API Docs -->
         <template v-if="isAdmin">
           <router-link 
@@ -228,6 +242,14 @@
         class="block px-3 py-2 rounded-lg text-base font-medium text-slate-200 hover:text-cyan-400 hover:bg-slate-800/50"
       >
         {{ isEn ? 'Terms of Service' : 'Điều Khoản Dịch Vụ' }}
+      </router-link>
+      <router-link 
+        to="/unlock" 
+        @click="mobileMenuOpen = false; sound.playClick()"
+        class="block px-3 py-2 rounded-lg text-base font-medium text-emerald-300 bg-emerald-500/10 border border-emerald-500/30 flex items-center gap-2"
+      >
+        <span>🎁</span>
+        <span>{{ isEn ? 'Unlock 10 Hints' : 'Mở Khóa Gói 10 Gợi Ý' }}</span>
       </router-link>
       <!-- Admin & API Docs for Mobile (Only shown if Admin) -->
       <template v-if="isAdmin">

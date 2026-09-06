@@ -8,12 +8,18 @@ import RegisterView from '../views/RegisterView.vue';
 import OAuthAuthorizeView from '../views/OAuthAuthorizeView.vue';
 import DocsView from '../views/DocsView.vue';
 import AdminView from '../views/AdminView.vue';
+import UnlockView from '../views/UnlockView.vue';
 
 const routes = [
   {
     path: '/',
     name: 'home',
     component: HomeView,
+  },
+  {
+    path: '/unlock',
+    name: 'unlock',
+    component: UnlockView,
   },
   {
     path: '/login',
