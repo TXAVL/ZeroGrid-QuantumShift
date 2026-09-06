@@ -142,7 +142,7 @@ class _AuthDialogState extends ConsumerState<AuthDialog> with WidgetsBindingObse
 
     if (trimmed.length < 3) {
       setState(() {
-        _usernameError = 'Tên đăng nhập phải có ít nhất 3 ký tự';
+        _usernameError = TxaLanguage.tr('auth_err_username_min_len', widget.langCode);
         _isUsernameValid = false;
         _isCheckingUsername = false;
       });
@@ -152,7 +152,7 @@ class _AuthDialogState extends ConsumerState<AuthDialog> with WidgetsBindingObse
     final validCharacters = RegExp(r'^[a-zA-Z0-9_.\s]+$');
     if (!validCharacters.hasMatch(trimmed)) {
       setState(() {
-        _usernameError = 'Chỉ được chứa chữ, số, dấu chấm và gạch dưới';
+        _usernameError = TxaLanguage.tr('auth_err_username_chars', widget.langCode);
         _isUsernameValid = false;
         _isCheckingUsername = false;
       });
@@ -172,7 +172,7 @@ class _AuthDialogState extends ConsumerState<AuthDialog> with WidgetsBindingObse
       setState(() {
         _isCheckingUsername = false;
         if (exists) {
-          _usernameError = 'Tên này đã được sử dụng, vui lòng chọn tên khác!';
+          _usernameError = TxaLanguage.tr('auth_err_username_taken', widget.langCode);
           _isUsernameValid = false;
         } else {
           _usernameError = null;
@@ -202,7 +202,7 @@ class _AuthDialogState extends ConsumerState<AuthDialog> with WidgetsBindingObse
 
     if (trimmed.length < 6) {
       setState(() {
-        _passwordError = 'Mật khẩu phải có ít nhất 6 ký tự';
+        _passwordError = TxaLanguage.tr('auth_err_password_min_len', widget.langCode);
         _isPasswordValid = false;
       });
     } else {
@@ -230,7 +230,7 @@ class _AuthDialogState extends ConsumerState<AuthDialog> with WidgetsBindingObse
 
     if (trimmed != _passwordController.text.trim()) {
       setState(() {
-        _confirmPasswordError = 'Mật khẩu xác nhận không khớp!';
+        _confirmPasswordError = TxaLanguage.tr('auth_err_password_mismatch', widget.langCode);
         _isConfirmPasswordValid = false;
       });
     } else {
@@ -256,7 +256,7 @@ class _AuthDialogState extends ConsumerState<AuthDialog> with WidgetsBindingObse
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     if (!emailRegex.hasMatch(trimmed)) {
       setState(() {
-        _emailError = 'Định dạng email không hợp lệ (ví dụ: name@gmail.com)';
+        _emailError = TxaLanguage.tr('auth_err_email_format', widget.langCode);
         _isEmailValid = false;
         _isCheckingEmail = false;
       });
@@ -275,7 +275,7 @@ class _AuthDialogState extends ConsumerState<AuthDialog> with WidgetsBindingObse
       setState(() {
         _isCheckingEmail = false;
         if (exists) {
-          _emailError = 'Email này đã liên kết với tài khoản khác!';
+          _emailError = TxaLanguage.tr('auth_err_email_taken', widget.langCode);
           _isEmailValid = false;
         } else {
           _emailError = null;
@@ -341,7 +341,7 @@ class _AuthDialogState extends ConsumerState<AuthDialog> with WidgetsBindingObse
           TxaToast.success(context, TxaLanguage.tr('auth_login_success', widget.langCode));
           Navigator.of(context).pop(true);
         } else {
-          TxaToast.error(context, result['error'] ?? 'Đăng nhập thất bại');
+          TxaToast.error(context, result['error'] ?? TxaLanguage.tr('auth_login_failed', widget.langCode));
         }
       }
     } else {
@@ -352,27 +352,27 @@ class _AuthDialogState extends ConsumerState<AuthDialog> with WidgetsBindingObse
       }
 
       if (_isCheckingUsername || _isCheckingEmail) {
-        TxaToast.warning(context, 'Hệ thống đang kiểm tra tính khả dụng, vui lòng chờ trong giây lát.');
+        TxaToast.warning(context, TxaLanguage.tr('auth_wait_checking', widget.langCode));
         return;
       }
 
       if (!_isUsernameValid || _usernameError != null) {
-        TxaToast.error(context, _usernameError ?? 'Tên đăng nhập không hợp lệ!');
+        TxaToast.error(context, _usernameError ?? TxaLanguage.tr('auth_err_username_min_len', widget.langCode));
         return;
       }
 
       if (!_isPasswordValid || _passwordError != null) {
-        TxaToast.error(context, _passwordError ?? 'Mật khẩu phải từ 6 ký tự trở lên!');
+        TxaToast.error(context, _passwordError ?? TxaLanguage.tr('auth_err_password_min_len', widget.langCode));
         return;
       }
 
       if (!_isConfirmPasswordValid || _confirmPasswordError != null) {
-        TxaToast.error(context, _confirmPasswordError ?? 'Mật khẩu xác nhận không khớp!');
+        TxaToast.error(context, _confirmPasswordError ?? TxaLanguage.tr('auth_err_password_mismatch', widget.langCode));
         return;
       }
 
       if (!_isEmailValid || _emailError != null) {
-        TxaToast.error(context, _emailError ?? 'Email không hợp lệ!');
+        TxaToast.error(context, _emailError ?? TxaLanguage.tr('auth_err_email_format', widget.langCode));
         return;
       }
 
@@ -390,7 +390,7 @@ class _AuthDialogState extends ConsumerState<AuthDialog> with WidgetsBindingObse
           TxaToast.success(context, TxaLanguage.tr('auth_register_success', widget.langCode));
           Navigator.of(context).pop(true);
         } else {
-          TxaToast.error(context, result['error'] ?? 'Đăng ký thất bại');
+          TxaToast.error(context, result['error'] ?? TxaLanguage.tr('auth_register_failed', widget.langCode));
         }
       }
     }
@@ -426,19 +426,19 @@ class _AuthDialogState extends ConsumerState<AuthDialog> with WidgetsBindingObse
     required GameColorPalette palette,
   }) {
     if (isChecking) {
-      return const Padding(
-        padding: EdgeInsets.only(top: 4, left: 6),
+      return Padding(
+        padding: const EdgeInsets.only(top: 4, left: 6),
         child: Row(
           children: [
-            SizedBox(
+            const SizedBox(
               width: 11,
               height: 11,
               child: CircularProgressIndicator(strokeWidth: 1.5, color: Color(0xFFFFCC00)),
             ),
-            SizedBox(width: 6),
+            const SizedBox(width: 6),
             Text(
-              'Đang kiểm tra tính khả dụng...',
-              style: TextStyle(fontSize: 10.5, color: Color(0xFFFFCC00), fontWeight: FontWeight.w500),
+              TxaLanguage.tr('auth_checking_availability', widget.langCode),
+              style: const TextStyle(fontSize: 10.5, color: Color(0xFFFFCC00), fontWeight: FontWeight.w500),
             ),
           ],
         ),
@@ -802,7 +802,7 @@ class _AuthDialogState extends ConsumerState<AuthDialog> with WidgetsBindingObse
                                   ? const Icon(Icons.check_circle_rounded, size: 18, color: Color(0xFF00FFA3))
                                   : null)),
                       hintText: _isRegisterMode
-                          ? 'Tên người dùng (Tối thiểu 3 ký tự)'
+                          ? TxaLanguage.tr('auth_username_register_hint', widget.langCode)
                           : TxaLanguage.tr('auth_username_hint', widget.langCode),
                       hintStyle: TextStyle(color: palette.textSecondary.withValues(alpha: 0.5), fontSize: 12),
                       enabledBorder: _buildInputBorder(
@@ -825,7 +825,7 @@ class _AuthDialogState extends ConsumerState<AuthDialog> with WidgetsBindingObse
                     isChecking: _isCheckingUsername,
                     error: _usernameError,
                     isValid: _isUsernameValid,
-                    validText: 'Tên người dùng hợp lệ và có thể đăng ký',
+                    validText: TxaLanguage.tr('auth_valid_username', widget.langCode),
                     palette: palette,
                   ),
                 ],
@@ -859,7 +859,7 @@ class _AuthDialogState extends ConsumerState<AuthDialog> with WidgetsBindingObse
                               ? const Icon(Icons.check_circle_rounded, size: 18, color: Color(0xFF00FFA3))
                               : null),
                       hintText: _isRegisterMode
-                          ? 'Mật khẩu (Tối thiểu 6 ký tự)'
+                          ? TxaLanguage.tr('auth_password_register_hint', widget.langCode)
                           : TxaLanguage.tr('auth_password_hint', widget.langCode),
                       hintStyle: TextStyle(color: palette.textSecondary.withValues(alpha: 0.5), fontSize: 12),
                       enabledBorder: _buildInputBorder(
@@ -882,7 +882,7 @@ class _AuthDialogState extends ConsumerState<AuthDialog> with WidgetsBindingObse
                     isChecking: false,
                     error: _passwordError,
                     isValid: _isPasswordValid,
-                    validText: 'Mật khẩu đạt độ dài yêu cầu',
+                    validText: TxaLanguage.tr('auth_valid_password', widget.langCode),
                     palette: palette,
                   ),
                 ],
@@ -916,7 +916,7 @@ class _AuthDialogState extends ConsumerState<AuthDialog> with WidgetsBindingObse
                             : (_isConfirmPasswordValid
                                 ? const Icon(Icons.check_circle_rounded, size: 18, color: Color(0xFF00FFA3))
                                 : null),
-                        hintText: 'Xác nhận lại mật khẩu',
+                        hintText: TxaLanguage.tr('auth_confirm_password_hint', widget.langCode),
                         hintStyle: TextStyle(color: palette.textSecondary.withValues(alpha: 0.5), fontSize: 12),
                         enabledBorder: _buildInputBorder(
                           isChecking: false,
@@ -938,7 +938,7 @@ class _AuthDialogState extends ConsumerState<AuthDialog> with WidgetsBindingObse
                       isChecking: false,
                       error: _confirmPasswordError,
                       isValid: _isConfirmPasswordValid,
-                      validText: 'Mật khẩu xác nhận trùng khớp',
+                      validText: TxaLanguage.tr('auth_valid_password_match', widget.langCode),
                       palette: palette,
                     ),
                   ],
@@ -980,7 +980,7 @@ class _AuthDialogState extends ConsumerState<AuthDialog> with WidgetsBindingObse
                                 : (_emailController.text.isNotEmpty && _isEmailValid
                                     ? const Icon(Icons.check_circle_rounded, size: 18, color: Color(0xFF00FFA3))
                                     : null)),
-                        hintText: 'Email (Tùy chọn - để khôi phục)',
+                        hintText: TxaLanguage.tr('auth_email_optional_hint', widget.langCode),
                         hintStyle: TextStyle(color: palette.textSecondary.withValues(alpha: 0.5), fontSize: 12),
                         enabledBorder: _buildInputBorder(
                           isChecking: _isCheckingEmail,
@@ -1002,7 +1002,7 @@ class _AuthDialogState extends ConsumerState<AuthDialog> with WidgetsBindingObse
                       isChecking: _isCheckingEmail,
                       error: _emailError,
                       isValid: _emailController.text.isNotEmpty && _isEmailValid,
-                      validText: 'Email hợp lệ và có thể liên kết',
+                      validText: TxaLanguage.tr('auth_valid_email', widget.langCode),
                       palette: palette,
                     ),
                   ],
@@ -1024,7 +1024,9 @@ class _AuthDialogState extends ConsumerState<AuthDialog> with WidgetsBindingObse
                   child: _isLoading
                       ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
                       : Text(
-                          _isRegisterMode ? 'ĐĂNG KÝ TÀI KHOẢN' : 'ĐĂNG NHẬP',
+                          _isRegisterMode
+                              ? TxaLanguage.tr('btn_register_caps', widget.langCode)
+                              : TxaLanguage.tr('btn_login_caps', widget.langCode),
                           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, letterSpacing: 0.5),
                         ),
                 ),
@@ -1048,8 +1050,8 @@ class _AuthDialogState extends ConsumerState<AuthDialog> with WidgetsBindingObse
                 },
                 child: Text(
                   _isRegisterMode
-                      ? 'Đã có tài khoản? Đăng nhập ngay'
-                      : 'Chưa có tài khoản? Tạo tài khoản mới',
+                      ? TxaLanguage.tr('auth_already_have_acc', widget.langCode)
+                      : TxaLanguage.tr('auth_dont_have_acc', widget.langCode),
                   style: TextStyle(color: palette.accentNeon, fontSize: 12, fontWeight: FontWeight.bold),
                 ),
               ),
