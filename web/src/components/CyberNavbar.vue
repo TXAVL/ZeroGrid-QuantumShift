@@ -1,0 +1,216 @@
+<template>
+  <header class="sticky top-0 z-50 glass-panel border-b border-slate-800/80 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      
+      <!-- Brand Logo -->
+      <router-link 
+        to="/" 
+        class="flex items-center space-x-3.5 group cursor-pointer"
+        @click="sound.playClick()"
+        @mouseenter="sound.playHover()"
+      >
+        <div class="relative w-11 h-11 rounded-xl bg-gradient-to-tr from-cyan-400 via-sky-500 to-pink-500 p-[2px] shadow-lg shadow-cyan-500/20 group-hover:shadow-cyan-400/40 group-hover:scale-105 transition-all duration-300">
+          <div class="w-full h-full bg-[#070b16] rounded-[10px] flex items-center justify-center font-display font-black text-cyan-400 text-xl tracking-wider">
+            T
+          </div>
+          <!-- Corner Cyber Blips -->
+          <div class="absolute -top-1 -right-1 w-2 h-2 bg-pink-500 rounded-full animate-ping opacity-75"></div>
+        </div>
+
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-display font-black tracking-wider text-lg text-white group-hover:text-cyan-400 transition-colors">
+              TXA STUDIO
+            </span>
+            <span class="text-[9px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 uppercase tracking-widest">
+              Live v1.4
+            </span>
+          </div>
+          <div class="text-[11px] text-slate-400 font-mono tracking-tight flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>SYSTEM ONLINE</span>
+          </div>
+        </div>
+      </router-link>
+
+      <!-- Desktop Navigation Menu -->
+      <nav class="hidden md:flex items-center space-x-1 lg:space-x-2">
+        <router-link 
+          to="/" 
+          class="px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-200"
+          :class="$route.path === '/' ? 'text-cyan-400 bg-cyan-500/10 border border-cyan-500/30 shadow-neon-cyan' : 'text-slate-300 hover:text-white hover:bg-slate-800/50'"
+          @mouseenter="sound.playHover()"
+          @click="sound.playClick()"
+        >
+          Trang Chủ
+        </router-link>
+
+        <a 
+          href="/#showcase" 
+          class="px-3.5 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-cyan-400 hover:bg-slate-800/50 transition-all duration-200 flex items-center gap-1.5"
+          @mouseenter="sound.playHover()"
+          @click="sound.playClick()"
+        >
+          <span class="w-2 h-2 rounded-full bg-pink-500"></span>
+          Zero Grid Game
+        </a>
+
+        <router-link 
+          to="/privacy" 
+          class="px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-200"
+          :class="$route.path.startsWith('/privacy') ? 'text-cyan-400 bg-cyan-500/10 border border-cyan-500/30' : 'text-slate-300 hover:text-white hover:bg-slate-800/50'"
+          @mouseenter="sound.playHover()"
+          @click="sound.playClick()"
+        >
+          Quyền Riêng Tư
+        </router-link>
+
+        <router-link 
+          to="/delete-account" 
+          class="px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-200"
+          :class="$route.path.startsWith('/delete-account') ? 'text-pink-400 bg-pink-500/10 border border-pink-500/30 shadow-neon-pink' : 'text-slate-300 hover:text-pink-400 hover:bg-pink-500/10'"
+          @mouseenter="sound.playHover()"
+          @click="sound.playClick()"
+        >
+          Xóa Tài Khoản
+        </router-link>
+
+        <router-link 
+          to="/terms" 
+          class="px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-200"
+          :class="$route.path.startsWith('/terms') ? 'text-cyan-400 bg-cyan-500/10 border border-cyan-500/30' : 'text-slate-300 hover:text-white hover:bg-slate-800/50'"
+          @mouseenter="sound.playHover()"
+          @click="sound.playClick()"
+        >
+          Điều Khoản
+        </router-link>
+      </nav>
+
+      <!-- Action Controls: Audio FX & Lang & CTA -->
+      <div class="flex items-center space-x-2.5 sm:space-x-3">
+        <!-- Audio Mute/Unmute Toggle -->
+        <button 
+          @click="toggleAudio"
+          class="p-2.5 rounded-xl border transition-all text-xs flex items-center gap-1.5 font-mono"
+          :class="isMuted ? 'border-slate-800 bg-slate-900/60 text-slate-500 hover:text-slate-300' : 'border-cyan-500/30 bg-cyan-500/10 text-cyan-400 shadow-neon-cyan'"
+          title="Bật/Tắt hiệu ứng âm thanh Sci-Fi"
+        >
+          <svg v-if="!isMuted" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+          </svg>
+          <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+          </svg>
+          <span class="hidden sm:inline text-[11px]">{{ isMuted ? 'MUTE' : 'SFX' }}</span>
+        </button>
+
+        <!-- Language Switcher -->
+        <button 
+          @click="toggleLanguage"
+          @mouseenter="sound.playHover()"
+          class="px-2.5 py-1.5 rounded-xl border border-slate-800 bg-slate-900/80 hover:border-cyan-500/40 text-xs font-mono font-bold text-slate-300 hover:text-white transition-all flex items-center gap-1.5"
+        >
+          <span :class="currentLang === 'vi' ? 'text-cyan-400 font-extrabold' : 'text-slate-500'">VI</span>
+          <span class="text-slate-600">/</span>
+          <span :class="currentLang === 'en' ? 'text-pink-400 font-extrabold' : 'text-slate-500'">EN</span>
+        </button>
+
+        <!-- Play Store / Platform Dispatch CTA -->
+        <button 
+          @click="openDownloadModal('android')"
+          class="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-400 via-sky-500 to-pink-500 text-slate-950 font-display font-black text-xs uppercase tracking-wider hover:opacity-95 shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:scale-[1.02] active:scale-95 transition-all"
+          @mouseenter="sound.playHover()"
+        >
+          <GooglePlayIcon customClass="w-3.5 h-3.5" />
+          <span>CH PLAY</span>
+        </button>
+
+        <!-- Mobile Hamburger Toggle -->
+        <button 
+          @click="mobileMenuOpen = !mobileMenuOpen; sound.playClick()"
+          class="md:hidden p-2.5 rounded-xl border border-slate-800 bg-slate-900 text-slate-400 hover:text-white"
+        >
+          <svg v-if="!mobileMenuOpen" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+          </svg>
+          <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Mobile Navigation Drawer -->
+    <div 
+      v-if="mobileMenuOpen" 
+      class="md:hidden border-t border-slate-800/80 bg-[#070b16]/95 backdrop-blur-2xl px-5 py-4 space-y-2.5"
+    >
+      <router-link 
+        to="/" 
+        @click="mobileMenuOpen = false; sound.playClick()"
+        class="block px-3 py-2 rounded-lg text-base font-medium text-slate-200 hover:text-cyan-400 hover:bg-slate-800/50"
+      >
+        Trang Chủ (Index)
+      </router-link>
+      <a 
+        href="/#showcase" 
+        @click="mobileMenuOpen = false; sound.playClick()"
+        class="block px-3 py-2 rounded-lg text-base font-medium text-slate-200 hover:text-cyan-400 hover:bg-slate-800/50"
+      >
+        Zero Grid Game
+      </a>
+      <router-link 
+        to="/privacy" 
+        @click="mobileMenuOpen = false; sound.playClick()"
+        class="block px-3 py-2 rounded-lg text-base font-medium text-slate-200 hover:text-cyan-400 hover:bg-slate-800/50"
+      >
+        Chính Sách Quyền Riêng Tư
+      </router-link>
+      <router-link 
+        to="/delete-account" 
+        @click="mobileMenuOpen = false; sound.playClick()"
+        class="block px-3 py-2 rounded-lg text-base font-medium text-pink-400 bg-pink-500/10 rounded-lg"
+      >
+        Cổng Xóa Dữ Liệu / Tài Khoản
+      </router-link>
+      <router-link 
+        to="/terms" 
+        @click="mobileMenuOpen = false; sound.playClick()"
+        class="block px-3 py-2 rounded-lg text-base font-medium text-slate-200 hover:text-cyan-400 hover:bg-slate-800/50"
+      >
+        Điều Khoản Dịch Vụ
+      </router-link>
+      <button 
+        @click="mobileMenuOpen = false; openDownloadModal('android')"
+        class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-cyan-400 via-sky-500 to-pink-500 text-slate-950 font-display font-black text-xs uppercase tracking-wider shadow-lg shadow-cyan-500/20"
+      >
+        <GooglePlayIcon customClass="w-4 h-4" />
+        <span>Kiểm Thử Google Play / Nền Tảng</span>
+      </button>
+    </div>
+  </header>
+</template>
+
+<script setup>
+import { ref, inject } from 'vue';
+import GooglePlayIcon from './GooglePlayIcon.vue';
+import { sound } from '../services/sound.js';
+
+const mobileMenuOpen = ref(false);
+const isMuted = ref(sound.isMuted());
+
+const currentLang = inject('currentLang', ref('vi'));
+const setLang = inject('setLang', () => {});
+const openDownloadModal = inject('openDownloadModal', () => {});
+
+function toggleAudio() {
+  isMuted.value = sound.toggleMute();
+}
+
+function toggleLanguage() {
+  sound.playClick();
+  const next = currentLang.value === 'vi' ? 'en' : 'vi';
+  setLang(next);
+}
+</script>

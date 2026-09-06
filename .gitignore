@@ -1,0 +1,54 @@
+# =======================================================
+# TXA STUDIO & ZERO GRID: QUANTUM SHIFT - GITIGNORE
+# =======================================================
+
+# IDE & Editor caches (Thư mục rác IDE)
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+*.swp
+*~
+
+# Flutter / Dart caches & builds (Thư mục rác Flutter build)
+.dart_tool/
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+/coverage/
+**/ios/Flutter/.last_build_id
+.widget_preview/
+
+# Web dependencies & outputs (Thư mục rác Web)
+web/node_modules/
+web/dist/
+web/.vite/
+*.log
+
+# Sensitive API Keys, Configs & Credentials (Ẩn file nhạy cảm)
+andr.json
+ios nè.plist
+web.json
+*.env
+*.env.local
+*.env.*.local
+*.key
+key.properties
+local.properties
+**/*.jks
+**/*.keystore
+hs_err_pid*.log
+
+# Android Studio / Gradle outputs
+/android/.gradle/
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# NOTE: Thư mục "production/" ĐƯỢC GIỮ LẠI ĐỂ TRACKING (schema SQL & docs)
