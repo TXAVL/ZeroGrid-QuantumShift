@@ -127,18 +127,40 @@ class IapPricingHelper {
         );
       }
     } else if (productId == TxaConfig.iapHints10) {
-      final isVn = region == 'VN';
-      final priceStr = (product != null && product.price.isNotEmpty)
-          ? product.price
-          : (isVn ? '12.000 ₫' : '\$0.49');
-      return IapPriceDetails(
-        productId: TxaConfig.iapHints10,
-        originalPrice: priceStr,
-        discountedPrice: priceStr,
-        discountPercent: 0,
-        hasDiscount: false,
-        region: region,
-      );
+      if (region == 'VN') {
+        return const IapPriceDetails(
+          productId: TxaConfig.iapHints10,
+          originalPrice: '15.000 ₫',
+          discountedPrice: '10.500 ₫',
+          discountPercent: 30,
+          hasDiscount: true,
+          region: 'VN',
+        );
+      } else if (region == 'US') {
+        return const IapPriceDetails(
+          productId: TxaConfig.iapHints10,
+          originalPrice: '\$0.49',
+          discountedPrice: '\$0.34',
+          discountPercent: 30,
+          hasDiscount: true,
+          region: 'US',
+        );
+      } else {
+        final priceStr = (product != null && product.price.isNotEmpty)
+            ? product.price
+            : '\$0.49';
+        final discountedStr = (product != null && product.rawPrice > 0)
+            ? '${product.currencySymbol}${(product.rawPrice * 0.70).toStringAsFixed(2)}'
+            : '\$0.34';
+        return IapPriceDetails(
+          productId: TxaConfig.iapHints10,
+          originalPrice: priceStr,
+          discountedPrice: discountedStr,
+          discountPercent: 30,
+          hasDiscount: true,
+          region: 'OTHER',
+        );
+      }
     } else if (productId == TxaConfig.iapHints50) {
       final isVn = region == 'VN';
       final priceStr = (product != null && product.price.isNotEmpty)
