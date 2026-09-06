@@ -489,7 +489,8 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, inject } from 'vue';
+import { ref, computed, onMounted, onUnmounted, inject } from 'vue';
+import { useRouter } from 'vue-router';
 import { 
   adminListApps, 
   adminCreateApp, 
@@ -651,19 +652,6 @@ async function saveExpiryConfig() {
   setTimeout(() => { settingsNotice.value = ''; }, 3500);
 }
 
-async function savePinConfig() {
-  if (!newPinInput.value || newPinInput.value.length < 4) {
-    alert('Mã PIN tối thiểu 4 số');
-    return;
-  }
-  sound.playClick();
-  await updateSystemConfig('admin_pin', newPinInput.value);
-  newPinInput.value = '';
-  settingsNotice.value = '✓ Đã cập nhật mã PIN Admin thành công!';
-  sound.playSuccess();
-  setTimeout(() => { settingsNotice.value = ''; }, 3000);
-}
-
 function viewSnippet(app) {
   sound.playClick();
   selectedAppSnippet.value = app;
@@ -677,10 +665,21 @@ async function copy(text) {
   } catch (e) {}
 }
 
-onMounted(() => {
+function syncUser() {
   currentUser.value = getCurrentWebUser();
   if (isAdmin.value) {
     loadDashboardData();
   }
+}
+
+onMounted(() => {
+  window.addEventListener('storage', syncUser);
+  window.addEventListener('txa-auth-change', syncUser);
+  syncUser();
+});
+
+onUnmounted(() => {
+  window.removeEventListener('storage', syncUser);
+  window.removeEventListener('txa-auth-change', syncUser);
 });
 </script>
