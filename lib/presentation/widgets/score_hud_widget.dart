@@ -7,6 +7,7 @@ import '../../state/theme_notifier.dart';
 import '../../services/service_providers.dart';
 import '../../services/ads/ads_service.dart';
 import 'txa_toast.dart';
+import 'floating_score_delta_widget.dart';
 
 /// HUD thông tin trạng thái ván đấu & các nút điều khiển
 class ScoreHudWidget extends ConsumerWidget {
@@ -42,6 +43,13 @@ class ScoreHudWidget extends ConsumerWidget {
                 value: '${gameState.currentScore}',
                 palette: palette,
                 isHighlight: true,
+                floatingOverlay: FloatingScoreDeltaWidget(
+                  scoreDelta: gameState.lastScoreDelta,
+                  trigger: gameState.scoreDeltaTrigger,
+                  isCombo: gameState.isComboDelta,
+                  comboCount: gameState.currentCombo,
+                  palette: palette,
+                ),
               ),
 
               // 3. Timer tự động mm:ss / hh:mm:ss khi >= 60m (Bên Phải)
@@ -171,6 +179,7 @@ class _StatItem extends StatelessWidget {
   final String? subValue;
   final dynamic palette;
   final bool isHighlight;
+  final Widget? floatingOverlay;
 
   const _StatItem({
     required this.label,
@@ -178,6 +187,7 @@ class _StatItem extends StatelessWidget {
     this.subValue,
     required this.palette,
     this.isHighlight = false,
+    this.floatingOverlay,
   });
 
   @override
@@ -203,43 +213,54 @@ class _StatItem extends StatelessWidget {
               ]
             : null,
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
+        clipBehavior: Clip.none,
         children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.5,
-              color: isHighlight ? palette.accentNeon : palette.textSecondary,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                value,
+                label,
                 style: TextStyle(
-                  fontSize: 20,
+                  fontSize: 10,
                   fontWeight: FontWeight.bold,
-                  color: isHighlight ? palette.accentNeon : Colors.white,
+                  letterSpacing: 1.5,
+                  color: isHighlight ? palette.accentNeon : palette.textSecondary,
                 ),
               ),
-              if (subValue != null) ...[
-                const SizedBox(width: 4),
-                Text(
-                  subValue!,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: palette.textSecondary,
+              const SizedBox(height: 2),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
+                children: [
+                  Text(
+                    value,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: isHighlight ? palette.accentNeon : Colors.white,
+                    ),
                   ),
-                ),
-              ],
+                  if (subValue != null) ...[
+                    const SizedBox(width: 4),
+                    Text(
+                      subValue!,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: palette.textSecondary,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
             ],
           ),
+          if (floatingOverlay != null)
+            Positioned(
+              top: -16,
+              right: -8,
+              child: floatingOverlay!,
+            ),
         ],
       ),
     );

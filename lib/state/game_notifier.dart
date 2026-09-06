@@ -256,6 +256,7 @@ class GameNotifier extends StateNotifier<GameState> {
         return;
       }
 
+      final bool isEndlessCombo = newlyZeros >= 2;
       state = state.copyWith(
         board: moveResult.newState,
         movesCount: state.movesCount + 1,
@@ -269,6 +270,9 @@ class GameNotifier extends StateNotifier<GameState> {
         clearHint: true,
         endlessMovesLeft: newMovesLeft,
         endlessScore: newEndlessScore,
+        lastScoreDelta: endlessMoveScore,
+        scoreDeltaTrigger: state.scoreDeltaTrigger + 1,
+        isComboDelta: isEndlessCombo,
       );
 
       if (isBoardCleared) {
@@ -282,6 +286,7 @@ class GameNotifier extends StateNotifier<GameState> {
         ? (newlyZeros * 150 * max<int>(1, nextCombo)) + 10
         : 10;
     final int newCurrentScore = state.currentScore + campaignMoveScore;
+    final bool isCampaignCombo = newlyZeros >= 2;
 
     state = state.copyWith(
       board: moveResult.newState,
@@ -295,6 +300,9 @@ class GameNotifier extends StateNotifier<GameState> {
       undoStack: newUndoStack,
       clearHint: true,
       currentScore: newCurrentScore,
+      lastScoreDelta: campaignMoveScore,
+      scoreDeltaTrigger: state.scoreDeltaTrigger + 1,
+      isComboDelta: isCampaignCombo,
     );
 
     if (isBoardCleared) {
@@ -374,6 +382,9 @@ class GameNotifier extends StateNotifier<GameState> {
       endlessWave: nextWave,
       endlessScore: totalEndlessScore,
       endlessMovesLeft: awardedMoves,
+      lastScoreDelta: wavePoints,
+      scoreDeltaTrigger: state.scoreDeltaTrigger + 1,
+      isComboDelta: false,
     );
   }
 

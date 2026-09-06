@@ -6,6 +6,7 @@ import '../../state/theme_notifier.dart';
 import '../../services/service_providers.dart';
 import '../../services/ads/ads_service.dart';
 import 'txa_toast.dart';
+import 'floating_score_delta_widget.dart';
 
 /// HUD chuyên biệt cho Endless Mode: Hiển thị Wave, Ngân hàng Lượt đi (Energy/Moves), Điểm tích lũy và Kỷ lục
 class EndlessHudWidget extends ConsumerWidget {
@@ -77,28 +78,44 @@ class EndlessHudWidget extends ConsumerWidget {
               // 2. Điểm tích lũy hiện tại & Kỷ lục
               Column(
                 children: [
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
+                  Stack(
+                    clipBehavior: Clip.none,
                     children: [
-                      Text(
-                        '${gameState.endlessScore}',
-                        style: TextStyle(
-                          fontSize: 26,
-                          fontWeight: FontWeight.w900,
-                          color: isNewHighScore ? const Color(0xFFFFD600) : Colors.white,
-                          shadows: [
-                            BoxShadow(
-                              color: (isNewHighScore ? const Color(0xFFFFD600) : palette.accentNeon)
-                                  .withValues(alpha: 0.6),
-                              blurRadius: 16,
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            '${gameState.endlessScore}',
+                            style: TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.w900,
+                              color: isNewHighScore ? const Color(0xFFFFD600) : Colors.white,
+                              shadows: [
+                                BoxShadow(
+                                  color: (isNewHighScore ? const Color(0xFFFFD600) : palette.accentNeon)
+                                      .withValues(alpha: 0.6),
+                                  blurRadius: 16,
+                                ),
+                              ],
                             ),
+                          ),
+                          if (isNewHighScore) ...[
+                            const SizedBox(width: 4),
+                            const Icon(Icons.stars_rounded, color: Color(0xFFFFD600), size: 18),
                           ],
+                        ],
+                      ),
+                      Positioned(
+                        top: -16,
+                        right: -12,
+                        child: FloatingScoreDeltaWidget(
+                          scoreDelta: gameState.lastScoreDelta,
+                          trigger: gameState.scoreDeltaTrigger,
+                          isCombo: gameState.isComboDelta,
+                          comboCount: gameState.currentCombo,
+                          palette: palette,
                         ),
                       ),
-                      if (isNewHighScore) ...[
-                        const SizedBox(width: 4),
-                        const Icon(Icons.stars_rounded, color: Color(0xFFFFD600), size: 18),
-                      ],
                     ],
                   ),
                   Row(

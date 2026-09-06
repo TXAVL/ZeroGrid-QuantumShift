@@ -60,6 +60,9 @@ class GameState {
   final int endlessMovesLeft;
   final bool isGameOver;
   final bool hasUsedRevive;
+  final int lastScoreDelta;
+  final int scoreDeltaTrigger;
+  final bool isComboDelta;
 
   const GameState({
     required this.levelId,
@@ -86,6 +89,9 @@ class GameState {
     this.endlessMovesLeft = 15,
     this.isGameOver = false,
     this.hasUsedRevive = false,
+    this.lastScoreDelta = 0,
+    this.scoreDeltaTrigger = 0,
+    this.isComboDelta = false,
   });
 
   GameState copyWith({
@@ -115,6 +121,9 @@ class GameState {
     int? endlessMovesLeft,
     bool? isGameOver,
     bool? hasUsedRevive,
+    int? lastScoreDelta,
+    int? scoreDeltaTrigger,
+    bool? isComboDelta,
   }) {
     return GameState(
       levelId: levelId ?? this.levelId,
@@ -141,6 +150,9 @@ class GameState {
       endlessMovesLeft: endlessMovesLeft ?? this.endlessMovesLeft,
       isGameOver: isGameOver ?? this.isGameOver,
       hasUsedRevive: hasUsedRevive ?? this.hasUsedRevive,
+      lastScoreDelta: lastScoreDelta ?? this.lastScoreDelta,
+      scoreDeltaTrigger: scoreDeltaTrigger ?? this.scoreDeltaTrigger,
+      isComboDelta: isComboDelta ?? this.isComboDelta,
     );
   }
 }
