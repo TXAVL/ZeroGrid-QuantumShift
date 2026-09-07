@@ -393,6 +393,7 @@ class TxaLanguage extends ChangeNotifier {
       'crash_title': 'ỨNG DỤNG GẶP SỰ CỐ BẤT NGỜ',
       'crash_subtitle': 'Đã bắt ngoại lệ an toàn để tránh văng app. Bạn có thể sao chép nhật ký lỗi hoặc khởi động lại.',
       'crash_log_header': 'NHẬT KÝ LỖI (CRASH LOG)',
+      'crash_native_header': 'LỖI HỆ THỐNG NATIVE (KOTLIN / ANDROID)',
       'crash_restart_app': 'Khởi động lại ứng dụng',
       'crash_clear_cache': 'Xóa Cache & Khởi động lại',
       'crash_copy_log': 'Sao chép nhật ký lỗi',
@@ -414,6 +415,13 @@ class TxaLanguage extends ChangeNotifier {
       'log_copy_failed': 'Sao chép thất bại: %error%',
       'log_details_label': 'CHI TIẾT DÒNG LOG:',
       'log_raw_label': 'RAW LOG LINE:',
+      'log_copy_raw': 'Sao chép dòng gốc',
+      'log_copy_full': 'Sao chép chi tiết + máy',
+      'log_raw_box_label': 'DÒNG NHẬT KÝ GỐC (RAW LOG):',
+      'log_stack_box_label': 'CHI TIẾT LỖI & STACKTRACE:',
+      'crash_reason_label': 'NGUYÊN NHÂN CRASH (FATAL EXCEPTION)',
+      'crash_stacktrace_label': 'DẤU VẾT THỰC THI (STACK TRACE)',
+      'crash_recent_logs_label': 'NHẬT KÝ HỆ THỐNG GẦN NHẤT (RECENT LOGS)',
       'diag_title': 'THÔNG SỐ CHẨN ĐOÁN THIẾT BỊ',
       'diag_log_type': 'Loại nhật ký',
       'diag_recorded_time': 'Thời gian ghi nhận',
@@ -445,6 +453,11 @@ class TxaLanguage extends ChangeNotifier {
       'diag_full_version': 'Bản dựng đầy đủ',
       'diag_release_date': 'Ngày phát hành',
       'diag_collect_error': 'Lỗi thu thập thông số',
+
+      // GPGS Diagnostics & Logs
+      'gpgs_err_auth_title': 'Lỗi xác thực Google Play Games',
+      'gpgs_err_auth_diagnostics': '🛠️ HƯỚNG DẪN XỬ LÝ CHO NGƯỜI DÙNG & TESTER:\n• Kiểm tra tài khoản Google: Cần chắc chắn bạn đã đăng nhập tài khoản Google trên máy và tài khoản đã được cấp quyền thử nghiệm trong Google Play Console.\n• Bộ nhớ đệm: Vào Cài đặt máy > Ứng dụng > Google Play Games (Trò chơi Google Play) > Xóa bộ nhớ đệm (Clear cache) rồi thử lại.\n• Kết nối mạng: Kiểm tra lại Wi-Fi hoặc 4G/5G.',
+      'gpgs_err_general': 'Lỗi kết nối Google Play Games',
 
       // Banned Dialog
       'banned_dialog_title': 'TÀI KHOẢN BỊ KHÓA',
@@ -947,6 +960,7 @@ class TxaLanguage extends ChangeNotifier {
       'crash_title': 'UNEXPECTED APPLICATION ERROR',
       'crash_subtitle': 'An exception was captured safely to prevent OS termination. You can copy the diagnostic logs or restart.',
       'crash_log_header': 'CRASH DIAGNOSTIC LOG',
+      'crash_native_header': 'NATIVE ANDROID / KOTLIN CRASH',
       'crash_restart_app': 'Restart Application',
       'crash_clear_cache': 'Clear Cache & Restart',
       'crash_copy_log': 'Copy Error Log',
@@ -968,6 +982,13 @@ class TxaLanguage extends ChangeNotifier {
       'log_copy_failed': 'Copy failed: %error%',
       'log_details_label': 'LOG MESSAGE DETAILS:',
       'log_raw_label': 'RAW LOG LINE:',
+      'log_copy_raw': 'Copy Raw Line',
+      'log_copy_full': 'Copy Details + Specs',
+      'log_raw_box_label': 'RAW LOG ENTRY:',
+      'log_stack_box_label': 'ERROR DETAILS & STACKTRACE:',
+      'crash_reason_label': 'CRASH REASON (FATAL EXCEPTION)',
+      'crash_stacktrace_label': 'EXECUTION TRACE (STACK TRACE)',
+      'crash_recent_logs_label': 'RECENT SYSTEM LOGS',
       'diag_title': 'HARDWARE DIAGNOSTIC SPECIFICATIONS',
       'diag_log_type': 'Log Type',
       'diag_recorded_time': 'Recorded Timestamp',
@@ -999,6 +1020,11 @@ class TxaLanguage extends ChangeNotifier {
       'diag_full_version': 'Full Build String',
       'diag_release_date': 'Release Date',
       'diag_collect_error': 'Diagnostic Collection Error',
+
+      // GPGS Diagnostics & Logs
+      'gpgs_err_auth_title': 'Google Play Games Authentication Error',
+      'gpgs_err_auth_diagnostics': '🛠️ TROUBLESHOOTING FOR USERS & TESTERS:\n• Google Account: Ensure you are signed in and your account is added to the Play Console Testers list.\n• App Cache: Go to Device Settings > Apps > Google Play Games > Clear cache and retry.\n• Network: Verify your internet connection is active.',
+      'gpgs_err_general': 'Google Play Games Service Error',
 
       // Banned Dialog
       'banned_dialog_title': 'ACCOUNT SUSPENDED',

@@ -116,58 +116,30 @@ class TXALogger {
     final cleanType = type.toLowerCase().trim();
     final date = dateStr ?? _todayString();
 
-    if (cleanType == 'all') {
-      final List<String> allLines = [];
-      for (final t in ['app', 'api', 'crash', 'iap', 'iau', 'gpgs']) {
+    if (cleanType == 'all' || cleanType == 'services') {
+      final targets = cleanType == 'all'
+          ? ['app', 'api', 'crash', 'iap', 'iau', 'gpgs']
+          : ['iap', 'iau', 'gpgs'];
+
+      final List<_TXALogBlock> allBlocks = [];
+      for (final t in targets) {
         try {
           final file = await _getLogFile(t, date);
           if (await file.exists()) {
-            final lines = await file.readAsLines();
-            allLines.addAll(lines);
+            final content = await file.readAsString();
+            final blocks = _parseContentIntoBlocks(content);
+            allBlocks.addAll(blocks);
           }
         } catch (_) {}
       }
 
-      if (allLines.isEmpty) {
+      if (allBlocks.isEmpty) {
         return TxaLanguage.instance.getText('log_empty');
       }
 
-      allLines.sort((a, b) {
-        final matchA = RegExp(r'^\[(\d{2}:\d{2}:\d{2}\.\d{3})\]').firstMatch(a);
-        final matchB = RegExp(r'^\[(\d{2}:\d{2}:\d{2}\.\d{3})\]').firstMatch(b);
-        if (matchA != null && matchB != null) {
-          return matchA.group(1)!.compareTo(matchB.group(1)!);
-        }
-        return 0;
-      });
+      allBlocks.sort((a, b) => a.timestamp.compareTo(b.timestamp));
 
-      return allLines.join('\n');
-    } else if (cleanType == 'services') {
-      final List<String> serviceLines = [];
-      for (final t in ['iap', 'iau', 'gpgs']) {
-        try {
-          final file = await _getLogFile(t, date);
-          if (await file.exists()) {
-            final lines = await file.readAsLines();
-            serviceLines.addAll(lines);
-          }
-        } catch (_) {}
-      }
-
-      if (serviceLines.isEmpty) {
-        return TxaLanguage.instance.getText('log_empty');
-      }
-
-      serviceLines.sort((a, b) {
-        final matchA = RegExp(r'^\[(\d{2}:\d{2}:\d{2}\.\d{3})\]').firstMatch(a);
-        final matchB = RegExp(r'^\[(\d{2}:\d{2}:\d{2}\.\d{3})\]').firstMatch(b);
-        if (matchA != null && matchB != null) {
-          return matchA.group(1)!.compareTo(matchB.group(1)!);
-        }
-        return 0;
-      });
-
-      return serviceLines.join('\n');
+      return allBlocks.map((b) => b.fullText).join('\n');
     } else {
       try {
         final file = await _getLogFile(cleanType, date);
@@ -311,4 +283,52 @@ class TXALogger {
 
     _localErrorLogs.insert(0, logPayload);
   }
+
+  static List<_TXALogBlock> _parseContentIntoBlocks(String content) {
+    if (content.trim().isEmpty) return [];
+    final List<_TXALogBlock> blocks = [];
+    final lines = content.split('\n');
+    final headerRegExp = RegExp(r'^\[(\d{2}:\d{2}:\d{2}\.\d{3})\]');
+
+    String? currentTimestamp;
+    final List<String> currentLines = [];
+
+    void flush() {
+      if (currentTimestamp != null && currentLines.isNotEmpty) {
+        blocks.add(_TXALogBlock(
+          timestamp: currentTimestamp,
+          fullText: currentLines.join('\n'),
+        ));
+        currentLines.clear();
+      }
+    }
+
+    for (final line in lines) {
+      final match = headerRegExp.firstMatch(line.trim());
+      if (match != null) {
+        flush();
+        currentTimestamp = match.group(1)!;
+        currentLines.add(line);
+      } else {
+        if (currentLines.isNotEmpty) {
+          currentLines.add(line);
+        } else if (line.trim().isNotEmpty) {
+          currentLines.add(line);
+          currentTimestamp = '00:00:00.000';
+        }
+      }
+    }
+    flush();
+    return blocks;
+  }
+}
+
+class _TXALogBlock {
+  final String timestamp;
+  final String fullText;
+
+  _TXALogBlock({
+    required this.timestamp,
+    required this.fullText,
+  });
 }

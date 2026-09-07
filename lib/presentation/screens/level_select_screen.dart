@@ -108,6 +108,7 @@ class LevelSelectScreen extends ConsumerWidget {
 
           return Column(
             children: [
+              const BannerAdWrapper(isTop: true),
               Expanded(
                 child: GridView.builder(
                   padding: const EdgeInsets.all(20.0),

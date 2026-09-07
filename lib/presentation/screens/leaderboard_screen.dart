@@ -282,6 +282,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
       body: SafeArea(
         child: Column(
           children: [
+            const BannerAdWrapper(isTop: true),
             // Timezone & Local Date Header
             Container(
               width: double.infinity,

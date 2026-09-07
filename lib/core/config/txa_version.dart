@@ -47,14 +47,52 @@ class TxaVersion {
   /// Danh sách các bản phát hành được khai báo (Bản mới nhất đặt ở đầu tiên)
   static final List<TxaVersionRelease> releases = [
     // =========================================================================
-    // [TXA_7] - Zero Grid: Quantum Shift v1.6.1 (Build 9) - 2026-09-07
+    // [TXA_8] - Zero Grid: Quantum Shift v1.6.2 (Build 10) - 2026-09-07
     // =========================================================================
     TxaVersionRelease(
-      id: 'txa_7',
+      id: 'txa_8',
       version: TxaConfig.version,
       buildNumber: TxaConfig.buildNumber,
       releaseDate: TxaConfig.releaseDate,
       items: const [
+        // [TXA_8_ITEM_1] - Khởi động an toàn & Tự phục hồi
+        TxaChangelogItem(
+          icon: Icons.shield_rounded,
+          iconColor: Color(0xFF00FFA3),
+          titleKey: 'txa_8_item_1_title',
+          descKey: 'txa_8_item_1_desc',
+          badgeKey: 'txa_8_item_1_badge',
+        ),
+
+        // [TXA_8_ITEM_2] - Quản lý Khôi phục Giao dịch thông minh
+        TxaChangelogItem(
+          icon: Icons.restore_rounded,
+          iconColor: Color(0xFFFFD600),
+          titleKey: 'txa_8_item_2_title',
+          descKey: 'txa_8_item_2_desc',
+          badgeKey: 'txa_8_item_2_badge',
+        ),
+
+        // [TXA_8_ITEM_3] - Biểu ngữ thông minh & Giao diện sạch sẽ
+        TxaChangelogItem(
+          icon: Icons.view_compact_rounded,
+          iconColor: Color(0xFF00E5FF),
+          titleKey: 'txa_8_item_3_title',
+          descKey: 'txa_8_item_3_desc',
+          badgeKey: 'txa_8_item_3_badge',
+        ),
+      ],
+    ),
+
+    // =========================================================================
+    // [TXA_7] - Zero Grid: Quantum Shift v1.6.1 (Build 9) - 2026-09-07
+    // =========================================================================
+    const TxaVersionRelease(
+      id: 'txa_7',
+      version: '1.6.1',
+      buildNumber: '9',
+      releaseDate: '2026-09-07',
+      items: [
         // [TXA_7_ITEM_1] - Tối ưu và khắc phục các lỗi phát sinh (Fix lỗi abc)
         TxaChangelogItem(
           icon: Icons.bug_report_rounded,

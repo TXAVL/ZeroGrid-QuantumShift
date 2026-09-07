@@ -52,6 +52,7 @@ class StatsScreen extends ConsumerWidget {
       body: SafeArea(
         child: Column(
           children: [
+            const BannerAdWrapper(isTop: true),
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.all(20.0),

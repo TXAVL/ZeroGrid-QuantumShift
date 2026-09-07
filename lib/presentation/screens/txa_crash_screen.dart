@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/localization/txa_language.dart';
+import '../../core/utils/txa_device_info.dart';
+import '../../main.dart';
+import '../../services/auth/txa_auth_service.dart';
+import '../../services/service_providers.dart';
+import '../../services/storage_service.dart';
 import '../../services/txa_logger.dart';
 import '../widgets/txa_toast.dart';
 import 'splash_screen.dart';
@@ -10,12 +17,14 @@ class TXACrashScreen extends StatefulWidget {
   final Object? error;
   final StackTrace? stackTrace;
   final FlutterErrorDetails? details;
+  final bool isStandalone;
 
   const TXACrashScreen({
     super.key,
     this.error,
     this.stackTrace,
     this.details,
+    this.isStandalone = false,
   });
 
   @override
@@ -63,12 +72,32 @@ class _TXACrashScreenState extends State<TXACrashScreen> {
 
   Future<void> _restartApp() async {
     try {
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const SplashScreen()),
-        (route) => false,
+      final storage = StorageService();
+      await storage.initialize().catchError((e) {
+        debugPrint("Storage re-init error during crash recovery: $e");
+      });
+      final auth = TxaAuthService(storage);
+      auth.initDeepLinkListener();
+
+      runApp(
+        ProviderScope(
+          overrides: [
+            storageServiceProvider.overrideWithValue(storage),
+            authServiceProvider.overrideWithValue(auth),
+          ],
+          child: const ZeroGridApp(),
+        ),
       );
     } catch (_) {
-      SystemNavigator.pop();
+      if (!mounted) return;
+      try {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const SplashScreen()),
+          (route) => false,
+        );
+      } catch (e) {
+        SystemNavigator.pop();
+      }
     }
   }
 
@@ -80,6 +109,11 @@ class _TXACrashScreenState extends State<TXACrashScreen> {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.clear();
+      try {
+        await Hive.deleteBoxFromDisk('settings_box');
+        await Hive.deleteBoxFromDisk('progress_box');
+        await Hive.deleteBoxFromDisk('replays_box');
+      } catch (_) {}
       if (mounted) {
         TxaToast.success(
           context,
@@ -99,20 +133,41 @@ class _TXACrashScreenState extends State<TXACrashScreen> {
   }
 
   Future<void> _copyLogToClipboard() async {
+    final txaLang = TxaLanguage.instance;
     String recentLogs = '';
     try {
       recentLogs = await TXALogger.readLogs('all');
     } catch (_) {}
 
-    final logText = '--- ZERO GRID CRASH LOG ---\n'
-        'Error: ${_getErrorMessage()}\n\n'
-        'StackTrace:\n${_getStackTraceString()}'
-        '${recentLogs.isNotEmpty && recentLogs != TxaLanguage.instance.getText('log_empty') ? '\n\n--- RECENT APP & SERVICE LOGS ---\n$recentLogs' : ''}';
+    final header = await TXADeviceInfo.getFormattedHeader(
+      logType: 'CRASH',
+      timestamp: DateTime.now().toIso8601String(),
+      status: 'FATAL_CRASH',
+    );
+
+    final logText = '''
+$header
+=========================================
+💥 ${txaLang.getText('crash_reason_label')}
+=========================================
+${_getErrorMessage()}
+
+-----------------------------------------
+🔍 ${txaLang.getText('crash_stacktrace_label')}
+-----------------------------------------
+${_getStackTraceString()}
+
+-----------------------------------------
+📜 ${txaLang.getText('crash_recent_logs_label')}
+-----------------------------------------
+${recentLogs.isNotEmpty && recentLogs != txaLang.getText('log_empty') ? recentLogs : '(Không có nhật ký)'}
+=========================================
+''';
     await Clipboard.setData(ClipboardData(text: logText));
     if (mounted) {
       TxaToast.info(
         context,
-        TxaLanguage.instance.getText('crash_toast_copied'),
+        txaLang.getText('crash_toast_copied'),
       );
     }
   }
@@ -202,19 +257,31 @@ class _TXACrashScreenState extends State<TXACrashScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          children: [
-                            const Icon(Icons.bug_report_rounded, color: Color(0xFFFF9100), size: 18),
-                            const SizedBox(width: 8),
-                            Text(
-                              txaLang.getText('crash_log_header'),
-                              style: const TextStyle(
-                                color: Color(0xFFFF9100),
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
+                        Builder(
+                          builder: (context) {
+                            final isNative = errorMsg.contains('[NATIVE KOTLIN CRASH]') ||
+                                errorMsg.contains('[KOTLIN NATIVE CRASH]');
+                            return Row(
+                              children: [
+                                Icon(
+                                  isNative ? Icons.android_rounded : Icons.bug_report_rounded,
+                                  color: isNative ? const Color(0xFF00E5FF) : const Color(0xFFFF9100),
+                                  size: 18,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  txaLang.getText(isNative
+                                      ? 'crash_native_header'
+                                      : 'crash_log_header'),
+                                  style: TextStyle(
+                                    color: isNative ? const Color(0xFF00E5FF) : const Color(0xFFFF9100),
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
                         ),
                         const SizedBox(height: 10),
                         SelectableText(

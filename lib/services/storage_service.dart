@@ -24,18 +24,37 @@ class StorageService {
   final ValueNotifier<int> totalStarsNotifier = ValueNotifier<int>(0);
 
   Future<void> initialize() async {
-    await Hive.initFlutter();
-    _settingsBox = await Hive.openBox(_boxSettings);
-    _progressBox = await Hive.openBox(_boxProgress);
-    _replaysBox = await Hive.openBox(_boxReplays);
+    try {
+      await Hive.initFlutter();
+      _settingsBox = await Hive.openBox(_boxSettings);
+      _progressBox = await Hive.openBox(_boxProgress);
+      _replaysBox = await Hive.openBox(_boxReplays);
+    } catch (e) {
+      debugPrint("⚠️ Hive openBox error ($e) -> Attempting auto-repair...");
+      try {
+        await Hive.deleteBoxFromDisk(_boxSettings);
+        await Hive.deleteBoxFromDisk(_boxProgress);
+        await Hive.deleteBoxFromDisk(_boxReplays);
+        _settingsBox = await Hive.openBox(_boxSettings);
+        _progressBox = await Hive.openBox(_boxProgress);
+        _replaysBox = await Hive.openBox(_boxReplays);
+      } catch (inner) {
+        debugPrint("🚨 Hive recovery failed: $inner");
+        rethrow;
+      }
+    }
 
-    isAdFreeNotifier.value = isAdFree;
-    hintsCountNotifier.value = hintsCount;
-    usernameNotifier.value = playerUsername;
-    avatarUrlNotifier.value = avatarUrl;
-    userRoleNotifier.value = userRole;
-    controlModeNotifier.value = controlMode;
-    totalStarsNotifier.value = totalCampaignStars;
+    try {
+      isAdFreeNotifier.value = isAdFree;
+      hintsCountNotifier.value = hintsCount;
+      usernameNotifier.value = playerUsername;
+      avatarUrlNotifier.value = avatarUrl;
+      userRoleNotifier.value = userRole;
+      controlModeNotifier.value = controlMode;
+      totalStarsNotifier.value = totalCampaignStars;
+    } catch (e) {
+      debugPrint("⚠️ Error reading initial storage values: $e");
+    }
   }
 
   // --- USER PROFILE & IDENTITY ---
@@ -311,6 +330,35 @@ class StorageService {
       return true;
     }
     return false;
+  }
+
+  // --- CONSUMABLE IAP ANTI-SPAM RESTORE TRACKER ---
+  List<String> get claimedIapTransactions {
+    try {
+      final list = _settingsBox.get('claimed_iap_transactions');
+      if (list is List) {
+        return list.map((e) => e.toString()).toList();
+      }
+    } catch (_) {}
+    return <String>[];
+  }
+
+  bool isIapTransactionClaimed(String transactionId) {
+    if (transactionId.isEmpty) return false;
+    return claimedIapTransactions.contains(transactionId);
+  }
+
+  void markIapTransactionClaimed(String transactionId) {
+    if (transactionId.isEmpty) return;
+    try {
+      final list = claimedIapTransactions;
+      if (!list.contains(transactionId)) {
+        list.add(transactionId);
+        _settingsBox.put('claimed_iap_transactions', list);
+      }
+    } catch (e) {
+      debugPrint("Error marking transaction claimed: $e");
+    }
   }
 
   List<String> get unlockedThemes =>

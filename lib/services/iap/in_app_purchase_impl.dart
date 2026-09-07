@@ -209,11 +209,41 @@ class InAppPurchaseServiceImpl implements IapService {
         }
       } else if (purchase.status == PurchaseStatus.purchased ||
           purchase.status == PurchaseStatus.restored) {
-        TXALogger.logIap('Successfully processed ${purchase.status.name} for ${purchase.productID}');
-        if (!_restoredInCurrentSession.contains(purchase.productID)) {
-          _restoredInCurrentSession.add(purchase.productID);
+        TXALogger.logIap('Successfully processed ${purchase.status.name} for ${purchase.productID} (TxID: ${purchase.purchaseID})');
+
+        final isConsumable = purchase.productID == IapProductIds.hints10 ||
+            purchase.productID == IapProductIds.hints50;
+        final txId = (purchase.purchaseID != null && purchase.purchaseID!.isNotEmpty)
+            ? purchase.purchaseID!
+            : (purchase.verificationData.serverVerificationData.isNotEmpty
+                ? purchase.verificationData.serverVerificationData
+                : '');
+
+        if (isConsumable) {
+          // Quản lý chặt chẽ khôi phục gói tiêu thụ (10 hint / 50 hint):
+          // Ngăn chặn lạm dụng bấm Khôi phục nhiều lần để spam cùng 1 gói gợi ý.
+          // Nhưng nếu đổi tài khoản Google Play Console khác có giao dịch mới (khác transaction ID) thì vẫn cho nhận.
+          if (txId.isNotEmpty && _storageService.isIapTransactionClaimed(txId)) {
+            TXALogger.logIap(
+              'Giao dịch gói tiêu thụ ${purchase.productID} (ID: $txId) đã được nhận trước đó. Bỏ qua để tránh trùng lặp/spam.',
+            );
+          } else {
+            if (txId.isNotEmpty) {
+              _storageService.markIapTransactionClaimed(txId);
+            }
+            if (!_restoredInCurrentSession.contains(purchase.productID)) {
+              _restoredInCurrentSession.add(purchase.productID);
+            }
+            _deliverProduct(purchase.productID);
+          }
+        } else {
+          // Gói vĩnh viễn (Remove Ads, Pro Themes) luôn hợp lệ khi khôi phục
+          if (!_restoredInCurrentSession.contains(purchase.productID)) {
+            _restoredInCurrentSession.add(purchase.productID);
+          }
+          _deliverProduct(purchase.productID);
         }
-        _deliverProduct(purchase.productID);
+
         if (purchase.pendingCompletePurchase) {
           await _iap.completePurchase(purchase);
         }

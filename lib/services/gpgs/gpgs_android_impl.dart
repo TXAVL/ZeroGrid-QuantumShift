@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:games_services/games_services.dart';
+import '../../core/localization/txa_language.dart';
 import 'gpgs_service.dart';
 import '../storage_service.dart';
 import '../txa_logger.dart';
@@ -42,8 +44,15 @@ class GpgsAndroidServiceImpl implements GpgsService {
         TXALogger.logGpgs('GPGS Silent Sign-in returned empty (User not authenticated yet)');
       }
       return _signedInNotifier.value;
-    } catch (e) {
-      TXALogger.logGpgs('GPGS Silent Sign-in error (offline fallback): $e');
+    } catch (e, stack) {
+      final lang = _storageService.languageCode;
+      if (e is PlatformException && e.code == 'failed_to_authenticate') {
+        TXALogger.logGpgs(
+          '${TxaLanguage.tr('gpgs_err_general', lang)}: $e (failed_to_authenticate)\nDetails: ${e.message}\nStackTrace:\n$stack',
+        );
+      } else {
+        TXALogger.logGpgs('${TxaLanguage.tr('gpgs_err_general', lang)} (offline fallback): $e\nStackTrace:\n$stack');
+      }
       _signedInNotifier.value = false;
       return false;
     }
@@ -62,9 +71,22 @@ class GpgsAndroidServiceImpl implements GpgsService {
         await syncCloudSave();
       }
       return _signedInNotifier.value;
-    } catch (e) {
-      TXALogger.logGpgs('GPGS Explicit Sign-in error: $e');
+    } catch (e, stack) {
       _signedInNotifier.value = false;
+      final lang = _storageService.languageCode;
+      if (e is PlatformException && e.code == 'failed_to_authenticate') {
+        final title = TxaLanguage.tr('gpgs_err_auth_title', lang);
+        final diag = TxaLanguage.tr('gpgs_err_auth_diagnostics', lang);
+        TXALogger.logGpgs(
+          '❌ $title: $e\n'
+          '--------------------------------------------------\n'
+          '$diag\n'
+          '--------------------------------------------------\n'
+          'StackTrace:\n$stack',
+        );
+      } else {
+        TXALogger.logGpgs('${TxaLanguage.tr('gpgs_err_general', lang)}: $e\nStackTrace:\n$stack');
+      }
       return false;
     }
   }

@@ -128,6 +128,7 @@ class _DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
       body: SafeArea(
         child: Column(
           children: [
+            const BannerAdWrapper(isTop: true),
             Expanded(
               child: Center(
                 child: SingleChildScrollView(

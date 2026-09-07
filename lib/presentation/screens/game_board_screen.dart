@@ -13,7 +13,6 @@ import '../widgets/endless_hud_widget.dart';
 import '../widgets/endless_game_over_dialog.dart';
 import '../widgets/win_dialog_widget.dart';
 import '../widgets/replay_viewer_widget.dart';
-import '../widgets/banner_ad_wrapper.dart';
 
 /// Màn hình chơi game chính (Gameplay Board)
 class GameBoardScreen extends ConsumerStatefulWidget {
@@ -239,9 +238,6 @@ class _GameBoardScreenState extends ConsumerState<GameBoardScreen> {
             ),
 
             const Spacer(),
-
-            // Banner Ad neo dưới cùng
-            const BannerAdWrapper(),
           ],
         ),
       ),

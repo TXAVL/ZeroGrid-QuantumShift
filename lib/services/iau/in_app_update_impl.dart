@@ -30,8 +30,8 @@ class InAppUpdateServiceImpl implements UpdateService {
       } else {
         TXALogger.logIau('No updates currently available.');
       }
-    } catch (e) {
-      TXALogger.logIau('InAppUpdate check completed (safe fallback / debug): $e');
+    } catch (e, stack) {
+      TXALogger.logIau('InAppUpdate check failed (safe fallback / debug): $e\nStackTrace:\n$stack');
     }
   }
 
@@ -41,8 +41,8 @@ class InAppUpdateServiceImpl implements UpdateService {
     try {
       TXALogger.logIau('Completing flexible update and restarting...');
       await InAppUpdate.completeFlexibleUpdate();
-    } catch (e) {
-      TXALogger.logIau('InAppUpdate complete error: $e');
+    } catch (e, stack) {
+      TXALogger.logIau('InAppUpdate complete error: $e\nStackTrace:\n$stack');
     }
   }
 }

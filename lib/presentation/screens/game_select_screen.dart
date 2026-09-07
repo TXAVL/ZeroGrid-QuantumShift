@@ -100,6 +100,7 @@ class GameSelectScreen extends ConsumerWidget {
           body: SafeArea(
             child: Column(
               children: [
+                const BannerAdWrapper(isTop: true),
                 Expanded(
                   child: ListView(
                     padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),

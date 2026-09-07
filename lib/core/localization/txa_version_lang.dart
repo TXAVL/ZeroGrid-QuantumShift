@@ -15,6 +15,26 @@ class TxaVersionLang {
       'whats_new_btn_continue': 'ĐÃ HIỂU & TIẾP TỤC',
 
       // -----------------------------------------------------------------------
+      // [TXA_8] - Phiên bản v1.6.2 (Build 10) - Ngày: 2026-09-07
+      // -----------------------------------------------------------------------
+      'txa_8_title': 'Nâng Cấp Độ Ổn Định & Tối Ưu Quảng Cáo 1.6.2',
+
+      // [TXA_8_ITEM_1] - Khởi động mượt mà & Phòng hộ chống sập app
+      'txa_8_item_1_title': 'Khởi Động An Toàn & Tự Phục Hồi',
+      'txa_8_item_1_desc': 'Loại bỏ hoàn toàn hiện tượng văng ứng dụng khi vừa tải logo trên một số dòng máy. Tích hợp cơ chế tự động khôi phục dữ liệu an toàn để bạn luôn vào game mượt mà.',
+      'txa_8_item_1_badge': 'ỔN ĐỊNH',
+
+      // [TXA_8_ITEM_2] - Quản lý Khôi phục Gợi ý thông minh
+      'txa_8_item_2_title': 'Khôi Phục Giao Dịch Chính Xác',
+      'txa_8_item_2_desc': 'Cải tiến tính năng Khôi Phục Giao Dịch: Đảm bảo số lượng gợi ý được bảo lưu trọn vẹn, không bị cộng trùng lặp, đồng thời hỗ trợ chuyển đổi linh hoạt khi bạn đổi tài khoản Google Play.',
+      'txa_8_item_2_badge': 'TIỆN ÍCH',
+
+      // [TXA_8_ITEM_3] - Tối ưu hiển thị Biểu ngữ Quảng cáo thông minh
+      'txa_8_item_3_title': 'Biểu Ngữ Thông Minh & Giao Diện Sạch Sẽ',
+      'txa_8_item_3_desc': 'Biểu ngữ tự động hiển thị cân đối ở cả phần trên và dưới màn hình chơi game. Khi mất mạng hoặc chưa tải xong, khung trống sẽ tự động ẩn đi hoàn toàn, không để lại khoảng đen.',
+      'txa_8_item_3_badge': 'GIAO DIỆN',
+
+      // -----------------------------------------------------------------------
       // [TXA_7] - Phiên bản v1.6.1 (Build 9) - Ngày: 2026-09-07
       // -----------------------------------------------------------------------
       'txa_7_title': 'Bản Cập Nhật Sửa Lỗi & Tối Ưu 1.6.1',
@@ -209,6 +229,26 @@ class TxaVersionLang {
       // -----------------------------------------------------------------------
       'whats_new_title': "WHAT'S NEW IN THIS VERSION?",
       'whats_new_btn_continue': 'GOT IT & CONTINUE',
+
+      // -----------------------------------------------------------------------
+      // [TXA_8] - Version v1.6.2 (Build 10) - Date: 2026-09-07
+      // -----------------------------------------------------------------------
+      'txa_8_title': 'Stability & Smart Banner Upgrade 1.6.2',
+
+      // [TXA_8_ITEM_1] - Startup stability & Auto-repair
+      'txa_8_item_1_title': 'Rock-Solid Launch & Auto-Repair',
+      'txa_8_item_1_desc': 'Eliminated startup crashes on various Android devices. Integrated auto-repair fallback mechanisms to guarantee seamless app launching every time.',
+      'txa_8_item_1_badge': 'STABILITY',
+
+      // [TXA_8_ITEM_2] - Smart Hint Restoration
+      'txa_8_item_2_title': 'Accurate Purchase Restoration',
+      'txa_8_item_2_desc': 'Upgraded the Restore Purchases system: Prevents duplicate consumable hint claims while seamlessly recognizing valid purchases across different Google Play accounts.',
+      'txa_8_item_2_badge': 'SECURITY',
+
+      // [TXA_8_ITEM_3] - Smart Adaptive Banner
+      'txa_8_item_3_title': 'Smart Banners & Clean Layout',
+      'txa_8_item_3_desc': 'Banners now appear balanced at both the top and bottom of the game. If offline or unavailable, the frame cleanly disappears with zero black space.',
+      'txa_8_item_3_badge': 'INTERFACE',
 
       // -----------------------------------------------------------------------
       // [TXA_7] - Version v1.6.1 (Build 9) - Date: 2026-09-07

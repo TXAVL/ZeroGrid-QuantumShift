@@ -33,7 +33,7 @@ class _TXALogViewerScreenState extends State<TXALogViewerScreen>
   final List<String> _logTypes = ['all', 'app', 'api', 'crash', 'services'];
   List<TXALogEntry> _parsedEntries = [];
   bool _isLoading = false;
-  final Set<int> _expandedIndices = {};
+  int? _expandedIndex;
 
   @override
   void initState() {
@@ -59,7 +59,7 @@ class _TXALogViewerScreenState extends State<TXALogViewerScreen>
   Future<void> _loadLogs() async {
     setState(() {
       _isLoading = true;
-      _expandedIndices.clear();
+      _expandedIndex = null;
     });
     final activeType = _logTypes[_tabController.index];
     final content = await TXALogger.readLogs(activeType);
@@ -94,17 +94,17 @@ class _TXALogViewerScreenState extends State<TXALogViewerScreen>
           timestamp: timestamp,
           type: type,
           message: message,
-          rawLine: trimmed,
+          rawLine: line,
         ));
       } else {
         if (list.isNotEmpty) {
           final lastEntry = list.last;
-          final updatedMessage = lastEntry.message.length > 15000
+          final updatedMessage = lastEntry.message.length > 25000
               ? lastEntry.message
-              : '${lastEntry.message}\n$trimmed';
-          final updatedRaw = lastEntry.rawLine.length > 15000
+              : '${lastEntry.message}\n$line';
+          final updatedRaw = lastEntry.rawLine.length > 25000
               ? lastEntry.rawLine
-              : '${lastEntry.rawLine}\n$trimmed';
+              : '${lastEntry.rawLine}\n$line';
 
           list[list.length - 1] = TXALogEntry(
             timestamp: lastEntry.timestamp,
@@ -116,8 +116,8 @@ class _TXALogViewerScreenState extends State<TXALogViewerScreen>
           list.add(TXALogEntry(
             timestamp: '--:--:--',
             type: 'APP',
-            message: trimmed,
-            rawLine: trimmed,
+            message: line,
+            rawLine: line,
           ));
         }
       }
@@ -139,8 +139,21 @@ class _TXALogViewerScreenState extends State<TXALogViewerScreen>
   }
 
   Widget _buildLogItem(TXALogEntry entry, int index) {
-    final isExpanded = _expandedIndices.contains(index);
+    final isExpanded = _expandedIndex == index;
     final typeColor = _getTypeColor(entry.type);
+    final txaLang = TxaLanguage.instance;
+
+    final isError = entry.type.toUpperCase().contains('CRASH') ||
+        entry.type.toUpperCase().contains('ERROR') ||
+        entry.message.toLowerCase().contains('error') ||
+        entry.message.toLowerCase().contains('fail') ||
+        entry.message.toLowerCase().contains('thất bại') ||
+        entry.message.toLowerCase().contains('exception');
+
+    final newlineIndex = entry.message.indexOf('\n');
+    final hasMultiLine = newlineIndex != -1;
+    final mainMessage = hasMultiLine ? entry.message.substring(0, newlineIndex).trim() : entry.message;
+    final detailsText = hasMultiLine ? entry.message.substring(newlineIndex + 1).trim() : '';
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
@@ -148,14 +161,14 @@ class _TXALogViewerScreenState extends State<TXALogViewerScreen>
         color: const Color(0xFF191820),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: typeColor.withValues(alpha: isExpanded ? 0.7 : 0.2),
+          color: typeColor.withValues(alpha: isExpanded ? 0.75 : 0.2),
           width: isExpanded ? 1.5 : 1.0,
         ),
         boxShadow: isExpanded
             ? [
                 BoxShadow(
-                  color: typeColor.withValues(alpha: 0.15),
-                  blurRadius: 10,
+                  color: typeColor.withValues(alpha: 0.18),
+                  blurRadius: 12,
                   spreadRadius: 1,
                 ),
               ]
@@ -165,92 +178,310 @@ class _TXALogViewerScreenState extends State<TXALogViewerScreen>
         borderRadius: BorderRadius.circular(16),
         onTap: () {
           setState(() {
-            if (isExpanded) {
-              _expandedIndices.remove(index);
+            if (_expandedIndex == index) {
+              _expandedIndex = null;
             } else {
-              _expandedIndices.add(index);
+              _expandedIndex = index;
             }
           });
         },
         child: Padding(
           padding: const EdgeInsets.all(12),
-          child: Row(
+          child: isExpanded
+              ? _buildExpandedContent(
+                  entry: entry,
+                  typeColor: typeColor,
+                  isError: isError,
+                  mainMessage: mainMessage,
+                  detailsText: detailsText,
+                  txaLang: txaLang,
+                )
+              : _buildCollapsedContent(
+                  entry: entry,
+                  typeColor: typeColor,
+                  isError: isError,
+                  mainMessage: mainMessage,
+                ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCollapsedContent({
+    required TXALogEntry entry,
+    required Color typeColor,
+    required bool isError,
+    required String mainMessage,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: typeColor.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: typeColor.withValues(alpha: 0.5), width: 1),
+              ),
+              child: Text(
+                entry.type,
+                style: TextStyle(
+                  color: typeColor,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              entry.timestamp,
+              style: const TextStyle(
+                color: Colors.white54,
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                fontFamily: 'monospace',
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Type Badge & Timestamp column
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: typeColor.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: typeColor.withValues(alpha: 0.5), width: 1),
-                    ),
-                    child: Text(
-                      entry.type,
+              Text(
+                mainMessage,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  height: 1.4,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 6),
+        const Padding(
+          padding: EdgeInsets.only(top: 2),
+          child: Icon(
+            Icons.keyboard_arrow_down_rounded,
+            color: Colors.white38,
+            size: 20,
+          ),
+        ),
+        const SizedBox(width: 4),
+        _TXACopyButton(entry: entry),
+      ],
+    );
+  }
+
+  Widget _buildExpandedContent({
+    required TXALogEntry entry,
+    required Color typeColor,
+    required bool isError,
+    required String mainMessage,
+    required String detailsText,
+    required TxaLanguage txaLang,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: typeColor.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: typeColor.withValues(alpha: 0.5), width: 1),
+              ),
+              child: Text(
+                entry.type,
+                style: TextStyle(
+                  color: typeColor,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              '🕒 ${entry.timestamp}',
+              style: const TextStyle(
+                color: Colors.white70,
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                fontFamily: 'monospace',
+              ),
+            ),
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: isError
+                    ? const Color(0xFFFF5252).withValues(alpha: 0.2)
+                    : const Color(0xFF00FFA3).withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(
+                  color: isError ? const Color(0xFFFF5252) : const Color(0xFF00FFA3),
+                  width: 0.8,
+                ),
+              ),
+              child: Text(
+                isError ? 'FAILED' : 'SUCCESS',
+                style: TextStyle(
+                  color: isError ? const Color(0xFFFF5252) : const Color(0xFF00FFA3),
+                  fontSize: 9,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+            const Spacer(),
+            Icon(
+              Icons.keyboard_arrow_up_rounded,
+              color: typeColor,
+              size: 22,
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        const Divider(color: Colors.white12, height: 1),
+        const SizedBox(height: 10),
+
+        SelectableText(
+          mainMessage,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            height: 1.4,
+          ),
+        ),
+
+        if (detailsText.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: const Color(0xFF100F15),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: Colors.white12),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.bug_report_rounded, size: 14, color: typeColor),
+                    const SizedBox(width: 6),
+                    Text(
+                      txaLang.getText('log_stack_box_label'),
                       style: TextStyle(
                         color: typeColor,
                         fontSize: 10,
-                        fontWeight: FontWeight.w900,
+                        fontWeight: FontWeight.bold,
                         letterSpacing: 0.5,
                       ),
                     ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                SelectableText(
+                  detailsText,
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 11,
+                    fontFamily: 'monospace',
+                    height: 1.35,
                   ),
-                  const SizedBox(height: 6),
+                ),
+              ],
+            ),
+          ),
+        ],
+
+        const SizedBox(height: 12),
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: const Color(0xFF0E0E12),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: Colors.white10),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.terminal_rounded, size: 14, color: Colors.white54),
+                  const SizedBox(width: 6),
                   Text(
-                    entry.timestamp,
+                    txaLang.getText('log_raw_box_label'),
                     style: const TextStyle(
                       color: Colors.white54,
                       fontSize: 10,
-                      fontWeight: FontWeight.w600,
-                      fontFamily: 'monospace',
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.5,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(width: 12),
-
-              // Message Body
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    AnimatedCrossFade(
-                      firstChild: Text(
-                        entry.message,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          height: 1.4,
-                        ),
-                      ),
-                      secondChild: SelectableText(
-                        entry.message,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          height: 1.4,
-                          fontFamily: 'monospace',
-                        ),
-                      ),
-                      crossFadeState: isExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
-                      duration: const Duration(milliseconds: 200),
-                    ),
-                  ],
+              const SizedBox(height: 6),
+              SelectableText(
+                entry.rawLine,
+                style: const TextStyle(
+                  color: Colors.white54,
+                  fontSize: 10,
+                  fontFamily: 'monospace',
+                  height: 1.3,
                 ),
               ),
-              const SizedBox(width: 8),
-
-              // Copy Button
-              _TXACopyButton(entry: entry),
             ],
           ),
         ),
-      ),
+
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: _TXACopyButton(
+                entry: entry,
+                isFullButton: true,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                  side: const BorderSide(color: Colors.white24),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  backgroundColor: const Color(0xFF14131A),
+                ),
+                icon: const Icon(Icons.copy_rounded, size: 14, color: Colors.white70),
+                label: Text(
+                  txaLang.getText('log_copy_raw'),
+                  style: const TextStyle(fontSize: 11, color: Colors.white70, fontWeight: FontWeight.w600),
+                ),
+                onPressed: () async {
+                  await Clipboard.setData(ClipboardData(text: entry.rawLine));
+                  HapticFeedback.lightImpact();
+                  if (mounted) {
+                    TxaToast.info(context, txaLang.getText('log_copied'));
+                  }
+                },
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -355,7 +586,12 @@ class _TXALogViewerScreenState extends State<TXALogViewerScreen>
 
 class _TXACopyButton extends StatefulWidget {
   final TXALogEntry entry;
-  const _TXACopyButton({required this.entry});
+  final bool isFullButton;
+
+  const _TXACopyButton({
+    required this.entry,
+    this.isFullButton = false,
+  });
 
   @override
   State<_TXACopyButton> createState() => _TXACopyButtonState();
@@ -388,10 +624,18 @@ class _TXACopyButtonState extends State<_TXACopyButton>
       _isCopied = true;
     });
 
+    final isError = widget.entry.type.toUpperCase().contains('CRASH') ||
+        widget.entry.type.toUpperCase().contains('ERROR') ||
+        widget.entry.message.toLowerCase().contains('error') ||
+        widget.entry.message.toLowerCase().contains('fail') ||
+        widget.entry.message.toLowerCase().contains('thất bại') ||
+        widget.entry.message.toLowerCase().contains('exception');
+    final status = isError ? 'ERROR' : 'SUCCESS';
+
     final header = await TXADeviceInfo.getFormattedHeader(
       logType: widget.entry.type,
       timestamp: widget.entry.timestamp,
-      status: 'SUCCESS',
+      status: status,
     );
 
     final clipboardText = '''
@@ -429,6 +673,44 @@ ${widget.entry.rawLine}
 
   @override
   Widget build(BuildContext context) {
+    final txaLang = TxaLanguage.instance;
+
+    if (widget.isFullButton) {
+      return ElevatedButton.icon(
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+          backgroundColor: const Color(0xFF6C5CE7).withValues(alpha: 0.25),
+          foregroundColor: const Color(0xFFA29BFE),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+            side: const BorderSide(color: Color(0xFF6C5CE7), width: 1),
+          ),
+          elevation: 0,
+        ),
+        icon: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          child: _isCopied
+              ? const Icon(
+                  Icons.check_circle_rounded,
+                  color: Color(0xFF00E676),
+                  key: ValueKey('copied_full'),
+                  size: 16,
+                )
+              : const Icon(
+                  Icons.copy_rounded,
+                  color: Color(0xFFA29BFE),
+                  key: ValueKey('copy_full'),
+                  size: 16,
+                ),
+        ),
+        label: Text(
+          txaLang.getText('log_copy_full'),
+          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+        ),
+        onPressed: _handleCopy,
+      );
+    }
+
     return ScaleTransition(
       scale: Tween<double>(begin: 1.0, end: 0.85).animate(
         CurvedAnimation(parent: _animController, curve: Curves.easeOut),

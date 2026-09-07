@@ -550,6 +550,9 @@ class _MainMenuScreenState extends ConsumerState<MainMenuScreen> with WidgetsBin
       body: SafeArea(
         child: Column(
           children: [
+            // Top Banner Ad
+            const BannerAdWrapper(isTop: true),
+
             // Top Bar: Player Profile & Quick Action Icons
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -764,7 +767,8 @@ class _MainMenuScreenState extends ConsumerState<MainMenuScreen> with WidgetsBin
                                 icon: isAdFree ? Icons.verified_rounded : Icons.block_flipped,
                                 title: isAdFree
                                     ? TxaLanguage.tr('btn_ad_free_active', langCode)
-                                    : '${TxaLanguage.tr('btn_remove_ads', langCode)} (${removeAdsPriceDetails.discountedPrice})',
+                                    : TxaLanguage.tr('btn_remove_ads', langCode),
+                                price: isAdFree ? null : removeAdsPriceDetails.discountedPrice,
                                 originalPrice: (!isAdFree && removeAdsPriceDetails.hasDiscount)
                                     ? removeAdsPriceDetails.originalPrice
                                     : null,
@@ -785,7 +789,6 @@ class _MainMenuScreenState extends ConsumerState<MainMenuScreen> with WidgetsBin
                                       },
                               );
                             },
-
                           ),
                           const SizedBox(height: 14),
                         ],
@@ -926,6 +929,7 @@ class _MenuActionButton extends StatelessWidget {
   final String subtitle;
   final dynamic palette;
   final Color? badgeColor;
+  final String? price;
   final String? originalPrice;
   final String? discountBadge;
   final VoidCallback onTap;
@@ -936,6 +940,7 @@ class _MenuActionButton extends StatelessWidget {
     required this.subtitle,
     required this.palette,
     this.badgeColor,
+    this.price,
     this.originalPrice,
     this.discountBadge,
     required this.onTap,
@@ -990,38 +995,56 @@ class _MenuActionButton extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          if (originalPrice != null) ...[
-                            const SizedBox(width: 6),
-                            Text(
-                              originalPrice!,
-                              style: const TextStyle(
-                                fontSize: 11,
-                                color: Colors.white38,
-                                decoration: TextDecoration.lineThrough,
-                                decorationColor: Color(0xFFFF5252),
-                                decorationThickness: 2.0,
-                              ),
-                            ),
-                          ],
-                          if (discountBadge != null) ...[
-                            const SizedBox(width: 6),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
-                              decoration: BoxDecoration(
-                                gradient: const LinearGradient(
-                                  colors: [Color(0xFFFF0055), Color(0xFFFF5E3A)],
-                                ),
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              child: Text(
-                                discountBadge!,
+                          if (price != null) ...[
+                            const SizedBox(width: 8),
+                            if (originalPrice != null) ...[
+                              Text(
+                                originalPrice!,
                                 style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w900,
+                                  fontSize: 11,
+                                  color: Colors.white38,
+                                  decoration: TextDecoration.lineThrough,
+                                  decorationColor: Color(0xFFFF5252),
+                                  decorationThickness: 2.0,
                                 ),
                               ),
+                              const SizedBox(width: 5),
+                            ],
+                            Text(
+                              price!,
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w900,
+                                color: originalPrice != null ? palette.accentNeon : Colors.white,
+                              ),
                             ),
+                            if (discountBadge != null) ...[
+                              const SizedBox(width: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [Color(0xFFFF0055), Color(0xFFFF5E3A)],
+                                  ),
+                                  borderRadius: BorderRadius.circular(5),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: const Color(0xFFFF0055).withValues(alpha: 0.35),
+                                      blurRadius: 4,
+                                    ),
+                                  ],
+                                ),
+                                child: Text(
+                                  discountBadge!,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ],
                         ],
                       ),
