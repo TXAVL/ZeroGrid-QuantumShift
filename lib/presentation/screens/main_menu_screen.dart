@@ -13,6 +13,7 @@ import '../widgets/achievements_dialog.dart';
 import '../widgets/how_to_play_dialog.dart';
 import '../widgets/profile_dialog.dart';
 import '../widgets/whats_new_dialog.dart';
+import '../widgets/update_history_dialog.dart';
 import '../widgets/restore_purchases_dialog.dart';
 import '../widgets/txa_toast.dart';
 import '../../core/utils/txa_format.dart';
@@ -181,38 +182,44 @@ class _MainMenuScreenState extends ConsumerState<MainMenuScreen> with WidgetsBin
   }
 
   void _showSettingsDialog(BuildContext context, WidgetRef ref) {
-    final themeState = ref.read(themeProvider);
-    final palette = themeState.palette;
-    final storage = ref.read(storageServiceProvider);
-    final langCode = ref.read(languageProvider);
-    final isSwipeUnlocked = storage.unlockedCampaignLevel > TxaConfig.swipeModeUnlockLevel;
-
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: palette.boardFrame,
+      backgroundColor: Colors.transparent,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       builder: (ctx) {
-        return DraggableScrollableSheet(
-          initialChildSize: 0.65,
-          minChildSize: 0.4,
-          maxChildSize: 0.92,
-          expand: false,
-          builder: (context, scrollController) {
+        return Consumer(
+          builder: (context, ref, _) {
+            final themeState = ref.watch(themeProvider);
+            final palette = themeState.palette;
+            final storage = ref.watch(storageServiceProvider);
+            final langCode = ref.watch(languageProvider);
+            final isSwipeUnlocked = storage.unlockedCampaignLevel > TxaConfig.swipeModeUnlockLevel;
+            final isAdmin = storage.userRole == 'admin';
+
             return StatefulBuilder(
               builder: (context, setModalState) {
-                final isAdmin = storage.userRole == 'admin';
-
-                return SingleChildScrollView(
-                  controller: scrollController,
-                  physics: const BouncingScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Drag Handle Bar
+                return Container(
+                  decoration: BoxDecoration(
+                    color: palette.boardFrame,
+                    borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+                  ),
+                  child: DraggableScrollableSheet(
+                    initialChildSize: 0.65,
+                    minChildSize: 0.4,
+                    maxChildSize: 0.92,
+                    expand: false,
+                    builder: (context, scrollController) {
+                      return SingleChildScrollView(
+                        controller: scrollController,
+                        physics: const BouncingScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                          // Drag Handle Bar
                       Center(
                         child: Container(
                           width: 40,
@@ -464,6 +471,33 @@ class _MainMenuScreenState extends ConsumerState<MainMenuScreen> with WidgetsBin
                       ),
                       const Divider(color: Colors.white10),
 
+                      // Lịch sử cập nhật (Update History)
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF00E5FF).withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Icon(Icons.manage_history_rounded, color: Color(0xFF00E5FF), size: 22),
+                        ),
+                        title: Text(
+                          TxaLanguage.tr('update_history_title', langCode),
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                        ),
+                        subtitle: Text(
+                          TxaLanguage.tr('update_history_desc', langCode),
+                          style: const TextStyle(color: Color(0xFF8B9BB4), fontSize: 12),
+                        ),
+                        trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Color(0xFF00E5FF)),
+                        onTap: () {
+                          Navigator.of(ctx).pop();
+                          UpdateHistoryDialog.show(context, palette, langCode);
+                        },
+                      ),
+                      const Divider(color: Colors.white10),
+
                       // Nhật ký hệ thống (TXALogger Logs Viewer)
                       ListTile(
                         contentPadding: EdgeInsets.zero,
@@ -525,14 +559,17 @@ class _MainMenuScreenState extends ConsumerState<MainMenuScreen> with WidgetsBin
                       const SizedBox(height: 20),
                     ],
                   ),
-                );
-              },
-            );
-          },
-        );
-      },
-    );
-  }
+                    );
+                  },
+                ),
+              );
+            },
+          );
+        },
+      );
+    },
+  );
+}
 
   @override
   Widget build(BuildContext context) {

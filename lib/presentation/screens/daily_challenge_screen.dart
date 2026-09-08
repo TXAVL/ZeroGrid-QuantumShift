@@ -74,10 +74,10 @@ class _DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
 
     final langCode = ref.read(languageProvider);
     final stageName = stageToPlay == 1
-        ? (TxaLanguage.isVietnamese(langCode) ? 'Chặng 1 (Tiêu chuẩn)' : 'Stage 1 (Standard)')
+        ? TxaLanguage.tr('daily_stage_1_name', langCode)
         : (stageToPlay == 2
-            ? (TxaLanguage.isVietnamese(langCode) ? 'Chặng 2 (Nâng cao)' : 'Stage 2 (Advanced)')
-            : (TxaLanguage.isVietnamese(langCode) ? 'Chặng 3 (Chuyên gia)' : 'Stage 3 (Master)'));
+            ? TxaLanguage.tr('daily_stage_2_name', langCode)
+            : TxaLanguage.tr('daily_stage_3_name', langCode));
 
     ref.read(gameStateProvider.notifier).loadLevel(level, GameMode.dailyChallenge);
     Navigator.of(context).push(
@@ -86,7 +86,9 @@ class _DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
           title: '${TxaLanguage.tr('mode_daily_title', langCode)} - $stageName',
         ),
       ),
-    );
+    ).then((_) {
+      if (mounted) setState(() {});
+    });
   }
 
   @override
@@ -239,13 +241,13 @@ class _DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
                               children: [
                                 Column(
                                   children: [
-                                    const Text(
-                                      'TIẾN TRÌNH',
-                                      style: TextStyle(fontSize: 10.5, color: Colors.white70, fontWeight: FontWeight.bold),
+                                    Text(
+                                      TxaLanguage.tr('daily_progress_label', langCode),
+                                      style: const TextStyle(fontSize: 10.5, color: Colors.white70, fontWeight: FontWeight.bold),
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      'Chặng $completedStage/3',
+                                      TxaLanguage.tr('daily_stage_fmt', langCode).replaceAll('%stage%', '$completedStage'),
                                       style: const TextStyle(fontSize: 14, color: Color(0xFF00FFA3), fontWeight: FontWeight.bold),
                                     ),
                                   ],
@@ -253,9 +255,9 @@ class _DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
                                 Container(width: 1, height: 32, color: Colors.white12),
                                 Column(
                                   children: [
-                                    const Text(
-                                      'ĐIỂM HÔM NAY',
-                                      style: TextStyle(fontSize: 10.5, color: Colors.white70, fontWeight: FontWeight.bold),
+                                    Text(
+                                      TxaLanguage.tr('daily_score_today', langCode),
+                                      style: const TextStyle(fontSize: 10.5, color: Colors.white70, fontWeight: FontWeight.bold),
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
@@ -267,9 +269,9 @@ class _DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
                                 Container(width: 1, height: 32, color: Colors.white12),
                                 Column(
                                   children: [
-                                    const Text(
-                                      'SAO ĐẠT ĐƯỢC',
-                                      style: TextStyle(fontSize: 10.5, color: Colors.white70, fontWeight: FontWeight.bold),
+                                    Text(
+                                      TxaLanguage.tr('daily_stars_earned', langCode),
+                                      style: const TextStyle(fontSize: 10.5, color: Colors.white70, fontWeight: FontWeight.bold),
                                     ),
                                     const SizedBox(height: 4),
                                     Row(
@@ -318,12 +320,12 @@ class _DailyChallengeScreenState extends ConsumerState<DailyChallengeScreen> {
                             ),
                             label: Text(
                               completedStage == 0
-                                  ? (TxaLanguage.isVietnamese(langCode) ? 'Bắt đầu Chặng 1 (Tiêu chuẩn)' : 'Start Stage 1 (Standard)')
+                                  ? TxaLanguage.tr('daily_btn_start_1', langCode)
                                   : (completedStage == 1
-                                      ? (TxaLanguage.isVietnamese(langCode) ? 'Tiếp tục Chặng 2 (Nâng cao)' : 'Play Stage 2 (Advanced)')
+                                      ? TxaLanguage.tr('daily_btn_play_2', langCode)
                                       : (completedStage == 2
-                                          ? (TxaLanguage.isVietnamese(langCode) ? 'Tiếp tục Chặng 3 (Chuyên gia)' : 'Play Stage 3 (Master)')
-                                          : (TxaLanguage.isVietnamese(langCode) ? 'Chơi lại lập kỷ lục mới' : 'Replay for High Score'))),
+                                          ? TxaLanguage.tr('daily_btn_play_3', langCode)
+                                          : TxaLanguage.tr('daily_btn_replay', langCode))),
                               style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.bold),
                             ),
                             onPressed: () => _startDaily(nextStageToPlay),

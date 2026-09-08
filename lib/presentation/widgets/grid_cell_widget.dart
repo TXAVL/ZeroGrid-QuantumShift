@@ -142,6 +142,30 @@ class GridCellWidget extends ConsumerWidget {
               ),
             ),
 
+            // Ký hiệu hình học trợ năng khi bật Chế độ mù màu (Shape Accessibility Badges)
+            if (isColorblind && !isInactive)
+              Positioned(
+                top: 4,
+                left: 6,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.65),
+                    borderRadius: BorderRadius.circular(5),
+                    border: Border.all(color: Colors.white60, width: 0.7),
+                  ),
+                  child: Text(
+                    _getColorblindSymbol(cellValue),
+                    style: const TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      height: 1.1,
+                    ),
+                  ),
+                ),
+              ),
+
             // Icon chỉ báo giảm (-1) trên các ô lân cận khi bật Gợi ý
             if (isHintNeighbor && !isInactive)
               Positioned(
@@ -176,5 +200,20 @@ class GridCellWidget extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  String _getColorblindSymbol(int value) {
+    switch (value) {
+      case 1:
+        return '●';
+      case 2:
+        return '▲';
+      case 3:
+        return '■';
+      case 4:
+        return '◆';
+      default:
+        return '★';
+    }
   }
 }

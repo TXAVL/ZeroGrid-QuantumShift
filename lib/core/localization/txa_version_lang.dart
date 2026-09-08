@@ -15,6 +15,26 @@ class TxaVersionLang {
       'whats_new_btn_continue': 'ĐÃ HIỂU & TIẾP TỤC',
 
       // -----------------------------------------------------------------------
+      // [TXA_9] - Phiên bản v1.6.3 (Build 11) - Ngày: 2026-09-08
+      // -----------------------------------------------------------------------
+      'txa_9_title': 'Bản Nâng Cấp Đồng Bộ & Trải Nghiệm Người Chơi 1.6.3',
+
+      // [TXA_9_ITEM_1] - Đồng Bộ Đám Mây & Giữ Nguyên Tiến Độ
+      'txa_9_item_1_title': 'Đồng Bộ Đám Mây & Giữ Nguyên Tiến Độ',
+      'txa_9_item_1_desc': 'Tính năng Hợp nhất Thông minh (Smart Merge): Khi đăng nhập tài khoản Cloud, hệ thống tự động giữ lại số màn mở khóa và số sao cao nhất, không lo bị mất tiến độ. Khi đăng xuất hoặc đổi tài khoản, dữ liệu được cách ly an toàn.',
+      'txa_9_item_1_badge': 'ĐỒNG BỘ',
+
+      // [TXA_9_ITEM_2] - Thử Thách Ngày & Đua Top Giải Đấu
+      'txa_9_item_2_title': 'Thử Thách Ngày & Đua Top Giải Đấu',
+      'txa_9_item_2_desc': 'Hoàn thiện chuỗi Thử Thách Ngày 3 chặng mượt mà, tự động chuyển chặng tiếp theo và ghi nhận điểm số tức thì. Bảng Xếp Hạng Giải Đấu ghi nhận số ván tham gia chuẩn xác ở mọi chế độ chơi.',
+      'txa_9_item_2_badge': 'TÍNH NĂNG',
+
+      // [TXA_9_ITEM_3] - Hỗ Trợ Mù Màu Trực Quan & Mã UDID
+      'txa_9_item_3_title': 'Hỗ Trợ Mù Màu Trực Quan & Mã UDID',
+      'txa_9_item_3_desc': 'Chế độ mù màu nay hiển thị rõ biểu tượng hình học riêng biệt trên từng ô màu (tròn, tam giác, vuông, thoi) và phản hồi bật/tắt tức thì. Thêm nút sao chép Mã Người Chơi (UDID) nhanh chóng trong trang Hồ sơ.',
+      'txa_9_item_3_badge': 'TRẢI NGHIỆM',
+
+      // -----------------------------------------------------------------------
       // [TXA_8] - Phiên bản v1.6.2 (Build 10) - Ngày: 2026-09-07
       // -----------------------------------------------------------------------
       'txa_8_title': 'Nâng Cấp Độ Ổn Định & Tối Ưu Quảng Cáo 1.6.2',
@@ -229,6 +249,26 @@ class TxaVersionLang {
       // -----------------------------------------------------------------------
       'whats_new_title': "WHAT'S NEW IN THIS VERSION?",
       'whats_new_btn_continue': 'GOT IT & CONTINUE',
+
+      // -----------------------------------------------------------------------
+      // [TXA_9] - Version v1.6.3 (Build 11) - Date: 2026-09-08
+      // -----------------------------------------------------------------------
+      'txa_9_title': 'Sync Engine & Accessibility Upgrade 1.6.3',
+
+      // [TXA_9_ITEM_1] - Smart Cloud Sync & Progress Protection
+      'txa_9_item_1_title': 'Smart Cloud Sync & Progress Protection',
+      'txa_9_item_1_desc': 'Smart Merge engine: When signing in, your highest unlocked levels and stars are seamlessly preserved and synced to the Cloud without progress loss. Logging out or switching accounts is completely isolated and secure.',
+      'txa_9_item_1_badge': 'SYNC',
+
+      // [TXA_9_ITEM_2] - Multi-Stage Daily Challenge & Tournaments
+      'txa_9_item_2_title': 'Multi-Stage Daily Challenge & Tournaments',
+      'txa_9_item_2_desc': 'Smooth 3-stage Daily Challenge progression with instant auto-advancement and live score tracking. Weekly League Tournament accurately records your matches across all game modes.',
+      'txa_9_item_2_badge': 'FEATURE',
+
+      // [TXA_9_ITEM_3] - Visual Colorblind Mode & Player UDID
+      'txa_9_item_3_title': 'Visual Colorblind Mode & Player UDID',
+      'txa_9_item_3_desc': 'Colorblind mode now features distinct geometric shape badges on each color tile with instant toggle reactivity. Added a dedicated one-tap copy button for your Player ID (UDID) in the Profile screen.',
+      'txa_9_item_3_badge': 'UX',
 
       // -----------------------------------------------------------------------
       // [TXA_8] - Version v1.6.2 (Build 10) - Date: 2026-09-07

@@ -47,14 +47,52 @@ class TxaVersion {
   /// Danh sách các bản phát hành được khai báo (Bản mới nhất đặt ở đầu tiên)
   static final List<TxaVersionRelease> releases = [
     // =========================================================================
-    // [TXA_8] - Zero Grid: Quantum Shift v1.6.2 (Build 10) - 2026-09-07
+    // [TXA_9] - Zero Grid: Quantum Shift v1.6.3 (Build 11) - 2026-09-08
     // =========================================================================
     TxaVersionRelease(
-      id: 'txa_8',
+      id: 'txa_9',
       version: TxaConfig.version,
       buildNumber: TxaConfig.buildNumber,
       releaseDate: TxaConfig.releaseDate,
       items: const [
+        // [TXA_9_ITEM_1] - Đồng bộ Đám mây & Giữ nguyên Tiến độ
+        TxaChangelogItem(
+          icon: Icons.cloud_sync_rounded,
+          iconColor: Color(0xFF00FFA3),
+          titleKey: 'txa_9_item_1_title',
+          descKey: 'txa_9_item_1_desc',
+          badgeKey: 'txa_9_item_1_badge',
+        ),
+
+        // [TXA_9_ITEM_2] - Thử Thách Ngày & Đua Top Giải Đấu
+        TxaChangelogItem(
+          icon: Icons.emoji_events_rounded,
+          iconColor: Color(0xFFFFD600),
+          titleKey: 'txa_9_item_2_title',
+          descKey: 'txa_9_item_2_desc',
+          badgeKey: 'txa_9_item_2_badge',
+        ),
+
+        // [TXA_9_ITEM_3] - Hỗ Trợ Mù Màu Trực Quan & Mã UDID
+        TxaChangelogItem(
+          icon: Icons.accessibility_new_rounded,
+          iconColor: Color(0xFF00E5FF),
+          titleKey: 'txa_9_item_3_title',
+          descKey: 'txa_9_item_3_desc',
+          badgeKey: 'txa_9_item_3_badge',
+        ),
+      ],
+    ),
+
+    // =========================================================================
+    // [TXA_8] - Zero Grid: Quantum Shift v1.6.2 (Build 10) - 2026-09-07
+    // =========================================================================
+    const TxaVersionRelease(
+      id: 'txa_8',
+      version: '1.6.2',
+      buildNumber: '10',
+      releaseDate: '2026-09-07',
+      items: [
         // [TXA_8_ITEM_1] - Khởi động an toàn & Tự phục hồi
         TxaChangelogItem(
           icon: Icons.shield_rounded,

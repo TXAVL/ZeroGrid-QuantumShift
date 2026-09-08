@@ -134,7 +134,22 @@ class SupabaseService {
           'p_endless_high_score': endlessScore ?? _storage.endlessHighScore,
         }),
       );
-      return res.statusCode >= 200 && res.statusCode < 300;
+      if (res.statusCode >= 200 && res.statusCode < 300) {
+        return true;
+      }
+      // Fallback: Ghi trực tiếp vào bảng zg_users nếu RPC chưa được cấu hình hoặc lỗi status
+      final patchUrl = Uri.parse('$supabaseUrl/rest/v1/zg_users?user_id=eq.$userId');
+      final patchRes = await http.patch(
+        patchUrl,
+        headers: _headers,
+        body: jsonEncode({
+          'save_data': saveData,
+          'total_stars': totalStars ?? _storage.totalCampaignStars,
+          'endless_high_score': endlessScore ?? _storage.endlessHighScore,
+          'last_active': DateTime.now().toUtc().toIso8601String(),
+        }),
+      );
+      return patchRes.statusCode >= 200 && patchRes.statusCode < 300;
     } catch (e) {
       debugPrint("Supabase syncGameSave error: $e");
       return false;

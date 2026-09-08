@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../core/config/txa_version.dart';
+import '../../core/localization/txa_language.dart';
 import '../../core/localization/txa_version_lang.dart';
 import '../../core/utils/txa_format.dart';
 import '../theme/cyber_palette.dart';
+import 'update_history_dialog.dart';
 
 /// Hộp thoại "Có Gì Mới Ở Phiên Bản Này" (What's New Dialog)
 /// Đọc dữ liệu tập trung qua TxaVersion -> TxaConfig -> TxaVersionLang -> TxaLanguage
@@ -243,29 +245,54 @@ class WhatsNewDialog extends StatelessWidget {
                 ),
               ),
 
-              // Bottom Confirmation Button
+              // Bottom Confirmation Button & History Link
               Padding(
-                padding: const EdgeInsets.fromLTRB(18, 8, 18, 18),
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 48,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: palette.accentNeon,
-                      foregroundColor: palette.background,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                      elevation: 4,
-                    ),
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: Text(
-                      btnContinueText,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 13.5,
-                        letterSpacing: 0.8,
+                padding: const EdgeInsets.fromLTRB(18, 8, 18, 14),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: palette.accentNeon,
+                          foregroundColor: palette.background,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          elevation: 4,
+                        ),
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: Text(
+                          btnContinueText,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13.5,
+                            letterSpacing: 0.8,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                    const SizedBox(height: 6),
+                    TextButton.icon(
+                      style: TextButton.styleFrom(
+                        foregroundColor: palette.accentNeon,
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      ),
+                      icon: const Icon(Icons.manage_history_rounded, size: 16),
+                      label: Text(
+                        TxaLanguage.tr('btn_view_update_history', langCode),
+                        style: const TextStyle(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        UpdateHistoryDialog.show(context, palette, langCode);
+                      },
+                    ),
+                  ],
                 ),
               ),
             ],

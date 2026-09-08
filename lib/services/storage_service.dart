@@ -253,32 +253,126 @@ class StorageService {
     progressNotifier.value = progressNotifier.value + 1;
   }
 
-  /// Chuyển đổi tài khoản an toàn: Lưu snapshot của tài khoản cũ và nạp tiến trình của tài khoản mới
+  /// Hợp nhất tiến trình (Smart Merge): So sánh 2 bản lưu và luôn giữ lại giá trị cao nhất
+  Map<String, dynamic>? mergeSaveData(Map<String, dynamic>? local, Map<String, dynamic>? cloud) {
+    if (local == null || local.isEmpty) return cloud;
+    if (cloud == null || cloud.isEmpty) return local;
+
+    final localLevel = (local['unlocked_level'] as num?)?.toInt() ?? 1;
+    final cloudLevel = (cloud['unlocked_level'] as num?)?.toInt() ?? 1;
+
+    // Hợp nhất map số sao từng level (lấy số sao cao nhất của từng level)
+    final Map<String, int> mergedStars = {};
+    if (local['level_stars'] is Map) {
+      (local['level_stars'] as Map).forEach((k, v) {
+        if (v is num) mergedStars[k.toString()] = v.toInt();
+      });
+    }
+    if (cloud['level_stars'] is Map) {
+      (cloud['level_stars'] as Map).forEach((k, v) {
+        if (v is num) {
+          final cur = mergedStars[k.toString()] ?? 0;
+          if (v.toInt() > cur) mergedStars[k.toString()] = v.toInt();
+        }
+      });
+    }
+
+    // Hợp nhất map điểm số từng level (lấy điểm cao nhất)
+    final Map<String, int> mergedScores = {};
+    if (local['level_scores'] is Map) {
+      (local['level_scores'] as Map).forEach((k, v) {
+        if (v is num) mergedScores[k.toString()] = v.toInt();
+      });
+    }
+    if (cloud['level_scores'] is Map) {
+      (cloud['level_scores'] as Map).forEach((k, v) {
+        if (v is num) {
+          final cur = mergedScores[k.toString()] ?? 0;
+          if (v.toInt() > cur) mergedScores[k.toString()] = v.toInt();
+        }
+      });
+    }
+
+    final localEndless = (local['endless_high_score'] as num?)?.toInt() ?? 0;
+    final cloudEndless = (cloud['endless_high_score'] as num?)?.toInt() ?? 0;
+
+    final localMaxWave = (local['endless_max_wave'] as num?)?.toInt() ?? 0;
+    final cloudMaxWave = (cloud['endless_max_wave'] as num?)?.toInt() ?? 0;
+
+    final localGames = (local['total_games_played'] as num?)?.toInt() ?? 0;
+    final cloudGames = (cloud['total_games_played'] as num?)?.toInt() ?? 0;
+
+    final localWins = (local['total_wins'] as num?)?.toInt() ?? 0;
+    final cloudWins = (cloud['total_wins'] as num?)?.toInt() ?? 0;
+
+    final localHints = (local['hints_count'] as num?)?.toInt() ?? 3;
+    final cloudHints = (cloud['hints_count'] as num?)?.toInt() ?? 3;
+
+    final localThemes = (local['unlocked_themes'] is List) ? List<String>.from(local['unlocked_themes']) : <String>[];
+    final cloudThemes = (cloud['unlocked_themes'] is List) ? List<String>.from(cloud['unlocked_themes']) : <String>[];
+    final mergedThemes = {...localThemes, ...cloudThemes, 'cyber_neon'}.toList();
+
+    return {
+      'unlocked_level': max(localLevel, cloudLevel),
+      'hints_count': max(localHints, cloudHints),
+      'is_ad_free': (local['is_ad_free'] == true) || (cloud['is_ad_free'] == true),
+      'endless_high_score': max(localEndless, cloudEndless),
+      'endless_max_wave': max(localMaxWave, cloudMaxWave),
+      'total_games_played': max(localGames, cloudGames),
+      'total_wins': max(localWins, cloudWins),
+      'current_win_streak': max((local['current_win_streak'] as num?)?.toInt() ?? 0, (cloud['current_win_streak'] as num?)?.toInt() ?? 0),
+      'max_win_streak': max((local['max_win_streak'] as num?)?.toInt() ?? 0, (cloud['max_win_streak'] as num?)?.toInt() ?? 0),
+      'total_play_time_sec': max((local['total_play_time_sec'] as num?)?.toInt() ?? 0, (cloud['total_play_time_sec'] as num?)?.toInt() ?? 0),
+      'accumulated_score': max((local['accumulated_score'] as num?)?.toInt() ?? 0, (cloud['accumulated_score'] as num?)?.toInt() ?? 0),
+      'current_league_tier': max((local['current_league_tier'] as num?)?.toInt() ?? 0, (cloud['current_league_tier'] as num?)?.toInt() ?? 0),
+      'unlocked_themes': mergedThemes,
+      'level_stars': mergedStars,
+      'level_scores': mergedScores,
+    };
+  }
+
+  /// Chuyển đổi tài khoản:
+  /// - Mỗi tài khoản có tiến độ độc lập được lưu trong local_save_$userId
+  /// - Nếu vừa chơi ở chế độ Khách (Local) rồi Đăng nhập Cloud: So sánh Local và Cloud, cái nào lớn hơn thì giữ lại
+  /// - Tự động đồng bộ bản lưu hợp nhất lên Cloud
   Future<void> switchAccount(String newUserId, {Map<String, dynamic>? cloudSave}) async {
     final oldUserId = _settingsBox.get('player_id')?.toString() ?? '';
+    final wasGuest = isGuestMode;
+    final currentLocalSave = exportCurrentSaveData();
+
+    // Lưu lại tiến trình của tài khoản cũ trước khi chuyển
     if (oldUserId.isNotEmpty) {
-      final oldSave = exportCurrentSaveData();
-      _settingsBox.put('local_save_$oldUserId', jsonEncode(oldSave));
+      _settingsBox.put('local_save_$oldUserId', jsonEncode(currentLocalSave));
     }
 
     _settingsBox.put('player_id', newUserId);
 
-    if (cloudSave != null && cloudSave.isNotEmpty) {
-      await importSaveData(cloudSave);
-      _settingsBox.put('local_save_$newUserId', jsonEncode(cloudSave));
-    } else {
-      final localBackup = _settingsBox.get('local_save_$newUserId');
-      if (localBackup != null && localBackup is String && localBackup.isNotEmpty) {
-        try {
-          final decoded = jsonDecode(localBackup) as Map<String, dynamic>;
-          await importSaveData(decoded);
-        } catch (_) {
-          await importSaveData(null);
-        }
-      } else {
-        await importSaveData(null);
-      }
+    // Bản lưu trước đây của chính tài khoản này trên thiết bị này (nếu có)
+    Map<String, dynamic>? accountLocalSave;
+    final localBackup = _settingsBox.get('local_save_$newUserId');
+    if (localBackup != null && localBackup is String && localBackup.isNotEmpty) {
+      try {
+        accountLocalSave = jsonDecode(localBackup) as Map<String, dynamic>;
+      } catch (_) {}
     }
+
+    Map<String, dynamic>? effectiveSave;
+    if (wasGuest) {
+      // Từ Guest (Local) -> Đăng nhập Cloud: So sánh Local & Cloud, giữ tiến trình lớn hơn
+      effectiveSave = mergeSaveData(currentLocalSave, cloudSave ?? accountLocalSave);
+    } else {
+      // Chuyển đổi giữa các tài khoản: Nạp dữ liệu của chính tài khoản đó (ưu tiên Cloud nếu mới hơn)
+      effectiveSave = mergeSaveData(accountLocalSave, cloudSave);
+    }
+
+    await importSaveData(effectiveSave);
+
+    if (effectiveSave != null && effectiveSave.isNotEmpty) {
+      _settingsBox.put('local_save_$newUserId', jsonEncode(effectiveSave));
+    }
+
+    // Kích hoạt đồng bộ bản lưu mới nhất
+    _triggerSaveDataChanged();
   }
 
   // --- CONTROL SCHEME (Tap vs Swipe) ---
@@ -455,6 +549,7 @@ class StorageService {
     }
     totalStarsNotifier.value = totalCampaignStars;
     progressNotifier.value = progressNotifier.value + 1;
+    _triggerSaveDataChanged();
   }
 
   // --- STATS & LEADERBOARD MILESTONES ---

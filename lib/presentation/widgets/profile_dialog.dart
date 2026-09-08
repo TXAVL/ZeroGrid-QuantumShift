@@ -198,40 +198,100 @@ class _ProfileDialogState extends ConsumerState<ProfileDialog> {
               ),
               const SizedBox(height: 12),
 
-              // Linked Device Info Card
+              // Player ID / UDID & Device Card
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                 decoration: BoxDecoration(
-                  color: palette.background.withValues(alpha: 0.7),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.white10),
+                  color: palette.background.withValues(alpha: 0.8),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: palette.accentNeon.withValues(alpha: 0.25), width: 1.2),
                 ),
-                child: Row(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(Icons.smartphone_rounded, size: 16, color: palette.accentNeon),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '${TxaLanguage.tr('device_attached', widget.langCode)}: $_deviceDisplayName',
-                            style: const TextStyle(fontSize: 11, color: Colors.white70, fontWeight: FontWeight.bold),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.fingerprint_rounded, size: 16, color: palette.accentNeon),
+                            const SizedBox(width: 6),
+                            Text(
+                              TxaLanguage.tr('profile_player_id_title', widget.langCode),
+                              style: TextStyle(
+                                fontSize: 10.5,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.8,
+                                color: palette.accentNeon,
+                              ),
+                            ),
+                          ],
+                        ),
+                        InkWell(
+                          borderRadius: BorderRadius.circular(8),
+                          onTap: () {
+                            Clipboard.setData(ClipboardData(text: storage.playerId));
+                            TxaToast.info(context, TxaLanguage.tr('profile_id_copied', widget.langCode));
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: palette.accentNeon.withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: palette.accentNeon.withValues(alpha: 0.4)),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.copy_rounded, size: 13, color: palette.accentNeon),
+                                const SizedBox(width: 4),
+                                Text(
+                                  TxaLanguage.tr('btn_copy', widget.langCode),
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                    color: palette.accentNeon,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                          Text(
-                            'Device ID: ${storage.playerId}',
-                            style: TextStyle(fontSize: 9.5, color: palette.textSecondary, fontFamily: 'monospace'),
-                          ),
-                        ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    SelectableText(
+                      storage.playerId,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.white,
+                        fontFamily: 'monospace',
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                    IconButton(
-                      icon: Icon(Icons.copy_rounded, size: 14, color: palette.accentNeon),
-                      onPressed: () {
-                        Clipboard.setData(ClipboardData(text: storage.playerId));
-                        TxaToast.info(context, TxaLanguage.tr('profile_id_copied', widget.langCode));
-                      },
+                    const SizedBox(height: 4),
+                    Text(
+                      TxaLanguage.tr('profile_player_id_hint', widget.langCode),
+                      style: TextStyle(
+                        fontSize: 9.5,
+                        color: palette.textSecondary.withValues(alpha: 0.8),
+                        height: 1.3,
+                      ),
+                    ),
+                    const Divider(color: Colors.white10, height: 16),
+                    Row(
+                      children: [
+                        const Icon(Icons.smartphone_rounded, size: 14, color: Colors.white54),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            '${TxaLanguage.tr('device_attached', widget.langCode)}: $_deviceDisplayName',
+                            style: const TextStyle(fontSize: 10.5, color: Colors.white70),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),

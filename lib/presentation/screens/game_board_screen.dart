@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/engine/reverse_generator.dart';
+import '../../core/engine/seed_generator.dart';
 import '../../core/localization/txa_language.dart';
 import '../../state/game_notifier.dart';
 import '../../state/game_state.dart';
@@ -66,8 +67,44 @@ class _GameBoardScreenState extends ConsumerState<GameBoardScreen> {
 
       setState(() => _hasShownWinDialog = false);
       ref.read(gameStateProvider.notifier).loadLevel(generated, GameMode.campaign);
+    } else if (gameState.mode == GameMode.dailyChallenge) {
+      final currentLevel = int.tryParse(gameState.levelId) ?? 8881;
+      final currentStage = (currentLevel - 8880).clamp(1, 3);
+      if (currentStage < 3) {
+        final nextStage = currentStage + 1;
+        final dailySeedStr = SeedGenerator.getDailySeed();
+        final seedInt = SeedGenerator.seedToInt('${dailySeedStr}_stage$nextStage');
+
+        int size = 4;
+        int reverseSteps = 6;
+        int levelId = 8882;
+
+        if (nextStage == 2) {
+          size = 4;
+          reverseSteps = 8;
+          levelId = 8882;
+        } else if (nextStage >= 3) {
+          size = 5;
+          reverseSteps = 10;
+          levelId = 8883;
+        }
+
+        final nextLevel = ReverseGenerator.generate(
+          levelId: levelId,
+          size: size,
+          maxK: 4,
+          reverseSteps: reverseSteps,
+          customSeed: seedInt,
+        );
+
+        setState(() => _hasShownWinDialog = false);
+        ref.read(gameStateProvider.notifier).loadLevel(nextLevel, GameMode.dailyChallenge);
+      } else {
+        // Đã xong trọn vẹn 3 chặng hôm nay -> Quay về màn hình Daily Challenge
+        Navigator.of(context).pop();
+      }
     } else {
-      Navigator.of(context).pop(); // Thoát về menu cho Custom/Daily
+      Navigator.of(context).pop(); // Thoát về menu cho Custom
     }
   }
 
@@ -203,7 +240,9 @@ class _GameBoardScreenState extends ConsumerState<GameBoardScreen> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          widget.title,
+          gameState.mode == GameMode.dailyChallenge
+              ? '${TxaLanguage.tr('mode_daily_title', langCode)} - ${int.tryParse(gameState.levelId) == 8882 ? TxaLanguage.tr('daily_stage_2_name', langCode) : (int.tryParse(gameState.levelId) == 8883 ? TxaLanguage.tr('daily_stage_3_name', langCode) : TxaLanguage.tr('daily_stage_1_name', langCode))}'
+              : widget.title,
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,

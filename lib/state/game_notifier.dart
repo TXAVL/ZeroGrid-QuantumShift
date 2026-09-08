@@ -13,6 +13,7 @@ import '../services/ads/ads_service.dart';
 import '../services/gpgs/gpgs_service.dart';
 import '../services/supabase_service.dart';
 import '../services/service_providers.dart';
+import '../core/utils/txa_time.dart';
 import 'game_state.dart';
 
 final gameStateProvider = StateNotifierProvider<GameNotifier, GameState>((ref) {
@@ -242,6 +243,8 @@ class GameNotifier extends StateNotifier<GameState> {
           clearHint: true,
         );
         _haptic.tap();
+        _storage.recordGameEnd(won: false, durationSeconds: state.durationSeconds);
+        _storage.addWeeklyScore(newEndlessScore);
         _storage.updateEndlessHighScore(newEndlessScore);
         _storage.updateEndlessMaxWave(state.endlessWave);
         _supabase.submitScore(
@@ -424,6 +427,7 @@ class GameNotifier extends StateNotifier<GameState> {
     if (state.mode == GameMode.campaign) {
       final levelNum = int.tryParse(state.levelId) ?? 1;
       _storage.saveLevelResult(levelNum, stars, score);
+      _storage.addWeeklyScore(score);
 
       // 1. Campaign Progression Milestones
       _gpgs.unlockAchievement(GpgsAchievementIds.achFirstClear);
@@ -447,6 +451,22 @@ class GameNotifier extends StateNotifier<GameState> {
       if (!_usedHintInThisLevel && levelNum >= 50) {
         _gpgs.unlockAchievement(GpgsAchievementIds.achNoHintRun);
       }
+    } else if (state.mode == GameMode.dailyChallenge) {
+      final todayUtc = TxaTime.getTodayUtcDateString();
+      final levelNum = int.tryParse(state.levelId) ?? 8881;
+      // 8881: chặng 1, 8882: chặng 2, 8883: chặng 3
+      final stage = (levelNum - 8880).clamp(1, 3);
+
+      _storage.saveDailyResult(todayUtc, stage, score, stars);
+      _storage.addWeeklyScore(score);
+
+      // Mở khóa thành tích GPGS hàng ngày
+      _gpgs.unlockAchievement(GpgsAchievementIds.achDaily1);
+      if (stage >= 3) {
+        _gpgs.unlockAchievement(GpgsAchievementIds.achDaily3);
+      }
+    } else {
+      _storage.addWeeklyScore(score);
     }
 
     // Nộp kết quả lên Supabase nếu có mạng
@@ -455,15 +475,22 @@ class GameNotifier extends StateNotifier<GameState> {
       totalScore: score,
     ).toJson();
 
+    final isDaily = state.mode == GameMode.dailyChallenge;
+    final todayUtc = isDaily ? TxaTime.getTodayUtcDateString() : null;
+    final levelNum = int.tryParse(state.levelId) ?? 8881;
+    final stage = (levelNum - 8880).clamp(1, 3);
+    final submitLevelId = isDaily ? '${todayUtc}_stage$stage' : state.levelId;
+
     _supabase.submitScore(
-      mode: state.mode.name,
-      levelId: state.levelId,
+      mode: isDaily ? 'daily' : state.mode.name,
+      levelId: submitLevelId,
       score: score,
       moves: state.movesCount,
       durationSeconds: state.durationSeconds,
       stars: stars,
       comboMultiplier: state.maxComboMultiplier,
       ghostReplay: ghostReplay,
+      dateUtc: todayUtc,
     );
 
     // Cập nhật điểm chung cuộc vào state để hiển thị trên HUD và popup
@@ -538,7 +565,7 @@ class GameNotifier extends StateNotifier<GameState> {
       currentScore: doubled,
     );
 
-    // Cập nhật điểm đã nhân đôi vào storage nếu là campaign
+    // Cập nhật điểm đã nhân đôi vào storage
     if (state.mode == GameMode.campaign) {
       final levelNum = int.tryParse(state.levelId) ?? 1;
       final stars = ScoreCalculator.calculateStars(
@@ -546,6 +573,15 @@ class GameNotifier extends StateNotifier<GameState> {
         minMoves: state.minMoves,
       );
       _storage.saveLevelResult(levelNum, stars, doubled);
+    } else if (state.mode == GameMode.dailyChallenge) {
+      final todayUtc = TxaTime.getTodayUtcDateString();
+      final levelNum = int.tryParse(state.levelId) ?? 8881;
+      final stage = (levelNum - 8880).clamp(1, 3);
+      final stars = ScoreCalculator.calculateStars(
+        actualMoves: state.movesCount,
+        minMoves: state.minMoves,
+      );
+      _storage.saveDailyResult(todayUtc, stage, doubled, stars);
     }
   }
 
