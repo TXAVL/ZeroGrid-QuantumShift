@@ -3,6 +3,7 @@ package txa.zerogrid.quantumshift
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
+import com.google.android.gms.games.PlayGamesSdk
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -25,6 +26,9 @@ class MainActivity : FlutterActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setupNativeCrashHandler()
+        try {
+            PlayGamesSdk.initialize(this)
+        } catch (_: Exception) {}
         super.onCreate(savedInstanceState)
     }
 
@@ -108,6 +112,54 @@ class MainActivity : FlutterActivity() {
                     val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
                     prefs.edit().clear().commit()
                     result.success(true)
+                }
+                else -> result.notImplemented()
+            }
+        }
+
+        // Kênh kiểm tra tính khả dụng của Google Play Services (GMS)
+        val gmsChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "txa.zerogrid.quantumshift/gms")
+        gmsChannel.setMethodCallHandler { call, result ->
+            when (call.method) {
+                "checkGms" -> {
+                    try {
+                        val availability = com.google.android.gms.common.GoogleApiAvailability.getInstance()
+                        val status = availability.isGooglePlayServicesAvailable(this)
+                        val isSuccess = (status == com.google.android.gms.common.ConnectionResult.SUCCESS)
+                        val isUserResolvable = availability.isUserResolvableError(status)
+                        result.success(mapOf(
+                            "isAvailable" to isSuccess,
+                            "statusCode" to status,
+                            "isUserResolvable" to isUserResolvable
+                        ))
+                    } catch (_: Throwable) {
+                        result.success(mapOf(
+                            "isAvailable" to false,
+                            "statusCode" to -1,
+                            "isUserResolvable" to false
+                        ))
+                    }
+                }
+                "openPlayServicesStore" -> {
+                    try {
+                        val intent = android.content.Intent(android.content.Intent.ACTION_VIEW).apply {
+                            data = android.net.Uri.parse("market://details?id=com.google.android.gms")
+                            addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                        }
+                        startActivity(intent)
+                        result.success(true)
+                    } catch (_: Exception) {
+                        try {
+                            val webIntent = android.content.Intent(android.content.Intent.ACTION_VIEW).apply {
+                                data = android.net.Uri.parse("https://play.google.com/store/apps/details?id=com.google.android.gms")
+                                addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                            }
+                            startActivity(webIntent)
+                            result.success(true)
+                        } catch (_: Exception) {
+                            result.success(false)
+                        }
+                    }
                 }
                 else -> result.notImplemented()
             }

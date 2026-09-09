@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/localization/txa_language.dart';
+import '../../services/gms_service.dart';
 import '../../services/service_providers.dart';
+import 'gms_block_screen.dart';
 import 'main_menu_screen.dart';
 
 /// Màn hình Splash khởi tạo ngầm các dịch vụ, hỗ trợ chơi offline 100% và cơ chế đồng bộ Cloud Sync
@@ -37,6 +39,21 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   Future<void> _initializeApp() async {
     final langCode = ref.read(languageProvider);
     try {
+      // 0. Kiểm tra tính khả dụng của Google Mobile Services (GMS)
+      final gmsResult = await GmsService.checkAvailability();
+      if (!gmsResult.isAvailable && mounted) {
+        Navigator.of(context).pushReplacement(
+          PageRouteBuilder(
+            pageBuilder: (_, __, ___) => const GmsBlockScreen(),
+            transitionsBuilder: (_, animation, __, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+            transitionDuration: const Duration(milliseconds: 500),
+          ),
+        );
+        return;
+      }
+
       final ads = ref.read(adsServiceProvider);
       final gpgs = ref.read(gpgsServiceProvider);
       final iap = ref.read(iapServiceProvider);

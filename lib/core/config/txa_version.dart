@@ -47,14 +47,52 @@ class TxaVersion {
   /// Danh sách các bản phát hành được khai báo (Bản mới nhất đặt ở đầu tiên)
   static final List<TxaVersionRelease> releases = [
     // =========================================================================
-    // [TXA_9] - Zero Grid: Quantum Shift v1.6.3 (Build 11) - 2026-09-08
+    // [TXA_10] - Zero Grid: Quantum Shift v1.6.4 (Build 12) - 2026-09-09
     // =========================================================================
     TxaVersionRelease(
-      id: 'txa_9',
+      id: 'txa_10',
       version: TxaConfig.version,
       buildNumber: TxaConfig.buildNumber,
       releaseDate: TxaConfig.releaseDate,
       items: const [
+        // [TXA_10_ITEM_1] - Bảo Vệ & Kiểm Tra Google Play
+        TxaChangelogItem(
+          icon: Icons.shield_rounded,
+          iconColor: Color(0xFF00FFA3),
+          titleKey: 'txa_10_item_1_title',
+          descKey: 'txa_10_item_1_desc',
+          badgeKey: 'txa_10_item_1_badge',
+        ),
+
+        // [TXA_10_ITEM_2] - Đăng Nhập Google Trò Chơi Siêu Mượt
+        TxaChangelogItem(
+          icon: Icons.sports_esports_rounded,
+          iconColor: Color(0xFFFFD600),
+          titleKey: 'txa_10_item_2_title',
+          descKey: 'txa_10_item_2_desc',
+          badgeKey: 'txa_10_item_2_badge',
+        ),
+
+        // [TXA_10_ITEM_3] - Tối Ưu Tốc Độ & Phòng Tránh Sự Cố
+        TxaChangelogItem(
+          icon: Icons.speed_rounded,
+          iconColor: Color(0xFF00E5FF),
+          titleKey: 'txa_10_item_3_title',
+          descKey: 'txa_10_item_3_desc',
+          badgeKey: 'txa_10_item_3_badge',
+        ),
+      ],
+    ),
+
+    // =========================================================================
+    // [TXA_9] - Zero Grid: Quantum Shift v1.6.3 (Build 11) - 2026-09-08
+    // =========================================================================
+    const TxaVersionRelease(
+      id: 'txa_9',
+      version: '1.6.3',
+      buildNumber: '11',
+      releaseDate: '2026-09-08',
+      items: [
         // [TXA_9_ITEM_1] - Đồng bộ Đám mây & Giữ nguyên Tiến độ
         TxaChangelogItem(
           icon: Icons.cloud_sync_rounded,

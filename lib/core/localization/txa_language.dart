@@ -624,6 +624,16 @@ class TxaLanguage extends ChangeNotifier {
       'btn_collapse_all': 'Thu gọn',
       'btn_close_caps': 'ĐÓNG',
       'release_count_fmt': '%count% phiên bản đã phát hành',
+
+      // Màn Chặn Thiếu Google Play Services (GMS Block Screen)
+      'gms_missing_title': 'YÊU CẦU GOOGLE PLAY SERVICES',
+      'gms_missing_subtitle': 'Dịch vụ Google Mobile Services (GMS) chưa sẵn sàng',
+      'gms_missing_desc': 'Trò chơi Zero Grid: Quantum Shift yêu cầu Dịch Vụ Google Play (GMS) để kết nối Google Play Games, đồng bộ tiến trình màn chơi lên đám mây và mở khóa Bảng Xếp Hạng.\n\nThiết bị của bạn hiện chưa cài đặt hoặc phiên bản Google Play Services đã quá cũ. Vui lòng cài đặt hoặc cập nhật để trải nghiệm trọn vẹn trò chơi.',
+      'btn_install_gms': 'CÀI ĐẶT / CẬP NHẬT GOOGLE PLAY',
+      'btn_recheck_gms': 'KIỂM TRA LẠI KẾT NỐI',
+      'btn_exit_game': 'THOÁT TRÒ CHƠI',
+      'gms_recheck_failed': 'Vẫn chưa phát hiện Google Play Services trên thiết bị. Vui lòng cài đặt để tiếp tục!',
+      'gms_recheck_success': 'Đã kết nối thành công Google Play Services!',
     },
     'en': {
       // Main Menu & General
@@ -1220,6 +1230,16 @@ class TxaLanguage extends ChangeNotifier {
       'btn_collapse_all': 'Collapse',
       'btn_close_caps': 'CLOSE',
       'release_count_fmt': '%count% versions released',
+
+      // Google Play Services (GMS) Missing Block Screen
+      'gms_missing_title': 'GOOGLE PLAY SERVICES REQUIRED',
+      'gms_missing_subtitle': 'Google Mobile Services (GMS) is not available',
+      'gms_missing_desc': 'Zero Grid: Quantum Shift requires Google Play Services (GMS) to connect Google Play Games, synchronize game progression to the cloud, and unlock global Leaderboards.\n\nYour device does not have Google Play Services installed or the installed version is outdated. Please install or update it to play.',
+      'btn_install_gms': 'INSTALL / UPDATE GOOGLE PLAY',
+      'btn_recheck_gms': 'RECHECK CONNECTION',
+      'btn_exit_game': 'EXIT GAME',
+      'gms_recheck_failed': 'Google Play Services is still not detected. Please install or enable it to continue!',
+      'gms_recheck_success': 'Google Play Services detected successfully!',
     },
   };
 

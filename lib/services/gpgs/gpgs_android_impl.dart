@@ -34,21 +34,27 @@ class GpgsAndroidServiceImpl implements GpgsService {
     if (kIsWeb || !Platform.isAndroid) return false;
     try {
       TXALogger.logGpgs('Attempting GPGS Silent Sign-in...');
-      final result = await GamesServices.signIn();
+      final result = await GamesServices.signIn().timeout(
+        const Duration(seconds: 5),
+        onTimeout: () {
+          TXALogger.logGpgs('GPGS Silent Sign-in timed out (5s). Fallback to offline.');
+          return '';
+        },
+      );
       _signedInNotifier.value = (result != null && result.isNotEmpty);
       if (_signedInNotifier.value) {
         TXALogger.logGpgs('GPGS Silent Sign-in Success: $result');
         _flushOfflineScores();
         await syncCloudSave();
       } else {
-        TXALogger.logGpgs('GPGS Silent Sign-in returned empty (User not authenticated yet)');
+        TXALogger.logGpgs('GPGS Silent Sign-in unauthenticated (User has not authorized yet).');
       }
       return _signedInNotifier.value;
     } catch (e, stack) {
       final lang = _storageService.languageCode;
       if (e is PlatformException && e.code == 'failed_to_authenticate') {
         TXALogger.logGpgs(
-          '${TxaLanguage.tr('gpgs_err_general', lang)}: $e (failed_to_authenticate)\nDetails: ${e.message}\nStackTrace:\n$stack',
+          'ℹ️ [GPGS] Silent Sign-in chưa có phiên xác thực cached: $e. Cần đăng nhập tương tác (Interactive Sign-in).',
         );
       } else {
         TXALogger.logGpgs('${TxaLanguage.tr('gpgs_err_general', lang)} (offline fallback): $e\nStackTrace:\n$stack');

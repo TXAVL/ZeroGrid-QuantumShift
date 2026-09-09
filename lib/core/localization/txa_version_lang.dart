@@ -15,6 +15,26 @@ class TxaVersionLang {
       'whats_new_btn_continue': 'ĐÃ HIỂU & TIẾP TỤC',
 
       // -----------------------------------------------------------------------
+      // [TXA_10] - Phiên bản v1.6.4 (Build 12) - Ngày: 2026-09-09
+      // -----------------------------------------------------------------------
+      'txa_10_title': 'Bản Cập Nhật Tương Thích & Đăng Nhập Mượt Mà 1.6.4',
+
+      // [TXA_10_ITEM_1] - Bảo Vệ & Kiểm Tra Google Play
+      'txa_10_item_1_title': 'Bảo Vệ & Kiểm Tra Google Play',
+      'txa_10_item_1_desc': 'Tự động nhận diện thiết bị của bạn có hỗ trợ Dịch vụ Google Play hay không ngay khi mở game. Hướng dẫn cài đặt nhanh để đảm bảo luôn lưu lại tiến trình, điểm số và thành tích an toàn.',
+      'txa_10_item_1_badge': 'TƯƠNG THÍCH',
+
+      // [TXA_10_ITEM_2] - Đăng Nhập Google Trò Chơi Siêu Mượt
+      'txa_10_item_2_title': 'Đăng Nhập Google Trò Chơi Siêu Mượt',
+      'txa_10_item_2_desc': 'Nâng cấp hệ thống đăng nhập Google Play Games: Vào game nhanh hơn, kết nối tức thì chỉ với một chạm, tự động chạy ngầm ổn định mà không lo bị ngắt quãng.',
+      'txa_10_item_2_badge': 'KẾT NỐI',
+
+      // [TXA_10_ITEM_3] - Tối Ưu Tốc Độ & Phòng Tránh Sự Cố
+      'txa_10_item_3_title': 'Tối Ưu Tốc Độ & Phòng Tránh Sự Cố',
+      'txa_10_item_3_desc': 'Tối ưu hóa dung lượng bộ cài, tích hợp hệ thống chẩn đoán thông minh đạt chuẩn Google Play giúp game luôn chạy mượt mà, phản hồi cảm ứng tức thì và không bị văng đột ngột.',
+      'txa_10_item_3_badge': 'HIỆU NĂNG',
+
+      // -----------------------------------------------------------------------
       // [TXA_9] - Phiên bản v1.6.3 (Build 11) - Ngày: 2026-09-08
       // -----------------------------------------------------------------------
       'txa_9_title': 'Bản Nâng Cấp Đồng Bộ & Trải Nghiệm Người Chơi 1.6.3',
@@ -249,6 +269,26 @@ class TxaVersionLang {
       // -----------------------------------------------------------------------
       'whats_new_title': "WHAT'S NEW IN THIS VERSION?",
       'whats_new_btn_continue': 'GOT IT & CONTINUE',
+
+      // -----------------------------------------------------------------------
+      // [TXA_10] - Version v1.6.4 (Build 12) - Date: 2026-09-09
+      // -----------------------------------------------------------------------
+      'txa_10_title': 'Compatibility & Smooth Sign-In Upgrade 1.6.4',
+
+      // [TXA_10_ITEM_1] - Google Play Protection & Verification
+      'txa_10_item_1_title': 'Google Play Protection & Verification',
+      'txa_10_item_1_desc': 'Automatically verifies device Google Play Services support on launch. Provides clear setup guidance so your progression, high scores, and achievements are always securely synced.',
+      'txa_10_item_1_badge': 'COMPATIBILITY',
+
+      // [TXA_10_ITEM_2] - Seamless Google Play Games Sign-In
+      'txa_10_item_2_title': 'Seamless Google Play Games Sign-In',
+      'txa_10_item_2_desc': 'Upgraded Google Play Games authentication: Faster game launch, instant one-tap sign-in, and rock-solid background connectivity across all modern devices.',
+      'txa_10_item_2_badge': 'CONNECTIVITY',
+
+      // [TXA_10_ITEM_3] - Speed Optimization & Crash Prevention
+      'txa_10_item_3_title': 'Speed Optimization & Crash Prevention',
+      'txa_10_item_3_desc': 'Optimized app bundle footprint and integrated Google Play standard diagnostics to ensure ultra-responsive gameplay, smooth frame rates, and zero unexpected crashes.',
+      'txa_10_item_3_badge': 'PERFORMANCE',
 
       // -----------------------------------------------------------------------
       // [TXA_9] - Version v1.6.3 (Build 11) - Date: 2026-09-08

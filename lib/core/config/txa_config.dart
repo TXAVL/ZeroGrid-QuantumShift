@@ -12,9 +12,9 @@ class TxaConfig {
   // ==========================================
   static String appName = 'Zero Grid: Quantum Shift';
   static String packageId = 'txa.zerogrid.quantumshift';
-  static String version = '1.6.3';
-  static String buildNumber = '11';
-  static String releaseDate = '2026-09-08'; // Ngày cập nhật phiên bản tập trung
+  static String version = '1.6.4';
+  static String buildNumber = '12';
+  static String releaseDate = '2026-09-09'; // Ngày cập nhật phiên bản tập trung
 
   /// Chuỗi phiên bản đầy đủ dạng '1.0.0+1' (Tự động đồng bộ từ pubspec.yaml)
   static String get fullVersion => '$version+$buildNumber';
