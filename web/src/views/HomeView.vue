@@ -4,180 +4,325 @@
     <!-- ================================================================= -->
     <!-- 1. HERO SECTION -->
     <!-- ================================================================= -->
-    <section class="relative pt-12 pb-24 lg:pt-20 lg:pb-32 overflow-hidden">
+    <section class="relative pt-12 pb-20 lg:pt-20 lg:pb-28 overflow-hidden">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+        <div class="text-center max-w-4xl mx-auto space-y-6">
           
-          <!-- Left Column: Studio Pitch & Actions -->
-          <div class="lg:col-span-7 space-y-7 text-center lg:text-left">
-            
-            <!-- Neon Pill Badge -->
-            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 shadow-neon-cyan">
-              <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
-              <span class="text-xs font-mono font-bold tracking-widest text-cyan-300 uppercase">
-                TXA STUDIO // ZERO GRID RELEASE 1.5.0+7
-              </span>
-            </div>
-
-            <!-- Main Heading -->
-            <h1 class="text-4xl sm:text-6xl lg:text-7xl font-display font-black tracking-tight leading-[1.05] text-white">
-              BEYOND THE <br />
-              <span class="text-cyber-gradient text-neon-cyan">QUANTUM</span>
-              <span class="text-white"> MATRIX</span>
-            </h1>
-
-            <!-- Subtitle -->
-            <p class="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-normal">
-              {{ isEn 
-                ? 'Welcome to TXA Studio. We engineer high-octane minimalist cyber puzzle games, powered by pure 120 FPS Flutter mechanics, guaranteed mathematical solvability, and absolute player privacy.'
-                : 'Chào mừng bạn đến với TXA Studio. Chúng tôi tạo ra các siêu phẩm giải đố trí tuệ phong cách Cyberpunk, tối ưu 120 FPS với thuật toán toán học 100% có nghiệm và tôn trọng quyền riêng tư của bạn.' }}
-            </p>
-
-            <!-- CTA Buttons -->
-            <div class="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-2">
-              <!-- Play Store Button -->
-              <button 
-                @click="openDownloadModal()"
-                class="inline-flex items-center gap-3 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-cyan-400 via-sky-500 to-pink-500 text-slate-950 font-display font-black text-sm uppercase tracking-wider shadow-lg shadow-cyan-500/30 hover:shadow-cyan-400/50 hover:scale-[1.03] active:scale-95 transition-all"
-                @mouseenter="sound.playHover()"
-              >
-                <GooglePlayIcon customClass="w-5 h-5" />
-                <span>{{ isEn ? 'GET ON GOOGLE PLAY' : 'TẢI TRÊN GOOGLE PLAY' }}</span>
-              </button>
-
-              <!-- Explore Game Specs -->
-              <a 
-                href="#showcase" 
-                class="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl glass-panel border border-slate-700 hover:border-cyan-400 text-white font-medium text-sm hover:text-cyan-400 transition-all hover:scale-[1.02] active:scale-95"
-                @mouseenter="sound.playHover()"
-                @click="sound.playClick()"
-              >
-                <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                </svg>
-                <span>{{ isEn ? 'Explore Zero Grid' : 'Chi Tiết Game' }}</span>
-              </a>
-
-              <!-- Legal & Delete Quick Access -->
-              <router-link
-                to="/delete-account?game=quantumshift"
-                class="inline-flex items-center gap-1.5 px-4 py-3.5 rounded-2xl border border-pink-500/30 bg-pink-500/10 hover:bg-pink-500/20 text-pink-300 font-mono text-xs hover:text-white transition-all"
-                @mouseenter="sound.playHover()"
-                @click="sound.playClick()"
-              >
-                <span class="w-1.5 h-1.5 rounded-full bg-pink-400"></span>
-                <span>Data Rights / Delete</span>
-              </router-link>
-            </div>
-
-            <!-- Platform Availability Indicator Pills -->
-            <div class="flex flex-wrap items-center justify-center lg:justify-start gap-2.5 pt-2 text-xs font-mono">
-              <button 
-                @click="openDownloadModal('android')"
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 hover:bg-amber-500/20 hover:border-amber-400 transition-all cursor-pointer"
-                title="Xem tình trạng bản Android"
-              >
-                <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
-                <span>Android: {{ isEn ? 'Internal Testing' : 'Kiểm thử nội bộ' }}</span>
-              </button>
-
-              <button 
-                @click="openDownloadModal('ios')"
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-500/10 border border-sky-500/30 text-sky-300 hover:bg-sky-500/20 hover:border-sky-400 transition-all cursor-pointer"
-                title="Xem tình trạng bản iOS"
-              >
-                <span class="w-1.5 h-1.5 rounded-full bg-sky-400"></span>
-                <span>iOS: {{ isEn ? 'Coming Soon' : 'Chưa có ứng dụng' }}</span>
-              </button>
-
-              <button 
-                @click="openDownloadModal('windows')"
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 hover:bg-rose-500/20 hover:border-rose-400 transition-all cursor-pointer"
-                title="Xem tình trạng bản Windows"
-              >
-                <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-                <span>Windows: {{ isEn ? 'Not Supported' : 'Không khả dụng' }}</span>
-              </button>
-            </div>
-
-            <!-- Mini Spec Badges -->
-            <div class="grid grid-cols-3 gap-3 pt-6 border-t border-slate-800/80 max-w-lg mx-auto lg:mx-0">
-              <div class="text-center lg:text-left">
-                <div class="text-2xl sm:text-3xl font-display font-black text-cyan-400">120 FPS</div>
-                <div class="text-xs text-slate-400 font-mono">Ultra Refresh Rate</div>
-              </div>
-              <div class="text-center lg:text-left">
-                <div class="text-2xl sm:text-3xl font-display font-black text-pink-400">100%</div>
-                <div class="text-xs text-slate-400 font-mono">Solvable Logic</div>
-              </div>
-              <div class="text-center lg:text-left">
-                <div class="text-2xl sm:text-3xl font-display font-black text-emerald-400">0 NO-AD</div>
-                <div class="text-xs text-slate-400 font-mono">No Pop-up Spam</div>
-              </div>
-            </div>
-
+          <!-- Neon Pill Badge -->
+          <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 shadow-neon-cyan">
+            <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+            <span class="text-xs font-mono font-bold tracking-widest text-cyan-300 uppercase">
+              TXA STUDIO // DIGITAL INNOVATION LAB
+            </span>
           </div>
 
-          <!-- Right Column: 3D Holographic Showcase Graphic -->
-          <div class="lg:col-span-5 relative flex justify-center">
-            <!-- Hologram Backing Glow -->
-            <div class="absolute inset-0 bg-gradient-to-tr from-cyan-500/20 to-pink-500/20 rounded-3xl blur-2xl transform rotate-3 scale-95 pointer-events-none"></div>
+          <!-- Main Heading -->
+          <h1 class="text-4xl sm:text-6xl lg:text-7xl font-display font-black tracking-tight leading-[1.08] text-white">
+            HIGH-PERFORMANCE <br />
+            <span class="text-cyber-gradient text-neon-cyan">GAMES & SOFTWARE</span>
+          </h1>
 
-            <div class="relative w-full max-w-md rounded-3xl glass-panel p-4 border border-cyan-500/30 shadow-2xl shadow-cyan-950/60 transition-transform duration-500 hover:scale-[1.02]">
-              
-              <!-- Top Card Bar -->
-              <div class="flex items-center justify-between pb-3 border-b border-slate-800/80 mb-3 text-xs font-mono text-slate-400">
-                <div class="flex items-center gap-2">
-                  <span class="w-2.5 h-2.5 rounded-full bg-red-500 inline-block"></span>
-                  <span class="w-2.5 h-2.5 rounded-full bg-yellow-500 inline-block"></span>
-                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>
+          <!-- Subtitle -->
+          <p class="text-base sm:text-lg text-slate-300 max-w-3xl mx-auto leading-relaxed font-normal">
+            {{ isEn 
+              ? 'Welcome to TXA Studio. We engineer high-octane minimalist cyber puzzle games and privacy-first browser security extensions, powered by pure 120 FPS mechanics, clean architecture, and absolute user privacy.'
+              : 'Chào mừng bạn đến với TXA Studio. Chúng tôi sáng tạo các tựa game giải đố trí tuệ phong cách Cyberpunk 120 FPS và các tiện ích bảo mật duyệt web riêng tư hàng đầu, tôn trọng trải nghiệm người dùng tuyệt đối.' }}
+          </p>
+
+          <!-- Quick Navigation Jump Pills -->
+          <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
+            <a 
+              href="#shieldblock"
+              class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/25 hover:border-emerald-400 font-mono text-xs uppercase tracking-wider transition-all hover:scale-105"
+              @mouseenter="sound.playHover()"
+              @click="sound.playClick()"
+            >
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>🛡️ ShieldBlock Pro (Chrome Store)</span>
+            </a>
+
+            <a 
+              href="#showcase"
+              class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-pink-500/15 border border-pink-500/30 text-pink-300 hover:bg-pink-500/25 hover:border-pink-400 font-mono text-xs uppercase tracking-wider transition-all hover:scale-105"
+              @mouseenter="sound.playHover()"
+              @click="sound.playClick()"
+            >
+              <span class="w-2 h-2 rounded-full bg-pink-400 animate-pulse"></span>
+              <span>🎮 Zero Grid: Quantum Shift</span>
+            </a>
+          </div>
+
+        </div>
+
+        <!-- ============================================================= -->
+        <!-- SPOTLIGHT: DUAL FLAGSHIP PROJECTS GRID -->
+        <!-- ============================================================= -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-16">
+          
+          <!-- Spotlight Card 1: ShieldBlock Pro Extension -->
+          <div class="relative rounded-3xl glass-panel p-6 sm:p-8 border border-emerald-500/30 shadow-2xl shadow-emerald-950/40 hover:border-emerald-400/60 transition-all duration-300 flex flex-col justify-between group">
+            <div class="space-y-5">
+              <!-- Top Row -->
+              <div class="flex items-center justify-between">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 font-mono text-xs font-bold">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                  <span>CHROME WEB STORE APPROVED</span>
                 </div>
-                <span class="text-cyan-400 font-bold">QUANTUM_CORE // v1.4</span>
+                <span class="text-xs font-mono text-slate-400">v1.1.0 Pro</span>
               </div>
 
-              <!-- Feature Graphic Image -->
-              <div class="relative rounded-2xl overflow-hidden border border-slate-700/60 group">
-                <img 
-                  src="/playstore_feature_graphic.png" 
-                  alt="Quantum Shift: Zero Grid" 
-                  class="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-700"
-                  @error="onImgError"
-                />
-                <div class="absolute inset-0 bg-gradient-to-t from-[#070b16] via-transparent to-transparent opacity-60"></div>
-                
-                <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between">
-                  <span class="px-2.5 py-1 rounded-lg bg-black/80 backdrop-blur-md text-[11px] font-mono text-cyan-300 border border-cyan-500/30">
-                    CYBER MATRIX
-                  </span>
-                  <span class="px-2.5 py-1 rounded-lg bg-pink-500/80 backdrop-blur-md text-[11px] font-display font-bold text-white">
-                    PURE FLUTTER
-                  </span>
+              <!-- Logo & Title -->
+              <div class="flex items-center gap-4">
+                <div class="w-16 h-16 rounded-2xl bg-slate-900 border border-emerald-500/40 p-2.5 flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform">
+                  <img src="/shieldblock.svg" alt="ShieldBlock" class="w-full h-full object-contain" />
                 </div>
-              </div>
-
-              <!-- Logo & Quick Tagline -->
-              <div class="mt-4 flex items-center gap-3.5">
-                <img src="/logo_master.png" alt="Logo" class="w-12 h-12 rounded-xl object-contain bg-slate-900/80 p-1 border border-cyan-500/30" />
                 <div>
-                  <h3 class="font-display font-black text-white text-base tracking-wide">
-                    Zero Grid: Quantum Shift
-                  </h3>
-                  <p class="text-xs text-slate-400 font-mono">
-                    Published by TXA Studio • Google Play Internal Testing
+                  <h2 class="text-2xl font-display font-black text-white group-hover:text-emerald-300 transition-colors">
+                    ShieldBlock Pro
+                  </h2>
+                  <p class="text-xs font-mono text-emerald-400">
+                    Ad & Tracker Blocker • Anti-Trap Engine
                   </p>
                 </div>
               </div>
 
+              <!-- Description -->
+              <p class="text-slate-300 text-sm leading-relaxed">
+                {{ isEn 
+                  ? 'Official Chromium Manifest V3 extension approved by Google. Neutralizes deceptive click overlays, tab-under redirects, spam popups, and protects streaming video players with TXA Studio Cloud Sync.'
+                  : 'Tiện ích chặn quảng cáo và mã theo dõi thế hệ mới đã được Google kiểm duyệt và xuất bản chính thức trên Chrome Web Store. Tích hợp bộ máy chống bẫy chuyển hướng, bảo vệ Video Player và đồng bộ đám mây qua TXA Studio ID.' }}
+              </p>
+
+              <!-- Feature Highlights Pills -->
+              <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+                <div class="px-3 py-2 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300 flex items-center gap-2">
+                  <span class="text-emerald-400">⚡</span>
+                  <span>Anti-Clickjacking</span>
+                </div>
+                <div class="px-3 py-2 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300 flex items-center gap-2">
+                  <span class="text-emerald-400">🎬</span>
+                  <span>Player Protection</span>
+                </div>
+                <div class="px-3 py-2 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300 flex items-center gap-2">
+                  <span class="text-emerald-400">☁️</span>
+                  <span>TXA Cloud Sync</span>
+                </div>
+                <div class="px-3 py-2 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300 flex items-center gap-2">
+                  <span class="text-emerald-400">🛡️</span>
+                  <span>Zero Data Logging</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex flex-wrap items-center gap-3 pt-6 mt-6 border-t border-slate-800/80">
+              <a 
+                href="https://chromewebstore.google.com/detail/shieldblock-ad-tracker-bl/neajkofkkadimcabbhekjcgdbbkfpfll"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-2.5 px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500 text-slate-950 font-display font-black text-xs uppercase tracking-wider shadow-lg shadow-emerald-500/25 hover:shadow-emerald-400/40 hover:scale-[1.02] active:scale-95 transition-all"
+                @mouseenter="sound.playHover()"
+                @click="sound.playClick()"
+              >
+                <ChromeStoreIcon customClass="w-4 h-4" />
+                <span>{{ isEn ? 'GET ON CHROME STORE' : 'CÀI TRÊN CHROME STORE' }}</span>
+              </a>
+
+              <a 
+                href="#shieldblock"
+                class="inline-flex items-center gap-1.5 px-4 py-3 rounded-2xl border border-slate-700 hover:border-emerald-400 text-slate-300 hover:text-white text-xs font-mono transition-all"
+                @mouseenter="sound.playHover()"
+                @click="sound.playClick()"
+              >
+                <span>Chi tiết tính năng →</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Spotlight Card 2: Zero Grid Game -->
+          <div class="relative rounded-3xl glass-panel p-6 sm:p-8 border border-pink-500/30 shadow-2xl shadow-pink-950/40 hover:border-pink-400/60 transition-all duration-300 flex flex-col justify-between group">
+            <div class="space-y-5">
+              <!-- Top Row -->
+              <div class="flex items-center justify-between">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pink-500/10 border border-pink-500/30 text-pink-300 font-mono text-xs font-bold">
+                  <span class="w-1.5 h-1.5 rounded-full bg-pink-400 animate-ping"></span>
+                  <span>GOOGLE PLAY // TESTING</span>
+                </div>
+                <span class="text-xs font-mono text-slate-400">v1.5.0</span>
+              </div>
+
+              <!-- Graphic / Logo & Title -->
+              <div class="flex items-center gap-4">
+                <div class="w-16 h-16 rounded-2xl bg-slate-900 border border-pink-500/40 p-2.5 flex items-center justify-center shadow-lg shadow-pink-500/20 group-hover:scale-105 transition-transform">
+                  <img src="/logo_master.png" alt="Zero Grid" class="w-full h-full object-contain" />
+                </div>
+                <div>
+                  <h2 class="text-2xl font-display font-black text-white group-hover:text-pink-300 transition-colors">
+                    Zero Grid: Quantum Shift
+                  </h2>
+                  <p class="text-xs font-mono text-pink-400">
+                    Cyber Roguelite Puzzle • Pure Flutter 120 FPS
+                  </p>
+                </div>
+              </div>
+
+              <!-- Description -->
+              <p class="text-slate-300 text-sm leading-relaxed">
+                {{ isEn 
+                  ? 'High-Performance pure Flutter logic puzzle game. 100% mathematically solvable reverse generation algorithm, global ghost replay speedrunning, and zero spam mechanics.'
+                  : 'Siêu phẩm giải đố Lights Out ma trận phân rã số học đỉnh cao. 100% có nghiệm toán học logic, khung hình 120 FPS mượt mà trên Canvas CustomPainter và lưu trữ bảng xếp hạng đám mây.' }}
+              </p>
+
+              <!-- Feature Highlights Pills -->
+              <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+                <div class="px-3 py-2 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300 flex items-center gap-2">
+                  <span class="text-pink-400">Ω</span>
+                  <span>100% Solvable Logic</span>
+                </div>
+                <div class="px-3 py-2 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300 flex items-center gap-2">
+                  <span class="text-pink-400">⚡</span>
+                  <span>120 FPS Minimal Engine</span>
+                </div>
+                <div class="px-3 py-2 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300 flex items-center gap-2">
+                  <span class="text-pink-400">☁️</span>
+                  <span>Ghost Replay Cloud</span>
+                </div>
+                <div class="px-3 py-2 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300 flex items-center gap-2">
+                  <span class="text-pink-400">0</span>
+                  <span>No Pop-up Ads</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex flex-wrap items-center gap-3 pt-6 mt-6 border-t border-slate-800/80">
+              <button 
+                @click="openDownloadModal()"
+                class="inline-flex items-center gap-2.5 px-6 py-3 rounded-2xl bg-gradient-to-r from-pink-400 via-rose-500 to-amber-500 text-slate-950 font-display font-black text-xs uppercase tracking-wider shadow-lg shadow-pink-500/25 hover:shadow-pink-400/40 hover:scale-[1.02] active:scale-95 transition-all"
+                @mouseenter="sound.playHover()"
+              >
+                <GooglePlayIcon customClass="w-4 h-4" />
+                <span>{{ isEn ? 'GET ON GOOGLE PLAY' : 'TẢI TRÊN GOOGLE PLAY' }}</span>
+              </button>
+
+              <a 
+                href="#showcase"
+                class="inline-flex items-center gap-1.5 px-4 py-3 rounded-2xl border border-slate-700 hover:border-pink-400 text-slate-300 hover:text-white text-xs font-mono transition-all"
+                @mouseenter="sound.playHover()"
+                @click="sound.playClick()"
+              >
+                <span>Chi tiết game →</span>
+              </a>
             </div>
           </div>
 
         </div>
+
       </div>
     </section>
 
 
     <!-- ================================================================= -->
-    <!-- 2. GAME SPECIFICATIONS & FEATURES DEEP DIVE (#showcase) -->
+    <!-- 2. SHIELDBLOCK PRO DEEP DIVE (#shieldblock) -->
+    <!-- ================================================================= -->
+    <section id="shieldblock" class="py-20 border-t border-slate-800/80 relative">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
+          <div class="inline-block text-xs font-mono font-bold tracking-widest text-emerald-400 uppercase bg-emerald-500/10 px-3.5 py-1 rounded-full border border-emerald-500/20">
+            BROWSER SECURITY & SMART ENGINE
+          </div>
+          <h2 class="text-3xl sm:text-5xl font-display font-black text-white tracking-tight">
+            NEXT-GEN <span class="text-emerald-400">AD & TRACKER BLOCKER</span>
+          </h2>
+          <p class="text-slate-400 text-sm sm:text-base leading-relaxed">
+            {{ isEn 
+              ? 'ShieldBlock Pro combines the robust power of Chromium Manifest V3 with specialized anti-trap heuristics to give you an uncluttered, ultra-fast web experience.' 
+              : 'ShieldBlock Pro kết hợp sức mạnh tối ưu chuẩn Manifest V3 cùng bộ nhận diện chống bẫy thông minh, mang lại trải nghiệm duyệt web siêu tốc và bảo vệ quyền riêng tư toàn diện.' }}
+          </p>
+        </div>
+
+        <!-- 4 Cyber Feature Cards for ShieldBlock -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          
+          <div class="glass-card p-6 rounded-2xl space-y-4 border border-emerald-500/20">
+            <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-2xl font-bold">
+              🛡️
+            </div>
+            <h3 class="font-display font-bold text-lg text-white">
+              {{ isEn ? 'Anti-Clickjacking Traps' : 'Chống Bẫy Click Tàng Hình' }}
+            </h3>
+            <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
+              {{ isEn 
+                ? 'Detects and neutralizes invisible full-page overlay traps designed to hijack your first click to open malicious popups.' 
+                : 'Tự động quét và triệt tiêu các lớp thẻ div vô hình phủ kín trang web nhằm cướp thao tác click của bạn để mở pop-up quảng cáo.' }}
+            </p>
+          </div>
+
+          <div class="glass-card p-6 rounded-2xl space-y-4 border border-emerald-500/20">
+            <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-2xl font-bold">
+              🎬
+            </div>
+            <h3 class="font-display font-bold text-lg text-white">
+              {{ isEn ? 'Smart Video Player Guard' : 'Bảo Vệ Video Player' }}
+            </h3>
+            <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
+              {{ isEn 
+                ? 'Protects video playback frames on streaming sites, clearing ad layers covering play buttons without breaking video controls.' 
+                : 'Nhận diện khung phát video trên các trang xem phim, gỡ bỏ lớp bẫy đè lên nút Play/Pause mà không làm đơ hay lỗi trình phát.' }}
+            </p>
+          </div>
+
+          <div class="glass-card p-6 rounded-2xl space-y-4 border border-emerald-500/20">
+            <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 text-2xl font-bold">
+              ☁️
+            </div>
+            <h3 class="font-display font-bold text-lg text-white">
+              {{ isEn ? 'TXA Studio Cloud Sync' : 'Đồng Bộ TXA Studio ID' }}
+            </h3>
+            <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
+              {{ isEn 
+                ? 'Seamlessly sync your custom filter rules, whitelists, and preferences across all devices via Supabase cloud infrastructure.' 
+                : 'Đăng nhập bằng tài khoản TXA Studio ID để đồng bộ danh sách trắng, quy tắc cá nhân và thiết lập bảo vệ tức thì trên mọi máy tính.' }}
+            </p>
+          </div>
+
+          <div class="glass-card p-6 rounded-2xl space-y-4 border border-cyan-500/20">
+            <div class="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 text-2xl font-bold">
+              ⚡
+            </div>
+            <h3 class="font-display font-bold text-lg text-white">
+              {{ isEn ? 'Chromium MV3 Speed' : 'Tối Ưu Chuẩn MV3' }}
+            </h3>
+            <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
+              {{ isEn 
+                ? 'Ultra-lean declarativeNetRequest rules engine. Consumes minimal memory and CPU with 0 background telemetry.' 
+                : 'Tận dụng công nghệ declarativeNetRequest chạy ngầm trực tiếp ở tầng nhân trình duyệt. Tiết kiệm pin, nhẹ RAM và 0 thu thập dữ liệu.' }}
+            </p>
+          </div>
+
+        </div>
+
+        <div class="mt-10 text-center">
+          <a 
+            href="https://chromewebstore.google.com/detail/shieldblock-ad-tracker-bl/neajkofkkadimcabbhekjcgdbbkfpfll"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-emerald-500/20 border border-emerald-400/50 text-emerald-300 hover:bg-emerald-500/30 font-display font-black text-sm uppercase tracking-wider shadow-lg shadow-emerald-500/20 transition-all hover:scale-105"
+            @mouseenter="sound.playHover()"
+            @click="sound.playClick()"
+          >
+            <ChromeStoreIcon customClass="w-5 h-5" />
+            <span>{{ isEn ? 'INSTALL SHIELDBLOCK PRO ON CHROME WEB STORE' : 'CÀI ĐẶT SHIELDBLOCK PRO TRÊN CHROME WEB STORE' }}</span>
+          </a>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ================================================================= -->
+    <!-- 3. ZERO GRID SHOWCASE DEEP DIVE (#showcase) -->
     <!-- ================================================================= -->
     <section id="showcase" class="py-20 border-t border-slate-800/80 relative">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -196,10 +341,9 @@
           </p>
         </div>
 
-        <!-- 4 Cyber Feature Cards -->
+        <!-- 4 Cyber Feature Cards for Zero Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           
-          <!-- Card 1: 100% Solvable -->
           <div class="glass-card p-6 rounded-2xl space-y-4">
             <div class="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 font-mono text-xl font-bold shadow-neon-cyan">
               Ω
@@ -214,7 +358,6 @@
             </p>
           </div>
 
-          <!-- Card 2: 120 FPS Engine -->
           <div class="glass-card p-6 rounded-2xl space-y-4">
             <div class="w-12 h-12 rounded-xl bg-pink-500/10 border border-pink-500/30 flex items-center justify-center text-pink-400 font-mono text-xl font-bold shadow-neon-pink">
               ⚡
@@ -229,7 +372,6 @@
             </p>
           </div>
 
-          <!-- Card 3: Supabase Global Cloud -->
           <div class="glass-card p-6 rounded-2xl space-y-4">
             <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-mono text-xl font-bold shadow-neon-green">
               ☁
@@ -244,18 +386,17 @@
             </p>
           </div>
 
-          <!-- Card 4: Player Data Privacy First -->
           <div class="glass-card p-6 rounded-2xl space-y-4">
             <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 font-mono text-xl font-bold">
               🛡
             </div>
             <h3 class="font-display font-bold text-lg text-white">
-              {{ isEn ? 'Zero Data Abuse' : 'Minh Bạch Dữ Liệu' }}
+              {{ isEn ? 'Privacy First (No-Ads)' : 'Không Quảng Cáo Rác' }}
             </h3>
             <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
               {{ isEn 
-                ? 'No background tracking, no invasive location/contact harvesting. Full instant account & data deletion via our live terminal.' 
-                : 'Không thu thập danh bạ, vị trí hay dữ liệu nhạy cảm. Cung cấp cổng xóa sạch dữ liệu tự động theo chuẩn Google Play.' }}
+                ? 'Zero interstitial popup interruptions. Transparent data policy with automated self-service account erasure.' 
+                : 'Tuyệt đối không chèn quảng cáo tràn màn hình gây ức chế khi đang suy nghĩ. Bạn toàn quyền kiểm soát dữ liệu cá nhân.' }}
             </p>
           </div>
 
@@ -266,24 +407,17 @@
 
 
     <!-- ================================================================= -->
-    <!-- 3. COMPLIANCE & LEGAL PORTAL CARDS -->
+    <!-- 4. LEGAL & CENTRAL SERVICES DIRECTORY -->
     <!-- ================================================================= -->
-    <section class="py-20 border-t border-slate-800/80 bg-gradient-to-b from-transparent to-[#04060c]">
+    <section class="py-20 border-t border-slate-800/80 bg-[#050811]/60">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
-          <div>
-            <div class="text-xs font-mono text-cyan-400 tracking-widest uppercase mb-2">
-              GOOGLE PLAY CONSOLE & PLAYER SAFETY
-            </div>
-            <h2 class="text-3xl sm:text-4xl font-display font-black text-white">
-              TRANSPARENT <span class="text-neon-cyan">LEGAL PORTAL</span>
-            </h2>
-          </div>
-          <p class="text-slate-400 text-sm max-w-md">
-            {{ isEn 
-              ? 'Our policies are dynamic, audited, and bound to our live Supabase records for complete transparency.' 
-              : 'Các chính sách của chúng tôi được đồng bộ trực tiếp từ cơ sở dữ liệu Supabase, đảm bảo tính cập nhật và bảo vệ người dùng cao nhất.' }}
+        <div class="text-center max-w-2xl mx-auto mb-12">
+          <h2 class="text-2xl sm:text-3xl font-display font-black text-white">
+            TXA STUDIO // CENTRAL PLATFORM SERVICES
+          </h2>
+          <p class="text-slate-400 text-xs sm:text-sm mt-2 font-mono">
+            Hạ tầng tài khoản thống nhất & dịch vụ pháp lý minh bạch cho toàn bộ hệ sinh thái TXA Studio
           </p>
         </div>
 
@@ -291,14 +425,14 @@
           
           <!-- Card: Privacy Policy -->
           <router-link 
-            to="/privacy?game=quantumshift"
-            class="glass-panel p-8 rounded-2xl border border-cyan-500/20 hover:border-cyan-400 hover:shadow-neon-cyan transition-all group"
+            to="/privacy"
+            class="glass-panel p-8 rounded-2xl border border-slate-800 hover:border-cyan-400 transition-all group"
             @mouseenter="sound.playHover()"
             @click="sound.playClick()"
           >
             <div class="flex items-center justify-between mb-6">
               <span class="text-xs font-mono px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
-                DYNAMIC LIVE
+                DATA PRIVACY
               </span>
               <svg class="w-5 h-5 text-slate-500 group-hover:text-cyan-400 transform group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -309,14 +443,14 @@
             </h3>
             <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
               {{ isEn 
-                ? 'Full disclosures on data handling, permissions, offline storage, and AdMob guidelines.' 
-                : 'Khai báo chi tiết các loại dữ liệu xử lý, quyền ứng dụng, cơ chế lưu trữ máy chủ và AdMob.' }}
+                ? 'Full disclosures on data handling, permissions, offline storage for Zero Grid and ShieldBlock.' 
+                : 'Khai báo chi tiết các loại dữ liệu xử lý, quyền ứng dụng và cam kết không lưu dữ liệu duyệt web.' }}
             </p>
           </router-link>
 
           <!-- Card: Delete Account Terminal -->
           <router-link 
-            to="/delete-account?game=quantumshift"
+            to="/delete-account"
             class="glass-panel p-8 rounded-2xl border border-pink-500/20 hover:border-pink-400 hover:shadow-neon-pink transition-all group relative overflow-hidden"
             @mouseenter="sound.playHover()"
             @click="sound.playClick()"
@@ -334,14 +468,14 @@
             </h3>
             <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
               {{ isEn 
-                ? 'Instant automated data erasure request with real-time ticket tracker code.' 
-                : 'Yêu cầu xóa toàn bộ tài khoản và điểm cao khỏi Cloud. Nhận mã Ticket tra cứu tiến độ ngay tức thì.' }}
+                ? 'Instant automated data erasure request with real-time ticket tracker code across all TXA apps.' 
+                : 'Yêu cầu xóa toàn bộ tài khoản và dữ liệu cá nhân khỏi máy chủ TXA Studio với mã Ticket tra cứu tức thì.' }}
             </p>
           </router-link>
 
           <!-- Card: Terms of Service -->
           <router-link 
-            to="/terms?game=quantumshift"
+            to="/terms"
             class="glass-panel p-8 rounded-2xl border border-slate-800 hover:border-cyan-400 transition-all group"
             @mouseenter="sound.playHover()"
             @click="sound.playClick()"
@@ -359,8 +493,8 @@
             </h3>
             <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
               {{ isEn 
-                ? 'Rules on fair play, intellectual property rights, and community standards.' 
-                : 'Quy định sử dụng công bằng, bảo hộ sở hữu trí tuệ và chuẩn mực an toàn cho game thủ.' }}
+                ? 'Rules on fair play, intellectual property rights, and community standards for software and games.' 
+                : 'Quy định sử dụng công bằng, bảo hộ sở hữu trí tuệ và chuẩn mực an toàn cho game thủ & người dùng.' }}
             </p>
           </router-link>
 
@@ -375,14 +509,10 @@
 <script setup>
 import { computed, inject, ref } from 'vue';
 import GooglePlayIcon from '../components/GooglePlayIcon.vue';
+import ChromeStoreIcon from '../components/ChromeStoreIcon.vue';
 import { sound } from '../services/sound.js';
 
 const currentLang = inject('currentLang', ref('vi'));
 const isEn = computed(() => currentLang.value === 'en');
 const openDownloadModal = inject('openDownloadModal', () => {});
-
-function onImgError(e) {
-  // If local static asset fails, fallback to blank or styling
-  e.target.style.display = 'none';
-}
 </script>

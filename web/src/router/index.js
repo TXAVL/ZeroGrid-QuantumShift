@@ -9,12 +9,28 @@ import OAuthAuthorizeView from '../views/OAuthAuthorizeView.vue';
 import DocsView from '../views/DocsView.vue';
 import AdminView from '../views/AdminView.vue';
 import UnlockView from '../views/UnlockView.vue';
+import ZeroGridView from '../views/ZeroGridView.vue';
+import ShieldBlockView from '../views/ShieldBlockView.vue';
 
 const routes = [
   {
     path: '/',
     name: 'home',
     component: HomeView,
+  },
+  {
+    path: '/zero-grid',
+    name: 'zero-grid',
+    component: ZeroGridView,
+  },
+  {
+    path: '/quantumshift',
+    redirect: '/zero-grid',
+  },
+  {
+    path: '/shieldblock',
+    name: 'shieldblock',
+    component: ShieldBlockView,
   },
   {
     path: '/unlock',
