@@ -408,7 +408,6 @@ const errorState = ref(null); // 'TXA_ERR_SESSION_EXPIRED', 'TXA_ERR_INVALID_CLI
 const isSubmitting = ref(false);
 const grantedAuthCode = ref('');
 const codeCopied = ref(false);
-const isExtensionDirectLinked = ref(false);
 
 const isExtensionApp = computed(() => {
   const id = (appInfo.value?.client_id || clientId.value || '').toLowerCase();
@@ -556,7 +555,13 @@ async function handleAuthorize() {
     grantedAuthCode.value = res.auth_code;
     sound.playSuccess();
 
-    // Trigger deep link redirect to return to app/game
+    // For extensions: NEVER redirect! Simply auto-copy code to clipboard for manual paste into dashboard
+    if (isExtensionApp.value) {
+      await copyCode();
+      return;
+    }
+
+    // Trigger deep link redirect only for native mobile games
     triggerDeepLink();
 
   } catch (err) {
@@ -567,49 +572,22 @@ async function handleAuthorize() {
   }
 }
 
-function tryDirectExtensionBridge(targetUri) {
-  const extMatch = targetUri.match(/^chrome-extension:\/\/([a-z0-9]+)/i);
-  const extensionId = extMatch ? extMatch[1] : null;
-
-  if (extensionId && window.chrome?.runtime?.sendMessage) {
-    try {
-      window.chrome.runtime.sendMessage(
-        extensionId,
-        { what: 'txaCloudOAuthDirect', code: grantedAuthCode.value },
-        (res) => {
-          if (res && res.success) {
-            isExtensionDirectLinked.value = true;
-            sound.playSuccess();
-          }
-        }
-      );
-    } catch (err) {
-      console.warn('Chrome runtime direct send failed:', err);
-    }
-  }
-}
-
 function closeAuthTab() {
   sound.playClick();
   window.close();
 }
 
 function triggerDeepLink() {
+  if (isExtensionApp.value) return;
   const targetUri = redirectUri.value || (appInfo.value?.redirect_uris?.[0]) || 'txa.zerogrid.quantumshift://oauth/callback';
-  
-  if (targetUri.startsWith('chrome-extension://')) {
-    // Chrome strictly blocks top-level web navigation to chrome-extension:// with ERR_BLOCKED_BY_CLIENT!
-    // Instead, send the auth code directly to the extension service worker via externally_connectable:
-    tryDirectExtensionBridge(targetUri);
-    // Auto-copy code to clipboard for convenience
-    copyCode();
+  if (!targetUri || targetUri.startsWith('chrome-extension://') || targetUri.includes('chromewebstore.google.com')) {
     return;
   }
 
   const sep = targetUri.includes('?') ? '&' : '?';
   const finalUrl = `${targetUri}${sep}code=${encodeURIComponent(grantedAuthCode.value)}&state=${encodeURIComponent(stateParam.value)}`;
   
-  // Try redirecting via window.location.href for regular mobile apps or web schemes
+  // Try redirecting via window.location.href for regular mobile apps (ZeroGrid / QuantumShift)
   window.location.href = finalUrl;
 }
 
