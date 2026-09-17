@@ -636,5 +636,94 @@ export async function getPromotionStats() {
   return await callRpc('get_promotion_stats');
 }
 
+// =========================================================================
+// FEEDBACK & DEVICE TELEMETRY SYSTEM
+// =========================================================================
 
+export function collectDeviceTelemetry() {
+  if (typeof window === 'undefined') return {};
+  const nav = typeof navigator !== 'undefined' ? navigator : {};
+  const scr = typeof screen !== 'undefined' ? screen : {};
+  const ua = nav.userAgent || '';
 
+  let browserName = 'Unknown';
+  let browserVersion = '';
+  if (ua.includes('Edg/')) {
+    browserName = 'Microsoft Edge';
+    browserVersion = ua.split('Edg/')[1]?.split(' ')[0] || '';
+  } else if (ua.includes('OPR/') || ua.includes('Opera/')) {
+    browserName = 'Opera';
+    browserVersion = ua.split(/OPR\/|Opera\//)[1]?.split(' ')[0] || '';
+  } else if (ua.includes('Brave')) {
+    browserName = 'Brave';
+  } else if (ua.includes('Chrome/')) {
+    browserName = 'Google Chrome';
+    browserVersion = ua.split('Chrome/')[1]?.split(' ')[0] || '';
+  } else if (ua.includes('Firefox/')) {
+    browserName = 'Mozilla Firefox';
+    browserVersion = ua.split('Firefox/')[1]?.split(' ')[0] || '';
+  } else if (ua.includes('Safari/') && !ua.includes('Chrome')) {
+    browserName = 'Apple Safari';
+    browserVersion = ua.split('Version/')[1]?.split(' ')[0] || '';
+  }
+
+  let osName = 'Unknown';
+  if (/Windows NT 10.0/i.test(ua)) osName = 'Windows 10/11';
+  else if (/Windows NT 6.3/i.test(ua)) osName = 'Windows 8.1';
+  else if (/Windows NT 6.1/i.test(ua)) osName = 'Windows 7';
+  else if (/Mac OS X 10[._](\d+)/i.test(ua) || /Macintosh/i.test(ua)) osName = 'macOS';
+  else if (/Android (\d+(\.\d+)?)/i.test(ua)) osName = 'Android ' + (RegExp.$1 || '');
+  else if (/iPhone|iPad|iPod/i.test(ua)) osName = 'iOS';
+  else if (/Linux/i.test(ua)) osName = 'Linux';
+
+  return {
+    browser: browserName,
+    browser_version: browserVersion,
+    os: osName,
+    platform: nav.platform || '',
+    user_agent: ua,
+    screen_resolution: `${scr.width || 0}x${scr.height || 0}`,
+    avail_resolution: `${scr.availWidth || 0}x${scr.availHeight || 0}`,
+    color_depth: `${scr.colorDepth || 24}-bit`,
+    pixel_ratio: window.devicePixelRatio || 1,
+    language: nav.language || 'en',
+    languages: Array.isArray(nav.languages) ? nav.languages.join(', ') : '',
+    timezone: (typeof Intl !== 'undefined' && Intl.DateTimeFormat) ? Intl.DateTimeFormat().resolvedOptions().timeZone : 'UTC',
+    timezone_offset_minutes: new Date().getTimezoneOffset(),
+    cpu_cores: nav.hardwareConcurrency || null,
+    ram_gb: nav.deviceMemory || null,
+    connection_type: nav.connection?.effectiveType || null,
+    touch_support: ('ontouchstart' in window) || ((nav.maxTouchPoints || 0) > 0),
+    page_url: window.location?.href || '',
+    referrer: typeof document !== 'undefined' ? document.referrer : '',
+    collected_at: new Date().toISOString()
+  };
+}
+
+export async function submitFeedback({
+  appSlug = 'shieldblock',
+  appName = 'ShieldBlock Pro',
+  appVersion = '1.1.0',
+  reason,
+  details = '',
+  email = '',
+  deviceInfo = null
+} = {}) {
+  const telemetry = deviceInfo || collectDeviceTelemetry();
+  return await callRpc('txa_submit_feedback', {
+    p_app_slug: appSlug,
+    p_app_name: appName,
+    p_app_version: appVersion,
+    p_reason: reason,
+    p_details: details,
+    p_email: email || null,
+    p_device_info: telemetry
+  });
+}
+
+export async function adminListFeedbacks(limit = 50, offset = 0) {
+  return await callRpc('txa_admin_list_feedbacks', {
+    p_limit: limit,
+    p_offset: offset
+  });
+}

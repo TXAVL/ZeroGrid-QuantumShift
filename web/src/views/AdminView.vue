@@ -137,6 +137,15 @@
           </button>
 
           <button 
+            @click="activeTab = 'feedbacks'"
+            class="px-4 py-2.5 rounded-xl border transition-all flex items-center gap-2 shrink-0"
+            :class="activeTab === 'feedbacks' ? 'bg-amber-500/10 text-amber-300 border-amber-500/40 shadow-lg shadow-amber-500/10' : 'text-slate-400 border-slate-800 hover:text-white'"
+          >
+            <span>💬 Ý Kiến & Gỡ Cài Đặt</span>
+            <span class="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 text-[10px]">{{ feedbackList.length }}</span>
+          </button>
+
+          <button 
             @click="activeTab = 'settings'"
             class="px-4 py-2.5 rounded-xl border transition-all flex items-center gap-2 shrink-0"
             :class="activeTab === 'settings' ? 'bg-purple-500/10 text-purple-300 border-purple-500/40 shadow-lg shadow-purple-500/10' : 'text-slate-400 border-slate-800 hover:text-white'"
@@ -370,7 +379,135 @@
           </div>
         </div>
 
+        <!-- ================================================================= -->
+        <!-- TAB 4: UNINSTALL FEEDBACKS & DEVICE TELEMETRY                      -->
+        <!-- ================================================================= -->
+        <div v-if="activeTab === 'feedbacks'" class="space-y-6">
+          <div class="flex items-center justify-between flex-wrap gap-4">
+            <div>
+              <h2 class="text-lg font-display font-black text-white">Danh Sách Ý Kiến Đóng Góp & Gỡ Cài Đặt Tiện Ích</h2>
+              <p class="text-xs text-slate-400 font-mono">Báo cáo lý do người dùng gỡ cài đặt kèm thông số kỹ thuật thiết bị.</p>
+            </div>
+            <button 
+              @click="loadFeedbacks" 
+              class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 text-xs font-mono transition-all flex items-center gap-2"
+            >
+              <span>🔄 Làm Mới</span>
+            </button>
+          </div>
+
+          <div v-if="feedbackList.length === 0" class="p-8 rounded-2xl border border-slate-800 bg-[#090d1a]/60 text-center text-slate-500 font-mono text-xs">
+            Chưa có phản hồi gỡ cài đặt nào được ghi nhận trong cơ sở dữ liệu.
+          </div>
+
+          <div v-else class="space-y-4">
+            <div 
+              v-for="fb in feedbackList" 
+              :key="fb.id"
+              class="p-5 rounded-2xl border border-slate-800 bg-[#090d1a]/80 backdrop-blur-xl space-y-3"
+            >
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-800/60">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[11px] font-mono font-bold">
+                    {{ formatFeedbackReason(fb.reason) }}
+                  </span>
+                  <span class="text-xs font-mono text-slate-400">
+                    {{ fb.app_name }} v{{ fb.app_version }}
+                  </span>
+                </div>
+                <div class="text-[11px] font-mono text-slate-500">
+                  {{ new Date(fb.created_at).toLocaleString() }}
+                </div>
+              </div>
+
+              <!-- Details & Email -->
+              <div v-if="fb.details" class="text-xs sm:text-sm text-slate-200 bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+                "{{ fb.details }}"
+              </div>
+
+              <div class="flex flex-wrap items-center justify-between gap-3 text-xs font-mono pt-1">
+                <div class="text-slate-400">
+                  <span class="text-slate-500">Email:</span> 
+                  <span class="text-white ml-1">{{ fb.email || 'Không để lại email' }}</span>
+                </div>
+
+                <!-- Device summary pill -->
+                <div class="flex items-center gap-2">
+                  <span class="text-[11px] px-2.5 py-1 rounded-lg bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">
+                    💻 {{ fb.device_info?.browser || 'Browser' }} • {{ fb.device_info?.os || 'OS' }}
+                  </span>
+                  <button 
+                    @click="selectedFeedback = fb"
+                    class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-mono transition-colors"
+                  >
+                    Xem Chi Tiết Máy ⚙️
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
+
+      <!-- =================================================================== -->
+      <!-- MODAL: DEVICE TELEMETRY DETAIL                                      -->
+      <!-- =================================================================== -->
+      <Teleport to="body">
+        <div 
+          v-if="selectedFeedback" 
+          class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4"
+          @click.self="selectedFeedback = null"
+        >
+          <div class="w-full max-w-2xl rounded-3xl border border-slate-800 bg-[#090d1a] p-6 sm:p-8 space-y-5 text-slate-100 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+              <div>
+                <h3 class="font-display font-black text-white text-lg">Thông Số Môi Trường Thiết Bị</h3>
+                <p class="text-xs text-slate-400 font-mono">Báo cáo từ {{ selectedFeedback.app_name }} v{{ selectedFeedback.app_version }}</p>
+              </div>
+              <button @click="selectedFeedback = null" class="text-slate-400 hover:text-white text-lg">✕</button>
+            </div>
+
+            <!-- Reason & Comment -->
+            <div class="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 space-y-1 text-xs">
+              <div class="font-bold text-amber-300 font-mono">LÝ DO GỠ: {{ formatFeedbackReason(selectedFeedback.reason) }}</div>
+              <div v-if="selectedFeedback.details" class="text-slate-200">"{{ selectedFeedback.details }}"</div>
+              <div v-if="selectedFeedback.email" class="text-slate-400">Email: {{ selectedFeedback.email }}</div>
+            </div>
+
+            <!-- Telemetry Details Table -->
+            <div class="border border-slate-800 rounded-2xl overflow-hidden text-xs font-mono">
+              <div class="bg-slate-900/90 p-3 font-bold text-cyan-300 border-b border-slate-800">
+                THÔNG SỐ PHẦN CỨNG & HỆ THỐNG
+              </div>
+              <div class="divide-y divide-slate-800/60 bg-slate-950/60">
+                <div class="flex p-2.5 justify-between"><span class="text-slate-500">Trình Duyệt:</span><span class="text-white font-bold">{{ selectedFeedback.device_info?.browser }} {{ selectedFeedback.device_info?.browser_version }}</span></div>
+                <div class="flex p-2.5 justify-between"><span class="text-slate-500">Hệ Điều Hành:</span><span class="text-white">{{ selectedFeedback.device_info?.os }} ({{ selectedFeedback.device_info?.platform }})</span></div>
+                <div class="flex p-2.5 justify-between"><span class="text-slate-500">Độ Phân Giải Màn Hình:</span><span class="text-white">{{ selectedFeedback.device_info?.screen_resolution }} (Khả dụng: {{ selectedFeedback.device_info?.avail_resolution }})</span></div>
+                <div class="flex p-2.5 justify-between"><span class="text-slate-500">Pixel Ratio / Độ Sâu Màu:</span><span class="text-white">{{ selectedFeedback.device_info?.pixel_ratio }}x • {{ selectedFeedback.device_info?.color_depth }}</span></div>
+                <div class="flex p-2.5 justify-between"><span class="text-slate-500">Số Nhân CPU:</span><span class="text-cyan-300">{{ selectedFeedback.device_info?.cpu_cores ? selectedFeedback.device_info.cpu_cores + ' Cores' : 'Không xác định' }}</span></div>
+                <div class="flex p-2.5 justify-between"><span class="text-slate-500">Dung Lượng RAM:</span><span class="text-cyan-300">{{ selectedFeedback.device_info?.ram_gb ? selectedFeedback.device_info.ram_gb + ' GB' : 'Không xác định' }}</span></div>
+                <div class="flex p-2.5 justify-between"><span class="text-slate-500">Múi Giờ / Ngôn Ngữ:</span><span class="text-white">{{ selectedFeedback.device_info?.timezone }} • {{ selectedFeedback.device_info?.language }}</span></div>
+                <div class="flex p-2.5 justify-between"><span class="text-slate-500">Loại Kết Nối:</span><span class="text-white">{{ selectedFeedback.device_info?.connection_type || 'Mặc định' }}</span></div>
+                <div class="flex p-2.5 justify-between"><span class="text-slate-500">Hỗ Trợ Cảm Ứng:</span><span class="text-white">{{ selectedFeedback.device_info?.touch_support ? 'Có (Touch Device)' : 'Không (Desktop)' }}</span></div>
+                <div class="p-2.5 space-y-1">
+                  <div class="text-slate-500">User Agent Đầy Đủ:</div>
+                  <div class="text-[10px] text-slate-400 break-all bg-black/40 p-2 rounded-lg">{{ selectedFeedback.device_info?.user_agent }}</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex justify-end">
+              <button 
+                @click="selectedFeedback = null"
+                class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-mono font-bold"
+              >
+                Đóng
+              </button>
+            </div>
+          </div>
+        </div>
+      </Teleport>
 
       <!-- =================================================================== -->
       <!-- MODAL: CREATE NEW OAUTH APP                                         -->
@@ -589,7 +726,8 @@ import {
   getCurrentWebUser,
   clearCurrentWebUser,
   promoteToAdmin,
-  getAllGames
+  getAllGames,
+  adminListFeedbacks
 } from '../services/supabase.js';
 import { sound } from '../services/sound.js';
 
@@ -603,6 +741,8 @@ const isAdmin = computed(() => currentUser.value && currentUser.value.role === '
 const activeTab = ref('apps');
 const appList = ref([]);
 const deletionList = ref([]);
+const feedbackList = ref([]);
+const selectedFeedback = ref(null);
 const systemConfigs = ref({});
 const availableGames = ref([]);
 
@@ -743,16 +883,18 @@ async function handlePromoteUser() {
 
 async function loadDashboardData() {
   try {
-    const [apps, deletions, configs, games] = await Promise.all([
+    const [apps, deletions, configs, games, feedbacks] = await Promise.all([
       adminListApps(),
       adminListDeletions(),
       getSystemConfigs(),
-      getAllGames()
+      getAllGames(),
+      adminListFeedbacks()
     ]);
     appList.value = apps || [];
     deletionList.value = deletions || [];
     systemConfigs.value = configs || {};
     availableGames.value = games || [];
+    feedbackList.value = feedbacks?.items || [];
     expirySecondsInput.value = configs['oauth_expiry_seconds'] || (configs['oauth_expiry_minutes'] ? String(parseInt(configs['oauth_expiry_minutes'], 10) * 60) : '300');
 
     // Auto initialize preset if available
@@ -764,6 +906,26 @@ async function loadDashboardData() {
   } catch (e) {
     console.error('Failed to load admin data', e);
   }
+}
+
+async function loadFeedbacks() {
+  sound.playClick();
+  const res = await adminListFeedbacks();
+  feedbackList.value = res?.items || [];
+  sound.playSuccess();
+}
+
+function formatFeedbackReason(reason) {
+  const map = {
+    broken_site: 'Vỡ trang / Lỗi video',
+    ads_not_blocked: 'Không chặn được quảng cáo',
+    slow_performance: 'Làm chậm / Lag web',
+    hard_to_use: 'Giao diện khó dùng',
+    switched_competitor: 'Đổi sang tiện ích khác',
+    temporary_use: 'Chỉ dùng tạm thời',
+    other: 'Lý do khác'
+  };
+  return map[reason] || reason || 'Không xác định';
 }
 
 async function loadDeletions() {

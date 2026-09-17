@@ -98,9 +98,12 @@
                 <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-pink-500/10 text-pink-400">Extension</span>
               </router-link>
             </li>
-            <li class="pt-2">
+            <li class="pt-2 flex flex-col gap-1.5">
               <a href="mailto:txasoftdev@gmail.com" class="text-slate-400 hover:text-slate-200 transition-colors font-mono text-xs flex items-center gap-1">
                 <span>✉ txasoftdev@gmail.com</span>
+              </a>
+              <a href="https://t.me/dongmephim_channel" target="_blank" rel="noopener noreferrer" class="text-cyan-400 hover:text-cyan-300 transition-colors font-mono text-xs flex items-center gap-1">
+                <span>🎬 Telegram: Động Mê Phim</span>
               </a>
             </li>
           </ul>

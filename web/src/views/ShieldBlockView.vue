@@ -46,6 +46,18 @@
                 <span>{{ isEn ? 'GET ON CHROME STORE' : 'CÀI TRÊN CHROME STORE' }}</span>
               </a>
 
+              <a 
+                href="https://t.me/dongmephim_channel" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 hover:text-white font-medium text-sm transition-all hover:scale-[1.02] active:scale-95"
+                @mouseenter="sound.playHover()"
+                @click="sound.playClick()"
+              >
+                <span>🎬</span>
+                <span>{{ isEn ? 'Telegram Community' : 'Kênh Động Mê Phim' }}</span>
+              </a>
+
               <router-link
                 to="/privacy?app=shieldblock" 
                 class="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl glass-panel border border-slate-700 hover:border-emerald-400 text-white font-medium text-sm hover:text-emerald-300 transition-all hover:scale-[1.02] active:scale-95"
