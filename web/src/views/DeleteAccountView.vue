@@ -103,7 +103,7 @@
 
         <!-- Privacy link back -->
         <router-link 
-          :to="'/privacy/' + currentSlug" 
+          :to="privacyRoute" 
           class="text-xs text-slate-400 hover:text-cyan-400 font-mono transition-colors hidden sm:flex items-center gap-1"
         >
           <span>{{ isEn ? 'View Privacy Policy' : 'Xem Chính Sách' }}</span>
@@ -601,6 +601,7 @@ import {
   getGameInfo, 
   getFriendlyErrorMessage, 
   verifyGamePlayer,
+  normalizeProductSlug,
   DEFAULT_GAME 
 } from '../services/supabase.js';
 import { sound } from '../services/sound.js';
@@ -613,11 +614,8 @@ const isEn = computed(() => currentLang.value === 'en');
 const activeTab = ref(route.query.tab === 'status' ? 'track' : 'submit');
 
 const currentSlug = computed(() => {
-  const p = route.params.gameSlug || route.query.app || route.query.game || '';
-  const lower = p.toLowerCase();
-  if (lower.includes('shield')) return 'shieldblock';
-  if (lower.includes('zero') || lower.includes('quantum')) return 'quantumshift';
-  return p ? lower : 'quantumshift';
+  const p = route.query.app || route.query.game || route.params.gameSlug || '';
+  return normalizeProductSlug(p);
 });
 
 const isExtension = computed(() => {
@@ -626,6 +624,22 @@ const isExtension = computed(() => {
 
 const currentGame = ref({ ...DEFAULT_GAME });
 const currentProduct = computed(() => currentGame.value);
+
+const privacyRoute = computed(() => {
+  if (isExtension.value) {
+    return '/privacy?app=shieldblock';
+  }
+  return '/privacy?game=' + (route.query.game || 'quantumshift');
+});
+
+function switchProduct(target) {
+  sound.playClick();
+  if (target === 'shieldblock') {
+    router.push({ path: '/delete-account', query: { app: 'shieldblock' } });
+  } else {
+    router.push({ path: '/delete-account', query: { game: route.query.game || 'quantumshift' } });
+  }
+}
 
 const form = reactive({
   email: '',
@@ -658,11 +672,6 @@ const isUserIdValid = computed(() => {
 const isFormValid = computed(() => {
   return isEmailValid.value && isUserIdValid.value && form.confirmed;
 });
-
-function switchProduct(slug) {
-  sound.playClick();
-  router.push({ path: `/delete-account/${slug}` });
-}
 
 async function loadGame() {
   currentGame.value = await getGameInfo(currentSlug.value);

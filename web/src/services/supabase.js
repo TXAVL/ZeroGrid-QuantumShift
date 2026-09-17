@@ -34,6 +34,21 @@ export const KNOWN_PRODUCTS = {
     short_description: 'Trò chơi giải đố Logic Lights Out ma trận số học đỉnh cao. 100% có nghiệm, 120 FPS mượt mà!',
     created_at: '2026-09-05T00:00:00Z'
   },
+  zerogrid: {
+    slug: 'quantumshift',
+    title: 'Zero Grid: Quantum Shift',
+    package_id: 'txa.zerogrid.quantumshift',
+    developer_name: 'TXA Studio',
+    support_email: 'txasoftdev@gmail.com',
+    genre: 'Cyber Roguelite Puzzle / Logic Matrix',
+    platform: 'Android & Web',
+    icon: '/logo_master.png',
+    store_url: '/zero-grid',
+    type: 'game',
+    description: 'High-Performance Pure Flutter Logic Puzzle Game. 100% Solvable Reverse Generation Algorithm, 120 FPS Minimalist Cyber Experience.',
+    short_description: 'Trò chơi giải đố Logic Lights Out ma trận số học đỉnh cao. 100% có nghiệm, 120 FPS mượt mà!',
+    created_at: '2026-09-05T00:00:00Z'
+  },
   shieldblock: {
     slug: 'shieldblock',
     title: 'ShieldBlock - Ad & Tracker Blocker Pro',
@@ -50,6 +65,15 @@ export const KNOWN_PRODUCTS = {
     created_at: '2026-09-16T00:00:00Z'
   }
 };
+
+// Normalize product slug from query params (?game=... or ?app=...)
+export function normalizeProductSlug(raw = '') {
+  if (!raw) return 'quantumshift';
+  const lower = String(raw).trim().toLowerCase();
+  if (lower.includes('shield')) return 'shieldblock';
+  if (lower.includes('zero') || lower.includes('quantum')) return 'quantumshift';
+  return KNOWN_PRODUCTS[lower]?.slug || lower || 'quantumshift';
+}
 
 // Default fallback game metadata
 export const DEFAULT_GAME = KNOWN_PRODUCTS.quantumshift;
@@ -208,7 +232,9 @@ export function getFriendlyErrorMessage(err, isEn = false) {
 }
 
 // Fetch game metadata from Supabase
-export async function getGameInfo(slug = 'quantumshift') {
+export async function getGameInfo(rawSlug = 'quantumshift') {
+  const slug = normalizeProductSlug(rawSlug);
+  if (KNOWN_PRODUCTS[slug]) return KNOWN_PRODUCTS[slug];
   try {
     const res = await safeFetch(
       `${SUPABASE_URL}/rest/v1/txa_games?slug=eq.${encodeURIComponent(slug)}&is_active=eq.true&select=*`,

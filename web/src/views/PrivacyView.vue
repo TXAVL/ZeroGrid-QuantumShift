@@ -83,7 +83,7 @@
         <!-- Actions: Terms & Data Erasure Portal -->
         <div class="flex items-center gap-2 shrink-0">
           <router-link
-            :to="'/terms/' + currentSlug"
+            :to="termsRoute"
             class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white font-mono text-xs transition-all"
           >
             <span>📜</span>
@@ -464,7 +464,7 @@
 <script setup>
 import { ref, computed, inject, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { getGameInfo, KNOWN_PRODUCTS, DEFAULT_GAME } from '../services/supabase.js';
+import { getGameInfo, normalizeProductSlug, DEFAULT_GAME } from '../services/supabase.js';
 import { sound } from '../services/sound.js';
 
 const route = useRoute();
@@ -473,11 +473,8 @@ const currentLang = inject('currentLang', ref('vi'));
 const isEn = computed(() => currentLang.value === 'en');
 
 const currentSlug = computed(() => {
-  const p = route.params.gameSlug || route.query.app || route.query.game || '';
-  const lower = p.toLowerCase();
-  if (lower.includes('shield')) return 'shieldblock';
-  if (lower.includes('zero') || lower.includes('quantum')) return 'quantumshift';
-  return p ? lower : 'quantumshift';
+  const p = route.query.app || route.query.game || route.params.gameSlug || '';
+  return normalizeProductSlug(p);
 });
 
 const isExtension = computed(() => {
@@ -487,12 +484,26 @@ const isExtension = computed(() => {
 const currentProduct = ref({ ...DEFAULT_GAME });
 
 const deletionRoute = computed(() => {
-  return `/delete-account/${currentSlug.value}`;
+  if (isExtension.value) {
+    return '/delete-account?app=shieldblock';
+  }
+  return '/delete-account?game=' + (route.query.game || 'quantumshift');
 });
 
-function switchProduct(slug) {
+const termsRoute = computed(() => {
+  if (isExtension.value) {
+    return '/terms?app=shieldblock';
+  }
+  return '/terms?game=' + (route.query.game || 'quantumshift');
+});
+
+function switchProduct(target) {
   sound.playClick();
-  router.push({ path: `/privacy/${slug}` });
+  if (target === 'shieldblock') {
+    router.push({ path: '/privacy', query: { app: 'shieldblock' } });
+  } else {
+    router.push({ path: '/privacy', query: { game: route.query.game || 'quantumshift' } });
+  }
 }
 
 async function loadProduct() {

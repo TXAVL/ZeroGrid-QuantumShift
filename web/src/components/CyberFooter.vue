@@ -63,22 +63,42 @@
           </h3>
           <ul class="space-y-2.5 text-sm">
             <li>
-              <router-link to="/privacy" class="text-slate-300 hover:text-cyan-400 transition-colors">
-                {{ isEn ? 'Privacy Policy' : 'Chính Sách Quyền Riêng Tư' }}
+              <router-link to="/privacy?game=quantumshift" class="text-slate-300 hover:text-cyan-400 transition-colors flex items-center justify-between">
+                <span>{{ isEn ? 'Privacy (Zero Grid)' : 'Quyền Riêng Tư (Game)' }}</span>
+                <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-400">Play</span>
               </router-link>
             </li>
             <li>
-              <router-link to="/delete-account" class="text-pink-400 hover:text-pink-300 transition-colors flex items-center gap-1.5 font-medium">
-                <span>{{ isEn ? 'Delete Account / Data' : 'Xóa Tài Khoản / Dữ Liệu' }}</span>
-                <span class="text-[9px] font-mono px-1 rounded bg-pink-500/20 text-pink-300">Self-Service</span>
+              <router-link to="/privacy?app=shieldblock" class="text-slate-400 hover:text-emerald-400 transition-colors flex items-center justify-between text-xs">
+                <span>{{ isEn ? 'Privacy (ShieldBlock)' : 'Quyền Riêng Tư (Tiện Ích)' }}</span>
+                <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400">Extension</span>
+              </router-link>
+            </li>
+            <li class="pt-1">
+              <router-link to="/delete-account?game=quantumshift" class="text-pink-400 hover:text-pink-300 transition-colors flex items-center justify-between font-medium">
+                <span>{{ isEn ? 'Delete Data (Game)' : 'Xóa Dữ Liệu (Game)' }}</span>
+                <span class="text-[9px] font-mono px-1 rounded bg-pink-500/20 text-pink-300">Google Play</span>
               </router-link>
             </li>
             <li>
-              <router-link to="/terms" class="text-slate-300 hover:text-cyan-400 transition-colors">
-                {{ isEn ? 'Terms of Service' : 'Điều Khoản Dịch Vụ' }}
+              <router-link to="/delete-account?app=shieldblock" class="text-slate-400 hover:text-pink-400 transition-colors flex items-center justify-between text-xs">
+                <span>{{ isEn ? 'Purge Sync (ShieldBlock)' : 'Xóa Dữ Liệu (Tiện Ích)' }}</span>
+                <span class="text-[9px] font-mono px-1 rounded bg-slate-800 text-slate-400">Cloud Sync</span>
+              </router-link>
+            </li>
+            <li class="pt-1">
+              <router-link to="/terms?game=quantumshift" class="text-slate-300 hover:text-cyan-400 transition-colors flex items-center justify-between">
+                <span>{{ isEn ? 'Terms (Zero Grid)' : 'Điều Khoản (Game)' }}</span>
+                <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-400">Zero Grid</span>
               </router-link>
             </li>
             <li>
+              <router-link to="/terms?app=shieldblock" class="text-slate-400 hover:text-pink-400 transition-colors flex items-center justify-between text-xs">
+                <span>{{ isEn ? 'Terms (ShieldBlock)' : 'Điều Khoản (Tiện Ích)' }}</span>
+                <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-pink-500/10 text-pink-400">Extension</span>
+              </router-link>
+            </li>
+            <li class="pt-2">
               <a href="mailto:txasoftdev@gmail.com" class="text-slate-400 hover:text-slate-200 transition-colors font-mono text-xs flex items-center gap-1">
                 <span>✉ txasoftdev@gmail.com</span>
               </a>
