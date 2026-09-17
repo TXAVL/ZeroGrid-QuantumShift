@@ -37,26 +37,20 @@
         <div>
           <h3 class="text-xs font-mono uppercase tracking-widest text-slate-400 mb-4 font-bold flex items-center gap-2">
             <span class="w-1.5 h-1.5 bg-cyan-400 rounded-full"></span>
-            {{ isEn ? 'GAMES & ECOSYSTEM' : 'DỰ ÁN & HỆ SINH THÁI' }}
+            {{ isEn ? 'PROJECTS & ECOSYSTEM' : 'DỰ ÁN & HỆ SINH THÁI' }}
           </h3>
           <ul class="space-y-2.5 text-sm">
             <li>
-              <a href="/#showcase" class="text-slate-300 hover:text-cyan-400 transition-colors flex items-center justify-between">
+              <router-link to="/zero-grid" class="text-slate-300 hover:text-cyan-400 transition-colors flex items-center justify-between">
                 <span>Zero Grid: Quantum Shift</span>
-                <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-400">v1.4</span>
-              </a>
+                <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-400">Game v1.4</span>
+              </router-link>
             </li>
             <li>
-              <span class="text-slate-500 flex items-center justify-between cursor-not-allowed">
-                <span>Project Chrono (TBA)</span>
-                <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-500">2026 Q4</span>
-              </span>
-            </li>
-            <li>
-              <span class="text-slate-500 flex items-center justify-between cursor-not-allowed">
-                <span>Zero Grid: Overdrive</span>
-                <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-500">IN DEV</span>
-              </span>
+              <router-link to="/shieldblock" class="text-slate-300 hover:text-emerald-400 transition-colors flex items-center justify-between">
+                <span>ShieldBlock Pro</span>
+                <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400">Extension v1.1</span>
+              </router-link>
             </li>
           </ul>
         </div>
@@ -69,19 +63,19 @@
           </h3>
           <ul class="space-y-2.5 text-sm">
             <li>
-              <router-link to="/privacy?game=quantumshift" class="text-slate-300 hover:text-cyan-400 transition-colors">
+              <router-link to="/privacy" class="text-slate-300 hover:text-cyan-400 transition-colors">
                 {{ isEn ? 'Privacy Policy' : 'Chính Sách Quyền Riêng Tư' }}
               </router-link>
             </li>
             <li>
-              <router-link to="/delete-account?game=quantumshift" class="text-pink-400 hover:text-pink-300 transition-colors flex items-center gap-1.5 font-medium">
+              <router-link to="/delete-account" class="text-pink-400 hover:text-pink-300 transition-colors flex items-center gap-1.5 font-medium">
                 <span>{{ isEn ? 'Delete Account / Data' : 'Xóa Tài Khoản / Dữ Liệu' }}</span>
-                <span class="text-[9px] font-mono px-1 rounded bg-pink-500/20 text-pink-300">Google Play</span>
+                <span class="text-[9px] font-mono px-1 rounded bg-pink-500/20 text-pink-300">Self-Service</span>
               </router-link>
             </li>
             <li>
-              <router-link to="/terms?game=quantumshift" class="text-slate-300 hover:text-cyan-400 transition-colors">
-                {{ isEn ? 'Terms of Service' : 'Điều Khoản Sử Dụng' }}
+              <router-link to="/terms" class="text-slate-300 hover:text-cyan-400 transition-colors">
+                {{ isEn ? 'Terms of Service' : 'Điều Khoản Dịch Vụ' }}
               </router-link>
             </li>
             <li>

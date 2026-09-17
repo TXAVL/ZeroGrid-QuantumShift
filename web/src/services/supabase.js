@@ -17,18 +17,42 @@ const headers = {
   'Prefer': 'return=representation'
 };
 
-// Default fallback game metadata
-export const DEFAULT_GAME = {
-  slug: 'quantumshift',
-  title: 'Zero Grid: Quantum Shift',
-  package_id: 'txa.zerogrid.quantumshift',
-  developer_name: 'TXA Studio',
-  support_email: 'txasoftdev@gmail.com',
-  genre: 'Cyber Roguelite Puzzle / Logic Matrix',
-  description: 'High-Performance Pure Flutter Logic Puzzle Game. 100% Solvable Reverse Generation Algorithm, 120 FPS Minimalist Cyber Experience.',
-  short_description: 'Trò chơi giải đố Logic Lights Out ma trận số học đỉnh cao. 100% có nghiệm, 120 FPS mượt mà!',
-  created_at: '2026-09-05T00:00:00Z'
+// Known products ecosystem metadata
+export const KNOWN_PRODUCTS = {
+  quantumshift: {
+    slug: 'quantumshift',
+    title: 'Zero Grid: Quantum Shift',
+    package_id: 'txa.zerogrid.quantumshift',
+    developer_name: 'TXA Studio',
+    support_email: 'txasoftdev@gmail.com',
+    genre: 'Cyber Roguelite Puzzle / Logic Matrix',
+    platform: 'Android & Web',
+    icon: '/logo_master.png',
+    store_url: '/zero-grid',
+    type: 'game',
+    description: 'High-Performance Pure Flutter Logic Puzzle Game. 100% Solvable Reverse Generation Algorithm, 120 FPS Minimalist Cyber Experience.',
+    short_description: 'Trò chơi giải đố Logic Lights Out ma trận số học đỉnh cao. 100% có nghiệm, 120 FPS mượt mà!',
+    created_at: '2026-09-05T00:00:00Z'
+  },
+  shieldblock: {
+    slug: 'shieldblock',
+    title: 'ShieldBlock - Ad & Tracker Blocker Pro',
+    package_id: 'neajkofkkadimcabbhekjcgdbbkfpfll',
+    developer_name: 'TXA Studio',
+    support_email: 'txasoftdev@gmail.com',
+    genre: 'Browser Security / Ad & Tracker Protection',
+    platform: 'Chrome Web Store & Chromium',
+    icon: '/shieldblock.svg',
+    store_url: 'https://chromewebstore.google.com/detail/shieldblock-ad-tracker-bl/neajkofkkadimcabbhekjcgdbbkfpfll',
+    type: 'extension',
+    description: 'Ultra-fast, zero-telemetry ad and tracker blocker extension for Chromium browsers with cloud sync via TXA Studio ID.',
+    short_description: 'Tiện ích chặn quảng cáo và mã theo dõi bảo vệ quyền riêng tư tốc độ cao, đồng bộ cloud qua TXA Studio ID.',
+    created_at: '2026-09-16T00:00:00Z'
+  }
 };
+
+// Default fallback game metadata
+export const DEFAULT_GAME = KNOWN_PRODUCTS.quantumshift;
 
 // Custom Diagnostic Error Class
 export class SupabaseApiError extends Error {

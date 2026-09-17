@@ -3,19 +3,28 @@
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
       
       <!-- Top Title & Mode Tabs -->
-      <div class="mb-8 text-center sm:text-left flex flex-col sm:flex-row sm:items-end justify-between gap-6 pb-6 border-b border-slate-800/80">
+      <div class="mb-6 text-center sm:text-left flex flex-col sm:flex-row sm:items-end justify-between gap-6 pb-6 border-b border-slate-800/80">
         <div>
-          <div class="inline-flex items-center gap-2 text-xs font-mono text-pink-400 uppercase tracking-widest mb-1.5">
-            <span class="w-2 h-2 rounded-full bg-pink-500 animate-pulse"></span>
-            <span>GOOGLE PLAY DATA COMPLIANCE TERMINAL</span>
+          <div class="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest mb-1.5"
+            :class="isExtension ? 'text-emerald-400' : 'text-pink-400'"
+          >
+            <span class="w-2 h-2 rounded-full animate-pulse" :class="isExtension ? 'bg-emerald-500' : 'bg-pink-500'"></span>
+            <span>{{ isExtension ? 'CHROME WEB STORE PRIVACY & DATA PURGE' : 'GOOGLE PLAY DATA COMPLIANCE TERMINAL' }}</span>
           </div>
           <h1 class="text-3xl sm:text-4xl font-display font-black text-white">
             {{ isEn ? 'Data & Account Erasure' : 'Cổng Xóa Dữ Liệu & Tài Khoản' }}
           </h1>
           <p class="text-slate-400 text-xs sm:text-sm mt-1">
-            {{ isEn 
-              ? 'Self-service request to permanently purge player cloud statistics and scores.' 
-              : 'Gửi yêu cầu tự động xóa vĩnh viễn dữ liệu người chơi, điểm số và thứ hạng khỏi máy chủ.' }}
+            <template v-if="isExtension">
+              {{ isEn 
+                ? 'Self-service request to permanently purge cloud-synced rules, whitelist, and TXA Studio ID sync records.' 
+                : 'Gửi yêu cầu tự động xóa vĩnh viễn dữ liệu quy tắc bộ lọc đồng bộ đám mây, danh sách trắng và hủy liên kết tài khoản.' }}
+            </template>
+            <template v-else>
+              {{ isEn 
+                ? 'Self-service request to permanently purge player cloud statistics, scores, and rankings.' 
+                : 'Gửi yêu cầu tự động xóa vĩnh viễn dữ liệu người chơi, điểm số và thứ hạng khỏi máy chủ.' }}
+            </template>
           </p>
         </div>
 
@@ -38,21 +47,56 @@
         </div>
       </div>
 
-      <!-- Sleek Game Identity Badge (Thay vì lộ liễu hay thô kệch) -->
+      <!-- Interactive Product Switcher Tabs -->
+      <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <div class="inline-flex p-1 rounded-2xl bg-slate-900/90 border border-slate-800 font-mono text-xs">
+          <button
+            @click="switchProduct('quantumshift')"
+            class="flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all"
+            :class="currentSlug === 'quantumshift' ? 'bg-cyan-500 text-slate-950 font-bold shadow-neon-cyan' : 'text-slate-400 hover:text-white'"
+          >
+            <span>🎮</span>
+            <span>Zero Grid: Quantum Shift</span>
+            <span class="text-[10px] opacity-80 font-normal">({{ isEn ? 'Game' : 'Game' }})</span>
+          </button>
+          <button
+            @click="switchProduct('shieldblock')"
+            class="flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all"
+            :class="currentSlug === 'shieldblock' ? 'bg-pink-500 text-slate-950 font-bold shadow-neon-pink' : 'text-slate-400 hover:text-white'"
+          >
+            <span>🛡️</span>
+            <span>ShieldBlock Pro</span>
+            <span class="text-[10px] opacity-80 font-normal">({{ isEn ? 'Extension' : 'Tiện ích' }})</span>
+          </button>
+        </div>
+
+        <div class="text-xs text-slate-500 font-mono">
+          {{ isEn ? 'Targeting:' : 'Đang chọn:' }} <span class="text-slate-300 font-bold">{{ currentProduct.title }}</span>
+        </div>
+      </div>
+
+      <!-- Sleek Product Identity Badge -->
       <div class="glass-panel p-4 rounded-2xl border border-slate-800 mb-6 flex items-center justify-between">
         <div class="flex items-center gap-3.5">
           <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-400 via-sky-500 to-pink-500 p-[2px] shrink-0">
-            <img src="/logo_master.png" alt="Logo" class="w-full h-full rounded-[10px] object-cover bg-slate-950" />
+            <img 
+              :src="currentProduct.icon || (isExtension ? '/shieldblock.svg' : '/logo_master.png')" 
+              :alt="currentProduct.title" 
+              class="w-full h-full rounded-[10px] object-cover bg-slate-950 p-1" 
+            />
           </div>
           <div>
             <div class="flex items-center gap-2">
-              <span class="font-display font-bold text-sm text-white">{{ currentGame.title }}</span>
-              <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">
-                ACTIVE TARGET
+              <span class="font-display font-bold text-sm text-white">{{ currentProduct.title }}</span>
+              <span 
+                class="text-[10px] font-mono px-2 py-0.5 rounded-full border"
+                :class="isExtension ? 'bg-pink-500/10 text-pink-400 border-pink-500/30' : 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30'"
+              >
+                {{ isExtension ? 'CHROMIUM EXTENSION' : 'GOOGLE PLAY GAME' }}
               </span>
             </div>
             <div class="text-[11px] text-slate-400 font-mono">
-              {{ currentGame.package_id }}
+              {{ currentProduct.package_id }}
             </div>
           </div>
         </div>
@@ -83,7 +127,7 @@
                 {{ isEn ? 'Request Queued Successfully' : 'Đã Tiếp Nhận Yêu Cầu Xóa Dữ Liệu' }}
               </h3>
               <p class="text-xs text-slate-400 font-mono">
-                {{ isEn ? 'Dữ liệu dự kiến được thanh lọc trong vòng 48 giờ.' : 'Dữ liệu dự kiến được thanh lọc trong vòng 48 giờ.' }}
+                {{ isEn ? 'Data will be permanently purged within 48 hours.' : 'Dữ liệu dự kiến được thanh lọc hoàn toàn trong vòng 48 giờ.' }}
               </p>
             </div>
           </div>
@@ -132,7 +176,7 @@
             <input 
               v-model="form.email"
               type="email"
-              placeholder="player@example.com"
+              placeholder="user@example.com"
               required
               @blur="emailTouched = true"
               class="w-full px-4 py-3 rounded-xl bg-slate-900/90 border text-white text-sm outline-none font-mono transition-all"
@@ -143,33 +187,55 @@
             </p>
           </div>
 
-          <!-- Player ID / User ID -->
+          <!-- Player ID / Extension Sync ID / UUID -->
           <div class="space-y-2">
             <div class="flex items-center justify-between">
               <label class="block text-xs font-mono uppercase tracking-wider text-slate-400 font-bold">
-                {{ isEn ? 'Player ID / UUID' : 'ID Người Chơi / UUID Ẩn Danh' }} <span class="text-pink-500">*</span>
+                <template v-if="isExtension">
+                  {{ isEn ? 'TXA Studio ID / Extension Sync ID / Email' : 'Tài Khoản TXA Studio ID / Sync ID / Email' }}
+                </template>
+                <template v-else>
+                  {{ isEn ? 'Player ID / Anonymous UUID' : 'ID Người Chơi / UUID Ẩn Danh' }}
+                </template>
+                <span class="text-pink-500">*</span>
               </label>
               <span v-if="userIdTouched && !isUserIdValid" class="text-[11px] text-pink-400 font-mono">
-                {{ isEn ? 'Minimum 4 characters' : 'Tối thiểu 4 ký tự' }}
+                {{ isEn ? 'Minimum 3 characters' : 'Tối thiểu 3 ký tự' }}
               </span>
             </div>
             <input 
               v-model="form.userId"
               type="text"
-              placeholder="Ví dụ: USER-8841 hoặc UUID trong mục Cài Đặt Game"
+              :placeholder="isExtension 
+                ? 'Ví dụ: email tài khoản TXA ID hoặc UUID trong tiện ích' 
+                : 'Ví dụ: USER-8841 hoặc UUID trong mục Cài Đặt Game'"
               required
               @blur="userIdTouched = true"
               class="w-full px-4 py-3 rounded-xl bg-slate-900/90 border text-white text-sm outline-none font-mono transition-all"
               :class="userIdTouched && !isUserIdValid ? 'border-pink-500 focus:border-pink-400' : 'border-slate-700 focus:border-cyan-400'"
             />
+            <p class="text-[11px] text-slate-500 font-mono">
+              <template v-if="isExtension">
+                {{ isEn 
+                  ? 'Identify your ShieldBlock cloud sync rules and account association.' 
+                  : 'Dùng để xác định và thanh lọc hồ sơ đồng bộ quy tắc đám mây của ShieldBlock.' }}
+              </template>
+              <template v-else>
+                {{ isEn 
+                  ? 'Find your Player ID or Device UDID in Game Settings.' 
+                  : 'Bạn có thể xem mã người chơi hoặc UUID trong mục Cài Đặt của game Zero Grid.' }}
+              </template>
+            </p>
           </div>
 
-          <!-- Scope of Deletion -->
+          <!-- Scope of Deletion (Dynamic per product) -->
           <div class="space-y-2">
             <label class="block text-xs font-mono uppercase tracking-wider text-slate-400 font-bold">
               {{ isEn ? 'Scope of Erasure' : 'Phạm Vi Xóa Dữ Liệu' }} <span class="text-pink-500">*</span>
             </label>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 font-mono text-xs">
+            
+            <!-- Game Scopes -->
+            <div v-if="!isExtension" class="grid grid-cols-1 sm:grid-cols-3 gap-3 font-mono text-xs">
               <label 
                 class="p-3.5 rounded-xl border cursor-pointer transition-all flex flex-col justify-between gap-2"
                 :class="form.scope === 'all' ? 'border-pink-500/80 bg-pink-500/10 text-white' : 'border-slate-800 bg-slate-900/60 text-slate-400 hover:border-slate-700'"
@@ -209,6 +275,48 @@
                 </div>
               </label>
             </div>
+
+            <!-- Extension Scopes -->
+            <div v-else class="grid grid-cols-1 sm:grid-cols-3 gap-3 font-mono text-xs">
+              <label 
+                class="p-3.5 rounded-xl border cursor-pointer transition-all flex flex-col justify-between gap-2"
+                :class="form.scope === 'all' ? 'border-pink-500/80 bg-pink-500/10 text-white' : 'border-slate-800 bg-slate-900/60 text-slate-400 hover:border-slate-700'"
+              >
+                <div class="flex items-center justify-between">
+                  <span class="font-bold text-pink-400">{{ isEn ? 'FULL CLOUD PURGE' : 'XÓA SẠCH ĐÁM MÂY' }}</span>
+                  <input type="radio" v-model="form.scope" value="all" class="accent-pink-500" />
+                </div>
+                <div class="text-[10px] text-slate-400 leading-normal">
+                  {{ isEn ? 'Delete all synced rules, whitelist & sync profile.' : 'Xóa toàn bộ quy tắc đồng bộ, whitelist và hồ sơ sync.' }}
+                </div>
+              </label>
+
+              <label 
+                class="p-3.5 rounded-xl border cursor-pointer transition-all flex flex-col justify-between gap-2"
+                :class="form.scope === 'rules' ? 'border-cyan-500/80 bg-cyan-500/10 text-white' : 'border-slate-800 bg-slate-900/60 text-slate-400 hover:border-slate-700'"
+              >
+                <div class="flex items-center justify-between">
+                  <span class="font-bold text-cyan-400">{{ isEn ? 'RULES ONLY' : 'CHỈ BỘ LỌC' }}</span>
+                  <input type="radio" v-model="form.scope" value="rules" class="accent-cyan-500" />
+                </div>
+                <div class="text-[10px] text-slate-400 leading-normal">
+                  {{ isEn ? 'Purge custom rules & whitelist, keep TXA ID.' : 'Chỉ xóa quy tắc tùy biến & whitelist, giữ tài khoản TXA ID.' }}
+                </div>
+              </label>
+
+              <label 
+                class="p-3.5 rounded-xl border cursor-pointer transition-all flex flex-col justify-between gap-2"
+                :class="form.scope === 'auth' ? 'border-purple-500/80 bg-purple-500/10 text-white' : 'border-slate-800 bg-slate-900/60 text-slate-400 hover:border-slate-700'"
+              >
+                <div class="flex items-center justify-between">
+                  <span class="font-bold text-purple-400">{{ isEn ? 'UNLINK EXTENSION' : 'HỦY LIÊN KẾT' }}</span>
+                  <input type="radio" v-model="form.scope" value="auth" class="accent-purple-500" />
+                </div>
+                <div class="text-[10px] text-slate-400 leading-normal">
+                  {{ isEn ? 'Disconnect extension from cloud platform.' : 'Ngắt kết nối tiện ích ShieldBlock khỏi cloud TXA Studio.' }}
+                </div>
+              </label>
+            </div>
           </div>
 
           <!-- Reason (Optional) -->
@@ -219,7 +327,9 @@
             <textarea 
               v-model="form.reason"
               rows="2"
-              placeholder="Chia sẻ lý do giúp TXA Studio nâng cấp chất lượng game..."
+              :placeholder="isExtension 
+                ? 'Chia sẻ góp ý giúp TXA Studio nâng cao hiệu quả tiện ích ShieldBlock...' 
+                : 'Chia sẻ lý do giúp TXA Studio nâng cấp chất lượng game...'"
               class="w-full px-4 py-3 rounded-xl bg-slate-900/90 border border-slate-700 focus:border-cyan-400 text-white text-sm outline-none transition-all"
             ></textarea>
           </div>
@@ -299,7 +409,7 @@
                   </button>
 
                   <a 
-                    :href="'mailto:txasoftdev@gmail.com?subject=' + encodeURIComponent('[Hỗ Trợ Xóa Tài Khoản] Báo lỗi: ' + (submitNotice.code || '')) + '&body=' + encodeURIComponent('Chào TXA Studio,\nTôi gặp sự cố khi gửi yêu cầu xóa tài khoản cho game ' + currentSlug + '.\nEmail của tôi: ' + form.email + '\nMã chẩn đoán: ' + (submitNotice.code || ''))"
+                    :href="'mailto:txasoftdev@gmail.com?subject=' + encodeURIComponent('[Hỗ Trợ Xóa Tài Khoản] Báo lỗi: ' + (submitNotice.code || '')) + '&body=' + encodeURIComponent('Chào TXA Studio,\nTôi gặp sự cố khi gửi yêu cầu xóa tài khoản cho ' + currentProduct.title + '.\nEmail của tôi: ' + form.email + '\nMã chẩn đoán: ' + (submitNotice.code || ''))"
                     class="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700 font-mono text-xs flex items-center gap-1.5 transition-all"
                   >
                     <span>✉ txasoftdev@gmail.com</span>
@@ -457,8 +567,8 @@
             <!-- Details Grid -->
             <div class="grid grid-cols-2 gap-4 text-xs font-mono">
               <div>
-                <div class="text-slate-500">TỰA GAME:</div>
-                <div class="text-slate-300 font-bold">{{ trackResult.game_slug }}</div>
+                <div class="text-slate-500">SẢN PHẨM / DỰ ÁN:</div>
+                <div class="text-slate-300 font-bold uppercase">{{ trackResult.game_slug }}</div>
               </div>
               <div>
                 <div class="text-slate-500">PHẠM VI:</div>
@@ -484,7 +594,7 @@
 
 <script setup>
 import { ref, computed, inject, reactive, onMounted, watch } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { 
   submitDeletionRequest, 
   checkDeletionStatus, 
@@ -496,16 +606,26 @@ import {
 import { sound } from '../services/sound.js';
 
 const route = useRoute();
+const router = useRouter();
 const currentLang = inject('currentLang', ref('vi'));
 const isEn = computed(() => currentLang.value === 'en');
 
 const activeTab = ref(route.query.tab === 'status' ? 'track' : 'submit');
 
 const currentSlug = computed(() => {
-  return route.params.gameSlug || route.query.game || 'quantumshift';
+  const p = route.params.gameSlug || route.query.app || route.query.game || '';
+  const lower = p.toLowerCase();
+  if (lower.includes('shield')) return 'shieldblock';
+  if (lower.includes('zero') || lower.includes('quantum')) return 'quantumshift';
+  return p ? lower : 'quantumshift';
+});
+
+const isExtension = computed(() => {
+  return currentSlug.value === 'shieldblock' || currentGame.value.type === 'extension';
 });
 
 const currentGame = ref({ ...DEFAULT_GAME });
+const currentProduct = computed(() => currentGame.value);
 
 const form = reactive({
   email: '',
@@ -532,12 +652,17 @@ const isEmailValid = computed(() => {
 });
 
 const isUserIdValid = computed(() => {
-  return form.userId.trim().length >= 4;
+  return form.userId.trim().length >= 3;
 });
 
 const isFormValid = computed(() => {
   return isEmailValid.value && isUserIdValid.value && form.confirmed;
 });
+
+function switchProduct(slug) {
+  sound.playClick();
+  router.push({ path: `/delete-account/${slug}` });
+}
 
 async function loadGame() {
   currentGame.value = await getGameInfo(currentSlug.value);
@@ -554,6 +679,7 @@ onMounted(async () => {
 
 watch(() => route.params.gameSlug, loadGame);
 watch(() => route.query.game, loadGame);
+watch(() => route.query.app, loadGame);
 
 function resetForm() {
   form.email = '';
@@ -578,9 +704,10 @@ function formatStatus(status) {
 
 function formatScope(scope) {
   const map = {
-    all: isEn.value ? 'Full Account Purge' : 'Xóa toàn bộ tài khoản',
+    all: isEn.value ? 'Full Account / Cloud Purge' : 'Xóa toàn bộ tài khoản / Đám mây',
     leaderboard: isEn.value ? 'Leaderboard Only' : 'Chỉ bảng điểm',
-    auth: isEn.value ? 'Revoke Cloud Sync' : 'Hủy liên kết Cloud',
+    rules: isEn.value ? 'Custom Rules & Whitelist Only' : 'Chỉ quy tắc tùy biến & whitelist',
+    auth: isEn.value ? 'Revoke Cloud Sync' : 'Hủy liên kết Cloud Sync',
   };
   return map[scope] || scope;
 }
@@ -593,8 +720,8 @@ async function handleSubmit() {
       diagType: 'data',
       title: isEn.value ? 'Incomplete Form Details' : 'Thông Tin Chưa Điền Đầy Đủ',
       text: isEn.value 
-        ? 'Please make sure your email address is valid, Player ID is at least 4 characters, and confirmation is checked.' 
-        : 'Bạn vui lòng kiểm tra lại địa chỉ email, Mã người chơi (tối thiểu 4 ký tự) và tích chọn ô cam kết trước khi gửi nhé.',
+        ? 'Please make sure your email address is valid, Identifier is at least 3 characters, and confirmation is checked.' 
+        : 'Bạn vui lòng kiểm tra lại địa chỉ email, Mã tài khoản/định danh (tối thiểu 3 ký tự) và tích chọn ô cam kết trước khi gửi nhé.',
       code: 'ERR_VALIDATION_INCOMPLETE',
       canRetry: false
     };
@@ -604,22 +731,24 @@ async function handleSubmit() {
   submitNotice.value = null;
 
   try {
-    // 1. Kiểm tra mã người chơi có thực tế tồn tại trong cơ sở dữ liệu game không
-    const verifyRes = await verifyGamePlayer(form.userId);
-    if (verifyRes && verifyRes.exists === false) {
-      sound.playClick();
-      submitNotice.value = {
-        type: 'error',
-        diagType: 'data',
-        title: isEn.value ? 'Player ID Not Found in Database' : 'Mã Người Chơi Không Tồn Tại Trong Game',
-        text: isEn.value
-          ? `We could not find any active player account matching ID "${form.userId}" in the game database. Please open ${currentGame.value.title}, go to Settings, and copy your exact Player ID or Device UDID.`
-          : `Hệ thống kiểm tra và không tìm thấy hồ sơ người chơi nào với mã "${form.userId}" trong cơ sở dữ liệu của game ${currentGame.value.title}. Bạn vui lòng mở game, vào mục Cài đặt để kiểm tra lại chính xác Mã người chơi hoặc UDID nhé.`,
-        code: 'ERR_PLAYER_NOT_FOUND',
-        canRetry: false
-      };
-      isSubmitting.value = false;
-      return;
+    // Chỉ kiểm tra database game khi mục tiêu là game Zero Grid
+    if (!isExtension.value) {
+      const verifyRes = await verifyGamePlayer(form.userId);
+      if (verifyRes && verifyRes.exists === false) {
+        sound.playClick();
+        submitNotice.value = {
+          type: 'error',
+          diagType: 'data',
+          title: isEn.value ? 'Player ID Not Found in Database' : 'Mã Người Chơi Không Tồn Tại Trong Game',
+          text: isEn.value
+            ? `We could not find any active player account matching ID "${form.userId}" in the game database. Please open ${currentGame.value.title}, go to Settings, and copy your exact Player ID or Device UDID.`
+            : `Hệ thống kiểm tra và không tìm thấy hồ sơ người chơi nào với mã "${form.userId}" trong cơ sở dữ liệu của game ${currentGame.value.title}. Bạn vui lòng mở game, vào mục Cài đặt để kiểm tra lại chính xác Mã người chơi hoặc UDID nhé.`,
+          code: 'ERR_PLAYER_NOT_FOUND',
+          canRetry: false
+        };
+        isSubmitting.value = false;
+        return;
+      }
     }
 
     const { ticketId } = await submitDeletionRequest({
