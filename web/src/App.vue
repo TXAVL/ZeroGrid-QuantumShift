@@ -18,6 +18,12 @@
     <!-- Studio Footer -->
     <CyberFooter />
 
+    <!-- Brand Mascot Character (Follows cursor, 3D interactive) -->
+    <BrandMascot />
+
+    <!-- Custom Futuristic Cyberpunk Cursor System -->
+    <CyberCursor />
+
     <!-- Global Platform Download & Internal Testing Modal -->
     <DownloadPlatformModal ref="downloadModalRef" />
   </div>
@@ -29,6 +35,8 @@ import CyberBackground from './components/CyberBackground.vue';
 import CyberNavbar from './components/CyberNavbar.vue';
 import CyberFooter from './components/CyberFooter.vue';
 import DownloadPlatformModal from './components/DownloadPlatformModal.vue';
+import CyberCursor from './components/CyberCursor.vue';
+import BrandMascot from './components/BrandMascot.vue';
 
 const currentLang = ref(localStorage.getItem('txa_portal_lang') || 'vi');
 const downloadModalRef = ref(null);
