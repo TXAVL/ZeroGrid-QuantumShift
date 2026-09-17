@@ -130,20 +130,26 @@
 
         <div class="space-y-2">
           <span class="px-3 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-widest bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-            AUTHORIZED // CONNECTED
+            {{ isExtensionDirectLinked ? 'EXTENSION SYNCED // LIVE' : 'AUTHORIZED // READY' }}
           </span>
           <h2 class="text-xl sm:text-2xl font-display font-black text-white">
-            {{ isEn ? 'Authorization Successful!' : 'Ủy Quyền Thành Công!' }}
+            {{ isExtensionDirectLinked 
+              ? (isEn ? 'Connected to Extension Successfully!' : 'Đã Tự Động Đăng Nhập Tiện Ích!') 
+              : (isEn ? 'Authorization Successful!' : 'Ủy Quyền Thành Công!') }}
           </h2>
           <p class="text-xs text-slate-300 font-mono">
-            {{ isEn ? 'Redirecting back to your app...' : 'Đang tự động chuyển hướng về ứng dụng...' }}
+            {{ isExtensionDirectLinked 
+              ? (isEn ? 'ShieldBlock extension has received your authorization and logged in.' : 'Tiện ích ShieldBlock trên trình duyệt đã tự động nhận diện tài khoản của bạn. Bạn có thể đóng tab này lại.') 
+              : (isExtensionApp 
+                ? (isEn ? 'Authorization code generated. Copy and paste it into ShieldBlock dashboard.' : 'Mã ủy quyền đã sẵn sàng! Sao chép mã bên dưới và dán vào ô "Xác nhận mã" trên ShieldBlock.') 
+                : (isEn ? 'Redirecting back to your app...' : 'Đang tự động chuyển hướng về ứng dụng...')) }}
           </p>
         </div>
 
-        <!-- 1-Click Copy Code Fallback -->
+        <!-- 1-Click Copy Code Box -->
         <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-700/80 text-left space-y-2">
           <div class="flex items-center justify-between text-[11px] font-mono text-slate-400">
-            <span>{{ isEn ? 'Fallback Code (If app did not open):' : 'Mã dự phòng (Nếu ứng dụng chưa tự mở):' }}</span>
+            <span>{{ isExtensionApp ? (isEn ? 'Authorization Code:' : 'Mã ủy quyền TXA Studio:') : (isEn ? 'Fallback Code (If app did not open):' : 'Mã dự phòng (Nếu ứng dụng chưa tự mở):') }}</span>
             <span class="text-emerald-400 font-bold">txa_code_...</span>
           </div>
           <div class="flex items-center gap-2">
@@ -162,8 +168,16 @@
           </div>
         </div>
 
-        <div>
+        <div class="pt-2 space-y-3">
           <button 
+            v-if="isExtensionApp || isExtensionDirectLinked"
+            @click="closeAuthTab"
+            class="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-emerald-500 to-cyan-500 text-slate-950 font-display font-black text-xs uppercase tracking-wider shadow-lg shadow-emerald-500/30 hover:scale-[1.02] active:scale-95 transition-all"
+          >
+            {{ isEn ? 'CLOSE THIS TAB' : 'ĐÓNG TAB NÀY & HOÀN TẤT' }}
+          </button>
+          <button 
+            v-else
             @click="triggerDeepLink"
             class="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-cyan-400 via-sky-500 to-pink-500 text-slate-950 font-display font-black text-xs uppercase tracking-wider shadow-lg shadow-cyan-500/30 hover:scale-[1.02] active:scale-95 transition-all"
           >
@@ -247,7 +261,35 @@
             {{ isEn ? 'This app will be granted:' : 'Quyền hạn ứng dụng yêu cầu:' }}
           </div>
 
-          <div class="space-y-2 text-xs">
+          <!-- If Extension App (e.g. ShieldBlock Pro) -->
+          <div v-if="isExtensionApp" class="space-y-2 text-xs">
+            <div class="flex items-start gap-3 p-3 rounded-2xl border border-slate-800 bg-slate-900/40">
+              <span class="text-cyan-400 font-bold text-base leading-none">✓</span>
+              <div>
+                <div class="font-bold text-slate-200">{{ isEn ? 'View TXA Studio Account Profile' : 'Xem hồ sơ tài khoản TXA Studio' }}</div>
+                <div class="text-[11px] text-slate-400">{{ isEn ? 'Display name, avatar, and TXA Studio ID.' : 'Tên hiển thị, email và ID tài khoản TXA Studio.' }}</div>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3 p-3 rounded-2xl border border-slate-800 bg-slate-900/40">
+              <span class="text-cyan-400 font-bold text-base leading-none">✓</span>
+              <div>
+                <div class="font-bold text-slate-200">{{ isEn ? 'Sync Filters & Smart Guard' : 'Đồng bộ bộ lọc & Smart Guard' }}</div>
+                <div class="text-[11px] text-slate-400">{{ isEn ? 'Securely sync adblock lists, anti-trap rules, and user whitelist on Cloud.' : 'Đồng bộ hóa danh sách bộ lọc chặn quảng cáo, Smart Guard và danh sách trắng an toàn trên Cloud.' }}</div>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3 p-3 rounded-2xl border border-slate-800 bg-slate-900/40">
+              <span class="text-cyan-400 font-bold text-base leading-none">✓</span>
+              <div>
+                <div class="font-bold text-slate-200">{{ isEn ? 'Cloud Backup & Configuration Restore' : 'Sao lưu & Khôi phục cấu hình Cloud' }}</div>
+                <div class="text-[11px] text-slate-400">{{ isEn ? 'Safely backup and restore all ShieldBlock settings when installing on new browsers.' : 'Tự động lưu trữ và đồng bộ toàn bộ thiết lập ShieldBlock khi cài đặt trên trình duyệt hoặc máy tính mới.' }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- If Mobile Game App (e.g. ZeroGrid / QuantumShift) -->
+          <div v-else class="space-y-2 text-xs">
             <div class="flex items-start gap-3 p-3 rounded-2xl border border-slate-800 bg-slate-900/40">
               <span class="text-cyan-400 font-bold text-base leading-none">✓</span>
               <div>
@@ -282,7 +324,7 @@
           </a>
           <span>&</span>
           <a :href="appInfo.terms_url" target="_blank" class="text-cyan-400 hover:underline">
-            {{ isEn ? 'Terms of Service' : 'Điều Khoản Game' }}
+            {{ isExtensionApp ? (isEn ? 'Terms of Service' : 'Điều Khoản Dịch Vụ') : (isEn ? 'Game Terms' : 'Điều Khoản Game') }}
           </a>
         </div>
 
@@ -350,6 +392,14 @@ const errorState = ref(null); // 'TXA_ERR_SESSION_EXPIRED', 'TXA_ERR_INVALID_CLI
 const isSubmitting = ref(false);
 const grantedAuthCode = ref('');
 const codeCopied = ref(false);
+const isExtensionDirectLinked = ref(false);
+
+const isExtensionApp = computed(() => {
+  const id = (appInfo.value?.client_id || clientId.value || '').toLowerCase();
+  const name = (appInfo.value?.name || '').toLowerCase();
+  const redirect = (redirectUri.value || '').toLowerCase();
+  return id.includes('shieldblock') || id.includes('ext_') || name.includes('shieldblock') || redirect.startsWith('chrome-extension://');
+});
 
 // Live Dynamic Countdown Timer (MM:SS) based on Admin Configured Seconds
 const configuredSeconds = ref(300); // Default 300s (05:00)
@@ -501,12 +551,49 @@ async function handleAuthorize() {
   }
 }
 
+function tryDirectExtensionBridge(targetUri) {
+  const extMatch = targetUri.match(/^chrome-extension:\/\/([a-z0-9]+)/i);
+  const extensionId = extMatch ? extMatch[1] : null;
+
+  if (extensionId && window.chrome?.runtime?.sendMessage) {
+    try {
+      window.chrome.runtime.sendMessage(
+        extensionId,
+        { what: 'txaCloudOAuthDirect', code: grantedAuthCode.value },
+        (res) => {
+          if (res && res.success) {
+            isExtensionDirectLinked.value = true;
+            sound.playSuccess();
+          }
+        }
+      );
+    } catch (err) {
+      console.warn('Chrome runtime direct send failed:', err);
+    }
+  }
+}
+
+function closeAuthTab() {
+  sound.playClick();
+  window.close();
+}
+
 function triggerDeepLink() {
   const targetUri = redirectUri.value || (appInfo.value?.redirect_uris?.[0]) || 'txa.zerogrid.quantumshift://oauth/callback';
+  
+  if (targetUri.startsWith('chrome-extension://')) {
+    // Chrome strictly blocks top-level web navigation to chrome-extension:// with ERR_BLOCKED_BY_CLIENT!
+    // Instead, send the auth code directly to the extension service worker via externally_connectable:
+    tryDirectExtensionBridge(targetUri);
+    // Auto-copy code to clipboard for convenience
+    copyCode();
+    return;
+  }
+
   const sep = targetUri.includes('?') ? '&' : '?';
   const finalUrl = `${targetUri}${sep}code=${encodeURIComponent(grantedAuthCode.value)}&state=${encodeURIComponent(stateParam.value)}`;
   
-  // Try redirecting via window.location.href
+  // Try redirecting via window.location.href for regular mobile apps or web schemes
   window.location.href = finalUrl;
 }
 
