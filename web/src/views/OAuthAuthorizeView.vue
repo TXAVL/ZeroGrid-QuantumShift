@@ -122,59 +122,75 @@
       <!-- STATE 4: SUCCESS - AUTHORIZATION GRANTED                            -->
       <!-- =================================================================== -->
       <div v-else-if="grantedAuthCode" class="space-y-6 text-center py-4">
-        <div class="inline-flex p-4 rounded-3xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 shadow-xl shadow-emerald-500/10">
+        <!-- Top Animated Success Icon -->
+        <div class="inline-flex p-4 rounded-3xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 shadow-xl shadow-emerald-500/10 animate-pulse">
           <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
 
-        <div class="space-y-2">
-          <span class="px-3 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-widest bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-            {{ isExtensionDirectLinked ? 'EXTENSION SYNCED // LIVE' : 'AUTHORIZED // READY' }}
+        <div class="space-y-1.5">
+          <span class="px-3.5 py-1 rounded-full text-[10px] font-mono font-black uppercase tracking-widest bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+            AUTHORIZED // READY
           </span>
           <h2 class="text-xl sm:text-2xl font-display font-black text-white">
-            {{ isExtensionDirectLinked 
-              ? (isEn ? 'Connected to Extension Successfully!' : 'Đã Tự Động Đăng Nhập Tiện Ích!') 
-              : (isEn ? 'Authorization Successful!' : 'Ủy Quyền Thành Công!') }}
+            {{ isEn ? 'Authorization Successful!' : 'Ủy Quyền Thành Công!' }}
           </h2>
-          <p class="text-xs text-slate-300 font-mono">
-            {{ isExtensionDirectLinked 
-              ? (isEn ? 'ShieldBlock extension has received your authorization and logged in.' : 'Tiện ích ShieldBlock trên trình duyệt đã tự động nhận diện tài khoản của bạn. Bạn có thể đóng tab này lại.') 
-              : (isExtensionApp 
-                ? (isEn ? 'Authorization code generated. Copy and paste it into ShieldBlock dashboard.' : 'Mã ủy quyền đã sẵn sàng! Sao chép mã bên dưới và dán vào ô "Xác nhận mã" trên ShieldBlock.') 
-                : (isEn ? 'Redirecting back to your app...' : 'Đang tự động chuyển hướng về ứng dụng...')) }}
+          <p class="text-xs text-slate-400 font-normal">
+            {{ isEn ? 'Your authorization code has been generated.' : 'Mã ủy quyền của bạn đã được tạo thành công.' }}
           </p>
         </div>
 
-        <!-- 1-Click Copy Code Box -->
-        <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-700/80 text-left space-y-2">
-          <div class="flex items-center justify-between text-[11px] font-mono text-slate-400">
-            <span>{{ isExtensionApp ? (isEn ? 'Authorization Code:' : 'Mã ủy quyền TXA Studio:') : (isEn ? 'Fallback Code (If app did not open):' : 'Mã dự phòng (Nếu ứng dụng chưa tự mở):') }}</span>
-            <span class="text-emerald-400 font-bold">txa_code_...</span>
+        <!-- STUNNING CYBERPUNK CODE DISPLAY CARD -->
+        <div class="relative p-5 rounded-3xl bg-slate-950 border-2 transition-all duration-300 shadow-2xl" :class="codeCopied ? 'border-emerald-400 shadow-emerald-500/20' : 'border-cyan-500/50 shadow-cyan-500/20'">
+          <div class="text-[11px] font-mono uppercase tracking-widest text-slate-400 mb-2 flex items-center justify-between">
+            <span>{{ isEn ? 'AUTHORIZATION CODE:' : 'MÃ ỦY QUYỀN TIỆN ÍCH:' }}</span>
+            <span v-if="codeCopied" class="text-emerald-400 font-bold animate-pulse text-[10px]">✓ {{ isEn ? 'COPIED TO CLIPBOARD' : 'ĐÃ CHÉP VÀO BỘ NHỚ TẠM' }}</span>
           </div>
-          <div class="flex items-center gap-2">
-            <input 
-              type="text" 
-              readonly 
-              :value="grantedAuthCode" 
-              class="flex-1 px-3 py-2 rounded-xl bg-black/60 border border-slate-800 text-cyan-300 font-mono text-xs select-all outline-none"
-            />
+
+          <div class="font-mono text-xs sm:text-sm font-black text-cyan-300 tracking-wider break-all select-all py-3 bg-slate-900/90 px-4 rounded-xl border border-slate-800 shadow-inner">
+            {{ grantedAuthCode }}
+          </div>
+
+          <!-- BIG HIGHLIGHT COPY BUTTON WITH ANIMATION -->
+          <div class="mt-4">
             <button 
-              @click="copyCode"
-              class="px-4 py-2 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-300 text-xs font-mono font-bold transition-all"
+              @click="copyCode" 
+              class="w-full py-4 px-6 rounded-2xl font-display font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2.5 transition-all duration-300 shadow-xl cursor-pointer"
+              :class="codeCopied ? 'bg-gradient-to-r from-emerald-400 to-green-500 text-slate-950 shadow-emerald-500/40 scale-[1.02]' : 'bg-gradient-to-r from-cyan-400 via-sky-500 to-pink-500 text-slate-950 shadow-cyan-500/30 hover:scale-[1.02] active:scale-95'"
             >
-              {{ codeCopied ? (isEn ? 'COPIED!' : 'ĐÃ CHÉP!') : (isEn ? 'COPY' : 'SAO CHÉP') }}
+              <span class="text-base">{{ codeCopied ? '✓' : '📋' }}</span>
+              <span>{{ codeCopied ? (isEn ? 'COPIED TO CLIPBOARD!' : 'ĐÃ SAO CHÉP MÃ VÀO BỘ NHỚ TẠM!') : (isEn ? 'COPY AUTHORIZATION CODE' : 'SAO CHÉP MÃ ỦY QUYỀN') }}</span>
             </button>
+          </div>
+        </div>
+
+        <!-- 3-STEP QUICK GUIDE FOR EXTENSION -->
+        <div v-if="isExtensionApp" class="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 text-left space-y-2 text-xs">
+          <div class="font-bold text-slate-200 flex items-center gap-2">
+            <span class="text-cyan-400">💡</span> {{ isEn ? 'How to complete login:' : 'Hướng dẫn 3 bước dán mã hoàn tất:' }}
+          </div>
+          <div class="flex items-start gap-2 text-[11px] text-slate-400">
+            <span class="text-cyan-400 font-bold">1.</span>
+            <span>{{ isEn ? 'Click the button above to copy the authorization code.' : 'Bấm nút "Sao Chép Mã Ủy Quyền" ở trên (hoặc copy trực tiếp ô mã).' }}</span>
+          </div>
+          <div class="flex items-start gap-2 text-[11px] text-slate-400">
+            <span class="text-cyan-400 font-bold">2.</span>
+            <span>{{ isEn ? 'Switch back to the ShieldBlock Dashboard tab > TXA Studio Central Cloud Sync.' : 'Chuyển lại tab ShieldBlock Dashboard > TXA Studio Central Cloud Sync.' }}</span>
+          </div>
+          <div class="flex items-start gap-2 text-[11px] text-slate-400">
+            <span class="text-cyan-400 font-bold">3.</span>
+            <span>{{ isEn ? 'Paste the code into "Hoặc dán mã ủy quyền" and click Confirm.' : 'Dán mã vào ô "Hoặc dán mã ủy quyền..." và bấm Xác nhận mã là hoàn tất!' }}</span>
           </div>
         </div>
 
         <div class="pt-2 space-y-3">
           <button 
-            v-if="isExtensionApp || isExtensionDirectLinked"
+            v-if="isExtensionApp"
             @click="closeAuthTab"
-            class="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-emerald-500 to-cyan-500 text-slate-950 font-display font-black text-xs uppercase tracking-wider shadow-lg shadow-emerald-500/30 hover:scale-[1.02] active:scale-95 transition-all"
+            class="w-full py-3.5 px-6 rounded-2xl border border-slate-700 bg-slate-900/80 hover:bg-slate-800 text-slate-300 font-mono text-xs font-bold transition-all cursor-pointer"
           >
-            {{ isEn ? 'CLOSE THIS TAB' : 'ĐÓNG TAB NÀY & HOÀN TẤT' }}
+            {{ isEn ? 'CLOSE THIS TAB' : 'ĐÓNG TAB NÀY' }}
           </button>
           <button 
             v-else
@@ -599,12 +615,28 @@ function triggerDeepLink() {
 
 async function copyCode() {
   if (!grantedAuthCode.value) return;
+  sound.playClick();
   try {
-    await navigator.clipboard.writeText(grantedAuthCode.value);
-    codeCopied.value = true;
-    sound.playClick();
-    setTimeout(() => { codeCopied.value = false; }, 3000);
+    if (navigator?.clipboard?.writeText) {
+      await navigator.clipboard.writeText(grantedAuthCode.value);
+      codeCopied.value = true;
+      setTimeout(() => { codeCopied.value = false; }, 3500);
+      return;
+    }
   } catch (e) {}
+
+  try {
+    const el = document.createElement('textarea');
+    el.value = grantedAuthCode.value;
+    el.style.position = 'fixed';
+    el.style.opacity = '0';
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    codeCopied.value = true;
+    setTimeout(() => { codeCopied.value = false; }, 3500);
+  } catch (_) {}
 }
 
 function switchAccount() {
