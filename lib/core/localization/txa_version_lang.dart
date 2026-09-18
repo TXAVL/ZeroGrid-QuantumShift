@@ -15,6 +15,26 @@ class TxaVersionLang {
       'whats_new_btn_continue': 'ĐÃ HIỂU & TIẾP TỤC',
 
       // -----------------------------------------------------------------------
+      // [TXA_11] - Phiên bản v1.6.5 (Build 13) - Ngày: 2026-09-18
+      // -----------------------------------------------------------------------
+      'txa_11_title': 'Bản Cập Nhật Ổn Định Lõi & Tối Ưu Lượng Tử 1.6.5',
+
+      // [TXA_11_ITEM_1] - Tối Ưu Đồng Bộ & Lưu Trữ Đám Mây
+      'txa_11_item_1_title': 'Tối Ưu Đồng Bộ & Lưu Trữ Đám Mây',
+      'txa_11_item_1_desc': 'Nâng cấp toàn diện cơ chế liên kết dữ liệu đám mây: Bảo toàn tuyệt đối tiến trình, tự động giải quyết các xung đột trạng thái và bảo đảm dữ liệu của bạn luôn nhất quán, an toàn.',
+      'txa_11_item_1_badge': 'ĐỒNG BỘ',
+
+      // [TXA_11_ITEM_2] - Hệ Thống Vinh Danh & Cột Mốc Trực Quan
+      'txa_11_item_2_title': 'Hệ Thống Vinh Danh & Cột Mốc Trực Quan',
+      'txa_11_item_2_desc': 'Cải tiến trải nghiệm vinh danh thành tích trong trò chơi với các hiệu ứng thị giác sắc nét, phản hồi rung và âm thanh sống động ngay khi bạn chinh phục những nấc thang mới.',
+      'txa_11_item_2_badge': 'VINH DANH',
+
+      // [TXA_11_ITEM_3] - Gia Cố Hiệu Năng & Trải Nghiệm Mượt Mà
+      'txa_11_item_3_title': 'Gia Cố Hiệu Năng & Trải Nghiệm Mượt Mà',
+      'txa_11_item_3_desc': 'Tinh chỉnh kiến trúc xử lý ngầm, tối ưu hóa độ phản hồi cảm ứng và loại bỏ triệt để các độ trễ vi mô, mang lại cảm giác mượt mà và liền mạch nhất trong từng thao tác.',
+      'txa_11_item_3_badge': 'HIỆU NĂNG',
+
+      // -----------------------------------------------------------------------
       // [TXA_10] - Phiên bản v1.6.4 (Build 12) - Ngày: 2026-09-09
       // -----------------------------------------------------------------------
       'txa_10_title': 'Bản Cập Nhật Tương Thích & Đăng Nhập Mượt Mà 1.6.4',
@@ -269,6 +289,26 @@ class TxaVersionLang {
       // -----------------------------------------------------------------------
       'whats_new_title': "WHAT'S NEW IN THIS VERSION?",
       'whats_new_btn_continue': 'GOT IT & CONTINUE',
+
+      // -----------------------------------------------------------------------
+      // [TXA_11] - Version v1.6.5 (Build 13) - Date: 2026-09-18
+      // -----------------------------------------------------------------------
+      'txa_11_title': 'Core Stability & Quantum Resonance Update 1.6.5',
+
+      // [TXA_11_ITEM_1] - Enhanced Cloud Data & State Resilience
+      'txa_11_item_1_title': 'Enhanced Cloud Data & State Resilience',
+      'txa_11_item_1_desc': 'Comprehensive overhaul of the background cloud sync engine: Flawless progress preservation, seamless conflict handling, and rock-solid state consistency across all sessions.',
+      'txa_11_item_1_badge': 'SYNC',
+
+      // [TXA_11_ITEM_2] - Apex Recognition & Milestone Celebrations
+      'txa_11_item_2_title': 'Apex Recognition & Milestone Celebrations',
+      'txa_11_item_2_desc': 'Revamped in-game achievement celebrations with vivid visual feedback, crisp animations, and rewarding sensory feedback as you conquer new milestones.',
+      'txa_11_item_2_badge': 'REWARD',
+
+      // [TXA_11_ITEM_3] - Hyper-Responsive Engine & Fluid Polish
+      'txa_11_item_3_title': 'Hyper-Responsive Engine & Fluid Polish',
+      'txa_11_item_3_desc': 'Deep optimizations to the core processing loop, eliminating micro-latencies and maximizing touch precision for the most fluid, exhilarating puzzle experience.',
+      'txa_11_item_3_badge': 'PERFORMANCE',
 
       // -----------------------------------------------------------------------
       // [TXA_10] - Version v1.6.4 (Build 12) - Date: 2026-09-09

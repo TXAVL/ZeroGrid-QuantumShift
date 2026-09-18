@@ -81,7 +81,8 @@ final supabaseServiceProvider = Provider<SupabaseService>((ref) {
 
 final authServiceProvider = Provider<TxaAuthService>((ref) {
   final storage = ref.watch(storageServiceProvider);
-  final auth = TxaAuthService(storage);
+  final gpgs = ref.watch(gpgsServiceProvider);
+  final auth = TxaAuthService(storage, gpgs);
   auth.initDeepLinkListener();
   return auth;
 });

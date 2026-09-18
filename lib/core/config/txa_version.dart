@@ -47,14 +47,52 @@ class TxaVersion {
   /// Danh sách các bản phát hành được khai báo (Bản mới nhất đặt ở đầu tiên)
   static final List<TxaVersionRelease> releases = [
     // =========================================================================
-    // [TXA_10] - Zero Grid: Quantum Shift v1.6.4 (Build 12) - 2026-09-09
+    // [TXA_11] - Zero Grid: Quantum Shift v1.6.5 (Build 13) - 2026-09-18
     // =========================================================================
     TxaVersionRelease(
-      id: 'txa_10',
+      id: 'txa_11',
       version: TxaConfig.version,
       buildNumber: TxaConfig.buildNumber,
       releaseDate: TxaConfig.releaseDate,
       items: const [
+        // [TXA_11_ITEM_1] - Tối Ưu Đồng Bộ & Lưu Trữ Đám Mây
+        TxaChangelogItem(
+          icon: Icons.sync_lock_rounded,
+          iconColor: Color(0xFF00FFA3),
+          titleKey: 'txa_11_item_1_title',
+          descKey: 'txa_11_item_1_desc',
+          badgeKey: 'txa_11_item_1_badge',
+        ),
+
+        // [TXA_11_ITEM_2] - Hệ Thống Vinh Danh & Cột Mốc Trực Quan
+        TxaChangelogItem(
+          icon: Icons.military_tech_rounded,
+          iconColor: Color(0xFFFFD600),
+          titleKey: 'txa_11_item_2_title',
+          descKey: 'txa_11_item_2_desc',
+          badgeKey: 'txa_11_item_2_badge',
+        ),
+
+        // [TXA_11_ITEM_3] - Gia Cố Hiệu Năng & Trải Nghiệm Mượt Mà
+        TxaChangelogItem(
+          icon: Icons.bolt_rounded,
+          iconColor: Color(0xFF00E5FF),
+          titleKey: 'txa_11_item_3_title',
+          descKey: 'txa_11_item_3_desc',
+          badgeKey: 'txa_11_item_3_badge',
+        ),
+      ],
+    ),
+
+    // =========================================================================
+    // [TXA_10] - Zero Grid: Quantum Shift v1.6.4 (Build 12) - 2026-09-09
+    // =========================================================================
+    const TxaVersionRelease(
+      id: 'txa_10',
+      version: '1.6.4',
+      buildNumber: '12',
+      releaseDate: '2026-09-09',
+      items: [
         // [TXA_10_ITEM_1] - Bảo Vệ & Kiểm Tra Google Play
         TxaChangelogItem(
           icon: Icons.shield_rounded,

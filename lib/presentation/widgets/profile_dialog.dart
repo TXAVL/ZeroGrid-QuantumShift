@@ -298,6 +298,104 @@ class _ProfileDialogState extends ConsumerState<ProfileDialog> {
               ),
               const SizedBox(height: 14),
 
+              // Google Play Games Services (Cloud Save & Achievements)
+              ValueListenableBuilder<bool>(
+                valueListenable: ref.watch(gpgsServiceProvider).signedInListenable,
+                builder: (context, isGpgsConnected, _) {
+                  if (!isGpgsConnected) return const SizedBox.shrink();
+                  final gpgs = ref.read(gpgsServiceProvider);
+                  return Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.only(bottom: 14),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: palette.background.withValues(alpha: 0.8),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: const Color(0xFF00E676).withValues(alpha: 0.35),
+                        width: 1.2,
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF00E676).withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Icon(
+                                Icons.cloud_done_rounded,
+                                size: 16,
+                                color: Color(0xFF00E676),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            const Expanded(
+                              child: Text(
+                                'Google Play Games (Cloud Save)',
+                                style: TextStyle(
+                                  fontSize: 11.5,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton.icon(
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: Colors.white,
+                                  side: BorderSide(color: palette.accentNeon.withValues(alpha: 0.5)),
+                                  padding: const EdgeInsets.symmetric(vertical: 8),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                icon: Icon(Icons.cloud_sync_rounded, size: 14, color: palette.accentNeon),
+                                label: Text(
+                                  TxaLanguage.tr('gpgs_btn_sync', widget.langCode),
+                                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                onPressed: () async {
+                                  TxaToast.info(context, TxaLanguage.tr('gpgs_syncing', widget.langCode));
+                                  await gpgs.syncCloudSave(context: context);
+                                },
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            OutlinedButton.icon(
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: const Color(0xFFFFD600),
+                                side: BorderSide(color: const Color(0xFFFFD600).withValues(alpha: 0.5)),
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              icon: const Icon(Icons.emoji_events_rounded, size: 14, color: Color(0xFFFFD600)),
+                              label: Text(
+                                TxaLanguage.tr('gpgs_btn_achievements', widget.langCode),
+                                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+                              ),
+                              onPressed: () => gpgs.showAchievements(),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+
               // Warning if Guest Mode
               if (isGuest) ...[
                 Container(

@@ -9,6 +9,7 @@ import '../../core/localization/txa_language.dart';
 import '../../core/utils/txa_device.dart';
 import '../storage_service.dart';
 import '../txa_logger.dart';
+import '../gpgs/gpgs_service.dart';
 import 'txa_gg_login.dart';
 
 /// Trạng thái xác thực của người chơi
@@ -20,6 +21,7 @@ enum TxaAuthStatus {
 /// Dịch vụ Xác thực & Đăng nhập (TxaAuthService)
 class TxaAuthService {
   final StorageService _storage;
+  final GpgsService? _gpgs;
 
   static final StreamController<Map<String, dynamic>> _authEventController =
       StreamController<Map<String, dynamic>>.broadcast();
@@ -31,7 +33,7 @@ class TxaAuthService {
   static const String supabaseUrl = TxaConfig.supabaseUrl;
   static final String supabaseAnonKey = TxaConfig.supabaseAnonKey;
 
-  TxaAuthService(this._storage);
+  TxaAuthService(this._storage, [this._gpgs]);
 
   Map<String, String> get _headers => {
         'apikey': supabaseAnonKey,
@@ -92,6 +94,7 @@ class TxaAuthService {
           _storage.userRole = data['role'] ?? 'player';
           _storage.avatarUrl = data['avatar_url'] ?? '';
           TXALogger.logApi('Custom login success: ${data['username']}, role: ${data['role']}');
+          _gpgs?.syncCloudSave();
         }
         return data;
       }
@@ -142,6 +145,7 @@ class TxaAuthService {
           _storage.userRole = data['role'] ?? 'player';
           _storage.avatarUrl = '';
           TXALogger.logApi('Custom registration success: ${data['username']}');
+          _gpgs?.syncCloudSave();
         }
         return data;
       }
@@ -203,6 +207,7 @@ class TxaAuthService {
           _storage.avatarUrl = ggUser.photoUrl ?? (data['avatar_url'] ?? '');
           _storage.userRole = data['role'] ?? 'player';
           TXALogger.logApi('Google auth success: ${ggUser.email}, is_new: ${data['is_new']}, role: ${data['role']}');
+          _gpgs?.syncCloudSave();
           return true;
         }
       }
@@ -286,6 +291,7 @@ class TxaAuthService {
                 _storage.authEmail = txaEmail;
                 _storage.avatarUrl = syncData['avatar_url'] ?? txaAvatar;
                 _storage.userRole = syncData['role'] ?? 'player';
+                _gpgs?.syncCloudSave();
               }
             }
           } catch (syncErr) {

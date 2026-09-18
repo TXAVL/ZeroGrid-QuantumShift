@@ -38,5 +38,11 @@ class NoopGpgsService implements GpgsService {
   Future<void> showLeaderboard({String? leaderboardId}) async {}
 
   @override
-  Future<void> syncCloudSave() async {}
+  Future<void> syncCloudSave({BuildContext? context}) async {}
+
+  @override
+  Future<void> uploadLocalToCloud() async {}
+
+  @override
+  void checkPendingConflict(BuildContext context) {}
 }

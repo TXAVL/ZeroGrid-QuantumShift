@@ -77,7 +77,9 @@ abstract class GpgsService {
   Future<void> submitScore({required String leaderboardId, required int score});
   Future<void> showAchievements();
   Future<void> showLeaderboard({String? leaderboardId});
-  Future<void> syncCloudSave();
+  Future<void> syncCloudSave({BuildContext? context});
+  Future<void> uploadLocalToCloud();
+  void checkPendingConflict(BuildContext context);
   bool get isSignedIn;
   ValueListenable<bool> get signedInListenable;
 }

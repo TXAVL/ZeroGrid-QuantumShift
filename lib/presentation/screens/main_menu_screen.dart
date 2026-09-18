@@ -42,6 +42,7 @@ class _MainMenuScreenState extends ConsumerState<MainMenuScreen> with WidgetsBin
       _checkBannedStatus();
       _fetchUserProfile();
       _checkWhatsNew();
+      ref.read(gpgsServiceProvider).checkPendingConflict(context);
     });
   }
 
@@ -440,6 +441,62 @@ class _MainMenuScreenState extends ConsumerState<MainMenuScreen> with WidgetsBin
                         onTap: () {
                           Navigator.of(ctx).pop();
                           TxaConfig.openStoreSubscriptions();
+                        },
+                      ),
+                      const Divider(color: Colors.white10),
+
+                      // Google Play Games Services
+                      ValueListenableBuilder<bool>(
+                        valueListenable: ref.watch(gpgsServiceProvider).signedInListenable,
+                        builder: (context, isGpgsConnected, _) {
+                          final gpgs = ref.read(gpgsServiceProvider);
+                          return ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            leading: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: (isGpgsConnected ? const Color(0xFF00E676) : Colors.white38)
+                                    .withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Icon(
+                                Icons.sports_esports_rounded,
+                                color: isGpgsConnected ? const Color(0xFF00E676) : Colors.white70,
+                                size: 22,
+                              ),
+                            ),
+                            title: Text(
+                              TxaLanguage.tr('gpgs_section_title', langCode),
+                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                            ),
+                            subtitle: Text(
+                              isGpgsConnected
+                                  ? TxaLanguage.tr('gpgs_status_connected', langCode)
+                                  : TxaLanguage.tr('gpgs_status_disconnected', langCode),
+                              style: TextStyle(
+                                color: isGpgsConnected ? const Color(0xFF00E676) : const Color(0xFF8B9BB4),
+                                fontSize: 12,
+                              ),
+                            ),
+                            trailing: isGpgsConnected
+                                ? IconButton(
+                                    icon: const Icon(Icons.cloud_sync_rounded, color: Color(0xFF00E676)),
+                                    tooltip: TxaLanguage.tr('gpgs_btn_sync', langCode),
+                                    onPressed: () async {
+                                      Navigator.of(ctx).pop();
+                                      TxaToast.info(context, TxaLanguage.tr('gpgs_syncing', langCode));
+                                      await gpgs.syncCloudSave(context: context);
+                                    },
+                                  )
+                                : const Icon(Icons.cloud_off_rounded, color: Colors.white30, size: 20),
+                            onTap: isGpgsConnected
+                                ? () async {
+                                    Navigator.of(ctx).pop();
+                                    TxaToast.info(context, TxaLanguage.tr('gpgs_syncing', langCode));
+                                    await gpgs.syncCloudSave(context: context);
+                                  }
+                                : null,
+                          );
                         },
                       ),
                       const Divider(color: Colors.white10),

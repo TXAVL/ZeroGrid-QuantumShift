@@ -527,6 +527,39 @@ class StorageService {
     return total;
   }
 
+  // --- GOOGLE PLAY GAMES CLOUD OVERWRITE & ACHIEVEMENTS ---
+  /// Ghi đè toàn bộ tiến trình cục bộ bằng bản lưu từ Google Play Games
+  Future<void> overwriteLocalFromGpgs(Map<String, dynamic> cloudData) async {
+    final normalized = Map<String, dynamic>.from(cloudData);
+    if (!normalized.containsKey('level_stars') && normalized.containsKey('stars_map')) {
+      final starsMap = normalized['stars_map'];
+      final formattedStars = <String, int>{};
+      if (starsMap is Map) {
+        for (final e in starsMap.entries) {
+          final lvl = e.key.toString();
+          formattedStars['stars_lvl_$lvl'] = (e.value as num?)?.toInt() ?? 0;
+        }
+      }
+      normalized['level_stars'] = formattedStars;
+    }
+
+    await importSaveData(normalized);
+    final curId = playerId;
+    if (curId.isNotEmpty) {
+      _settingsBox.put('local_save_$curId', jsonEncode(exportCurrentSaveData()));
+    }
+    _triggerSaveDataChanged();
+  }
+
+  /// Kiểm tra xem danh hiệu / thành tựu đã được mở khóa cục bộ chưa
+  bool hasUnlockedAchievement(String achievementId) =>
+      _progressBox.get('ach_unlocked_$achievementId', defaultValue: false);
+
+  /// Ghi nhận mở khóa thành tựu vào bộ nhớ cục bộ
+  void markAchievementUnlocked(String achievementId) {
+    _progressBox.put('ach_unlocked_$achievementId', true);
+  }
+
   // --- DAILY CHALLENGE PROGRESSION ---
   bool isDailyCompletedToday(String dateUtc) => _progressBox.get('daily_completed_$dateUtc', defaultValue: false);
   int getDailyCompletedStage(String dateUtc) => _progressBox.get('daily_stage_$dateUtc', defaultValue: 0);
