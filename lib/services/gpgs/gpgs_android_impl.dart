@@ -335,13 +335,13 @@ class GpgsAndroidServiceImpl implements GpgsService {
       final cloudUnlockedLevel = (cloudJson['unlocked_level'] as num?)?.toInt() ?? 1;
       int cloudTotalStars = (cloudJson['total_campaign_stars'] as num?)?.toInt() ?? 0;
       if (cloudTotalStars == 0 && cloudJson['stars_map'] is Map) {
-        (cloudJson['stars_map'] as Map).values.forEach((v) {
+        for (final v in (cloudJson['stars_map'] as Map).values) {
           if (v is num) cloudTotalStars += v.toInt();
-        });
+        }
       } else if (cloudTotalStars == 0 && cloudJson['level_stars'] is Map) {
-        (cloudJson['level_stars'] as Map).values.forEach((v) {
+        for (final v in (cloudJson['level_stars'] as Map).values) {
           if (v is num) cloudTotalStars += v.toInt();
-        });
+        }
       }
       final cloudHighScore = (cloudJson['endless_high_score'] as num?)?.toInt() ?? 0;
 
@@ -368,7 +368,7 @@ class GpgsAndroidServiceImpl implements GpgsService {
         final targetContext = context ?? TxaToast.navigatorKey.currentContext;
         if (targetContext != null && targetContext.mounted) {
           final lang = _storageService.languageCode;
-          final palette = CyberPalettes.cyberNeon;
+          const palette = GameColorPalette.cyberNeon;
 
           await GpgsConflictDialog.show(
             context: targetContext,
@@ -429,7 +429,7 @@ class GpgsAndroidServiceImpl implements GpgsService {
       _pendingConflict = null;
       final localData = _storageService.exportCurrentSaveData();
       final lang = _storageService.languageCode;
-      final palette = CyberPalettes.cyberNeon;
+      const palette = GameColorPalette.cyberNeon;
 
       GpgsConflictDialog.show(
         context: context,
