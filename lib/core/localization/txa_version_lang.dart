@@ -15,6 +15,26 @@ class TxaVersionLang {
       'whats_new_btn_continue': 'ĐÃ HIỂU & TIẾP TỤC',
 
       // -----------------------------------------------------------------------
+      // [TXA_12] - Phiên bản v1.6.6 (Build 14) - Ngày: 2026-09-21
+      // -----------------------------------------------------------------------
+      'txa_12_title': 'Bản Cập Nhật Đồng Bộ Đám Mây & Tối Ưu Hóa 1.6.6',
+
+      // [TXA_12_ITEM_1] - Đồng Bộ Đám Mây Google Play Trò Chơi
+      'txa_12_item_1_title': 'Đồng Bộ Đám Mây Google Play Trò Chơi',
+      'txa_12_item_1_desc': 'Kích hoạt toàn diện tính năng Lưu trữ đám mây (Cloud Save) của Google Play Games: Tiến trình và thành tích chơi game của bạn giờ đây được sao lưu tự động và an toàn tuyệt đối trên đám mây.',
+      'txa_12_item_1_badge': 'CLOUD SAVE',
+
+      // [TXA_12_ITEM_2] - Hiển Thị Kết Nối Trực Quan Trong Cài Đặt
+      'txa_12_item_2_title': 'Hiển Thị Kết Nối Trực Quan Trong Cài Đặt',
+      'txa_12_item_2_desc': 'Cải tiến giao diện thiết lập với trạng thái kết nối Google Play Games chuẩn xác theo thời gian thực, phản ánh ngay lập tức tài khoản người chơi đã đăng nhập.',
+      'txa_12_item_2_badge': 'TRỰC QUAN',
+
+      // [TXA_12_ITEM_3] - Nâng Cao Độ Ổn Định & Tinh Chỉnh Đa Ngôn Ngữ
+      'txa_12_item_3_title': 'Nâng Cao Độ Ổn Định & Tinh Chỉnh Đa Ngôn Ngữ',
+      'txa_12_item_3_desc': 'Tối ưu hóa hệ thống từ điển ngôn ngữ, dọn dẹp các xung đột cấu hình và tăng cường độ mượt mà khi tương tác giao diện người dùng.',
+      'txa_12_item_3_badge': 'ỔN ĐỊNH',
+
+      // -----------------------------------------------------------------------
       // [TXA_11] - Phiên bản v1.6.5 (Build 13) - Ngày: 2026-09-18
       // -----------------------------------------------------------------------
       'txa_11_title': 'Bản Cập Nhật Ổn Định Lõi & Tối Ưu Lượng Tử 1.6.5',
@@ -289,6 +309,26 @@ class TxaVersionLang {
       // -----------------------------------------------------------------------
       'whats_new_title': "WHAT'S NEW IN THIS VERSION?",
       'whats_new_btn_continue': 'GOT IT & CONTINUE',
+
+      // -----------------------------------------------------------------------
+      // [TXA_12] - Version v1.6.6 (Build 14) - Date: 2026-09-21
+      // -----------------------------------------------------------------------
+      'txa_12_title': 'Cloud Sync Engine & Polish Update 1.6.6',
+
+      // [TXA_12_ITEM_1] - Google Play Games Cloud Save Integration
+      'txa_12_item_1_title': 'Google Play Games Cloud Save Integration',
+      'txa_12_item_1_desc': 'Fully activated Google Play Games Cloud Save snapshots: Your game progression and accomplishments are now seamlessly backed up and secure in the cloud.',
+      'txa_12_item_1_badge': 'CLOUD SAVE',
+
+      // [TXA_12_ITEM_2] - Real-Time Account Status in Settings
+      'txa_12_item_2_title': 'Real-Time Account Status in Settings',
+      'txa_12_item_2_desc': 'Polished settings screen with accurate, real-time Google Play Games connection status indicators reflecting your active gaming profile.',
+      'txa_12_item_2_badge': 'SETTINGS',
+
+      // [TXA_12_ITEM_3] - Stability Boost & Localization Refinements
+      'txa_12_item_3_title': 'Stability Boost & Localization Refinements',
+      'txa_12_item_3_desc': 'Enhanced localization dictionary management, cleaned up configuration parameters, and improved overall UI responsiveness and smoothness.',
+      'txa_12_item_3_badge': 'STABILITY',
 
       // -----------------------------------------------------------------------
       // [TXA_11] - Version v1.6.5 (Build 13) - Date: 2026-09-18

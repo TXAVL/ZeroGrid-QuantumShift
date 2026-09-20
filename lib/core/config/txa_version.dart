@@ -47,14 +47,52 @@ class TxaVersion {
   /// Danh sách các bản phát hành được khai báo (Bản mới nhất đặt ở đầu tiên)
   static final List<TxaVersionRelease> releases = [
     // =========================================================================
-    // [TXA_11] - Zero Grid: Quantum Shift v1.6.5 (Build 13) - 2026-09-18
+    // [TXA_12] - Zero Grid: Quantum Shift v1.6.6 (Build 14) - 2026-09-21
     // =========================================================================
     TxaVersionRelease(
-      id: 'txa_11',
+      id: 'txa_12',
       version: TxaConfig.version,
       buildNumber: TxaConfig.buildNumber,
       releaseDate: TxaConfig.releaseDate,
       items: const [
+        // [TXA_12_ITEM_1] - Đồng Bộ Đám Mây Google Play Trò Chơi
+        TxaChangelogItem(
+          icon: Icons.cloud_done_rounded,
+          iconColor: Color(0xFF00FFA3),
+          titleKey: 'txa_12_item_1_title',
+          descKey: 'txa_12_item_1_desc',
+          badgeKey: 'txa_12_item_1_badge',
+        ),
+
+        // [TXA_12_ITEM_2] - Hiển Thị Kết Nối Trực Quan Trong Cài Đặt
+        TxaChangelogItem(
+          icon: Icons.account_circle_rounded,
+          iconColor: Color(0xFFFFD600),
+          titleKey: 'txa_12_item_2_title',
+          descKey: 'txa_12_item_2_desc',
+          badgeKey: 'txa_12_item_2_badge',
+        ),
+
+        // [TXA_12_ITEM_3] - Nâng Cao Độ Ổn Định & Tinh Chỉnh Đa Ngôn Ngữ
+        TxaChangelogItem(
+          icon: Icons.bolt_rounded,
+          iconColor: Color(0xFF00E5FF),
+          titleKey: 'txa_12_item_3_title',
+          descKey: 'txa_12_item_3_desc',
+          badgeKey: 'txa_12_item_3_badge',
+        ),
+      ],
+    ),
+
+    // =========================================================================
+    // [TXA_11] - Zero Grid: Quantum Shift v1.6.5 (Build 13) - 2026-09-18
+    // =========================================================================
+    const TxaVersionRelease(
+      id: 'txa_11',
+      version: '1.6.5',
+      buildNumber: '13',
+      releaseDate: '2026-09-18',
+      items: [
         // [TXA_11_ITEM_1] - Tối Ưu Đồng Bộ & Lưu Trữ Đám Mây
         TxaChangelogItem(
           icon: Icons.sync_lock_rounded,
