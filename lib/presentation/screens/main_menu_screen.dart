@@ -183,6 +183,7 @@ class _MainMenuScreenState extends ConsumerState<MainMenuScreen> with WidgetsBin
   }
 
   void _showSettingsDialog(BuildContext context, WidgetRef ref) {
+    ref.read(gpgsServiceProvider).refreshSignInStatus();
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -486,16 +487,34 @@ class _MainMenuScreenState extends ConsumerState<MainMenuScreen> with WidgetsBin
                                       Navigator.of(ctx).pop();
                                       TxaToast.info(context, TxaLanguage.tr('gpgs_syncing', langCode));
                                       await gpgs.syncCloudSave(context: context);
+                                      await gpgs.syncAchievements();
                                     },
                                   )
-                                : const Icon(Icons.cloud_off_rounded, color: Colors.white30, size: 20),
-                            onTap: isGpgsConnected
-                                ? () async {
-                                    Navigator.of(ctx).pop();
-                                    TxaToast.info(context, TxaLanguage.tr('gpgs_syncing', langCode));
-                                    await gpgs.syncCloudSave(context: context);
-                                  }
-                                : null,
+                                : IconButton(
+                                    icon: const Icon(Icons.refresh_rounded, color: Colors.white60),
+                                    tooltip: TxaLanguage.tr('btn_refresh', langCode),
+                                    onPressed: () async {
+                                      TxaToast.info(context, TxaLanguage.tr('gpgs_syncing', langCode));
+                                      final ok = await gpgs.refreshSignInStatus();
+                                      if (!ok) {
+                                        await gpgs.explicitSignIn();
+                                      }
+                                    },
+                                  ),
+                            onTap: () async {
+                              if (isGpgsConnected) {
+                                Navigator.of(ctx).pop();
+                                TxaToast.info(context, TxaLanguage.tr('gpgs_syncing', langCode));
+                                await gpgs.syncCloudSave(context: context);
+                                await gpgs.syncAchievements();
+                              } else {
+                                TxaToast.info(context, TxaLanguage.tr('gpgs_syncing', langCode));
+                                final ok = await gpgs.refreshSignInStatus();
+                                if (!ok) {
+                                  await gpgs.explicitSignIn();
+                                }
+                              }
+                            },
                           );
                         },
                       ),

@@ -45,5 +45,11 @@ class NoopGpgsService implements GpgsService {
   Future<void> uploadLocalToCloud() async {}
 
   @override
+  Future<bool> refreshSignInStatus() async => false;
+
+  @override
+  Future<void> syncAchievements() async {}
+
+  @override
   void checkPendingConflict(BuildContext context) {}
 }

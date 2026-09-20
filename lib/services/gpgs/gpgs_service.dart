@@ -80,6 +80,8 @@ abstract class GpgsService {
   Future<void> showLeaderboard({String? leaderboardId});
   Future<void> syncCloudSave({BuildContext? context});
   Future<void> uploadLocalToCloud();
+  Future<bool> refreshSignInStatus();
+  Future<void> syncAchievements();
   void checkPendingConflict(BuildContext context);
   bool get isSignedIn;
   ValueListenable<bool> get signedInListenable;

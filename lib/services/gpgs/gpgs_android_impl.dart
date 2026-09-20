@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
@@ -18,8 +19,75 @@ class GpgsAndroidServiceImpl implements GpgsService {
   final ValueNotifier<bool> _signedInNotifier = ValueNotifier<bool>(false);
   final List<({String leaderboardId, int score})> _offlineScoreQueue = [];
   Map<String, dynamic>? _pendingConflict;
+  StreamSubscription? _playerSubscription;
+  final Map<String, String> _remoteIdMap = {};
 
-  GpgsAndroidServiceImpl(this._storageService);
+  static const List<String> _allLocalAchievementIds = [
+    GpgsAchievementIds.achFirstClear,
+    GpgsAchievementIds.achSector10,
+    GpgsAchievementIds.achSector25,
+    GpgsAchievementIds.achSector50,
+    GpgsAchievementIds.achSector75,
+    GpgsAchievementIds.achSector100,
+    GpgsAchievementIds.achStars10,
+    GpgsAchievementIds.achStars50,
+    GpgsAchievementIds.achStars100,
+    GpgsAchievementIds.achStars200,
+    GpgsAchievementIds.achStars300,
+    GpgsAchievementIds.achPerfectionist20,
+    GpgsAchievementIds.achStreak3,
+    GpgsAchievementIds.achStreak5,
+    GpgsAchievementIds.achStreak10,
+    GpgsAchievementIds.achWins10,
+    GpgsAchievementIds.achWins50,
+    GpgsAchievementIds.achWins100,
+    GpgsAchievementIds.achCombo3,
+    GpgsAchievementIds.achComboMasterX5,
+    GpgsAchievementIds.achCombo8,
+    GpgsAchievementIds.achSpeedDemon4x4,
+    GpgsAchievementIds.achNoHintRun,
+    GpgsAchievementIds.achEndless100,
+    GpgsAchievementIds.achEndless500,
+    GpgsAchievementIds.achEndless1000,
+    GpgsAchievementIds.achDaily1,
+    GpgsAchievementIds.achDaily3,
+    GpgsAchievementIds.achDaily7,
+    GpgsAchievementIds.achLbSubmit,
+    GpgsAchievementIds.achLbTop100,
+    GpgsAchievementIds.achLbTop50,
+    GpgsAchievementIds.achLbTop10,
+    GpgsAchievementIds.achLbTop1,
+    GpgsAchievementIds.achLbDailyPodium,
+    GpgsAchievementIds.achLbScore50k,
+  ];
+
+  GpgsAndroidServiceImpl(this._storageService) {
+    if (!kIsWeb && Platform.isAndroid) {
+      _listenToPlayerStream();
+    }
+  }
+
+  void _listenToPlayerStream() {
+    try {
+      _playerSubscription?.cancel();
+      _playerSubscription = GamesServices.player.listen((player) {
+        final signedIn = (player != null);
+        if (_signedInNotifier.value != signedIn) {
+          _signedInNotifier.value = signedIn;
+          TXALogger.logGpgs('🎮 [GPGS] Trạng thái Player thay đổi: signedIn=$signedIn (${player?.displayName ?? "Chưa xác thực"})');
+          if (signedIn) {
+            _flushOfflineScores();
+            syncAchievements();
+            syncCloudSave();
+          }
+        }
+      }, onError: (e) {
+        // Silent ignore stream channel error
+      });
+    } catch (e) {
+      TXALogger.logGpgs('⚠️ [GPGS] Không thể khởi tạo listener player stream: $e');
+    }
+  }
 
   @override
   bool get isSignedIn => _signedInNotifier.value;
@@ -31,6 +99,7 @@ class GpgsAndroidServiceImpl implements GpgsService {
   Future<void> initialize() async {
     if (kIsWeb || !Platform.isAndroid) return;
     TXALogger.logGpgs('Initializing Google Play Games Services...');
+    _listenToPlayerStream();
     await silentSignIn();
   }
 
@@ -40,16 +109,24 @@ class GpgsAndroidServiceImpl implements GpgsService {
     try {
       TXALogger.logGpgs('Attempting GPGS Silent Sign-in...');
       final result = await GamesServices.signIn().timeout(
-        const Duration(seconds: 5),
+        const Duration(seconds: 12),
         onTimeout: () {
-          TXALogger.logGpgs('GPGS Silent Sign-in timed out (5s). Fallback to offline.');
+          TXALogger.logGpgs('GPGS Silent Sign-in timed out (12s). Kiểm tra lại qua isSignedIn...');
           return '';
         },
       );
-      _signedInNotifier.value = (result != null && result.isNotEmpty);
+      bool signedIn = (result != null && result.isNotEmpty);
+      if (!signedIn) {
+        signedIn = await GamesServices.isSignedIn.timeout(
+          const Duration(seconds: 3),
+          onTimeout: () => false,
+        );
+      }
+      _signedInNotifier.value = signedIn;
       if (_signedInNotifier.value) {
-        TXALogger.logGpgs('GPGS Silent Sign-in Success: $result');
+        TXALogger.logGpgs('GPGS Silent Sign-in Success: $result (signedIn=true)');
         _flushOfflineScores();
+        await syncAchievements();
         await syncCloudSave();
       } else {
         TXALogger.logGpgs('GPGS Silent Sign-in unauthenticated (User has not authorized yet).');
@@ -59,13 +136,42 @@ class GpgsAndroidServiceImpl implements GpgsService {
       final lang = _storageService.languageCode;
       if (e is PlatformException && e.code == 'failed_to_authenticate') {
         TXALogger.logGpgs(
-          'ℹ️ [GPGS] Silent Sign-in chưa có phiên xác thực cached: $e. Cần đăng nhập tương tác (Interactive Sign-in).',
+          'ℹ️ [GPGS] Silent Sign-in chưa có phiên xác thực cached: $e.',
         );
       } else {
         TXALogger.logGpgs('${TxaLanguage.tr('gpgs_err_general', lang)} (offline fallback): $e\nStackTrace:\n$stack');
       }
-      _signedInNotifier.value = false;
-      return false;
+      try {
+        final fallback = await GamesServices.isSignedIn.timeout(const Duration(seconds: 2), onTimeout: () => false);
+        _signedInNotifier.value = fallback;
+      } catch (_) {
+        _signedInNotifier.value = false;
+      }
+      return _signedInNotifier.value;
+    }
+  }
+
+  @override
+  Future<bool> refreshSignInStatus() async {
+    if (kIsWeb || !Platform.isAndroid) return false;
+    try {
+      final signedIn = await GamesServices.isSignedIn.timeout(
+        const Duration(seconds: 4),
+        onTimeout: () => _signedInNotifier.value,
+      );
+      if (_signedInNotifier.value != signedIn) {
+        _signedInNotifier.value = signedIn;
+        TXALogger.logGpgs('🎮 [GPGS] Đã cập nhật trạng thái đăng nhập: $signedIn');
+        if (signedIn) {
+          _flushOfflineScores();
+          syncAchievements();
+          syncCloudSave();
+        }
+      }
+      return _signedInNotifier.value;
+    } catch (e) {
+      TXALogger.logGpgs('🎮 [GPGS] Lỗi khi làm mới trạng thái: $e');
+      return _signedInNotifier.value;
     }
   }
 
@@ -75,10 +181,18 @@ class GpgsAndroidServiceImpl implements GpgsService {
     try {
       TXALogger.logGpgs('Triggering GPGS Explicit Sign-in overlay...');
       final result = await GamesServices.signIn();
-      _signedInNotifier.value = (result != null && result.isNotEmpty);
+      bool signedIn = (result != null && result.isNotEmpty);
+      if (!signedIn) {
+        signedIn = await GamesServices.isSignedIn.timeout(
+          const Duration(seconds: 3),
+          onTimeout: () => false,
+        );
+      }
+      _signedInNotifier.value = signedIn;
       if (_signedInNotifier.value) {
         TXALogger.logGpgs('GPGS Explicit Sign-in Success: $result');
         _flushOfflineScores();
+        await syncAchievements();
         await syncCloudSave();
       }
       return _signedInNotifier.value;
@@ -103,6 +217,57 @@ class GpgsAndroidServiceImpl implements GpgsService {
   }
 
   @override
+  Future<void> syncAchievements() async {
+    if (!isSignedIn) return;
+    TXALogger.logGpgs('🔄 [GPGS] Bắt đầu đồng bộ danh hiệu hai chiều...');
+    try {
+      final remoteList = await GamesServices.loadAchievements(forceRefresh: true);
+      if (remoteList != null && remoteList.isNotEmpty) {
+        TXALogger.logGpgs('🎮 [GPGS] Đã tải ${remoteList.length} danh hiệu từ Google Play Console.');
+        for (final remote in remoteList) {
+          final rName = remote.name.toLowerCase().trim();
+          final rId = remote.id;
+
+          for (final localId in _allLocalAchievementIds) {
+            final key = localId.replaceFirst('CgkI_sample_', '').replaceAll('_', ' ').toLowerCase();
+            if (rName.contains(key) || key.contains(rName) || rId == localId) {
+              _remoteIdMap[localId] = rId;
+            }
+          }
+
+          // Chiều về: Nếu trên GPGS đã mở khóa -> ghi nhận cục bộ
+          if (remote.unlocked) {
+            _storageService.markAchievementUnlocked(rId);
+            for (final entry in _remoteIdMap.entries) {
+              if (entry.value == rId) {
+                _storageService.markAchievementUnlocked(entry.key);
+              }
+            }
+          }
+        }
+      }
+
+      // Chiều đi: Đẩy tất cả danh hiệu đã đạt được ở máy lên GPGS
+      for (final localId in _allLocalAchievementIds) {
+        if (_storageService.hasUnlockedAchievement(localId)) {
+          final targetId = _remoteIdMap[localId] ?? localId;
+          try {
+            await GamesServices.unlock(
+              achievement: Achievement(androidID: targetId),
+            );
+            TXALogger.logGpgs('✅ [GPGS] Đã đồng bộ danh hiệu lên GPGS: $localId (ID: $targetId)');
+          } catch (e) {
+            TXALogger.logGpgs('ℹ️ [GPGS] Bỏ qua unlock cho $targetId: $e');
+          }
+        }
+      }
+      TXALogger.logGpgs('✅ [GPGS] Hoàn tất tiến trình đồng bộ danh hiệu.');
+    } catch (e) {
+      TXALogger.logGpgs('⚠️ [GPGS] Lỗi khi đồng bộ danh hiệu: $e');
+    }
+  }
+
+  @override
   Future<void> unlockAchievement(String achievementId) async {
     // 1. Ghi nhận và hiển thị thông báo thành tựu in-game nếu mới mở khóa
     final alreadyUnlocked = _storageService.hasUnlockedAchievement(achievementId);
@@ -120,18 +285,15 @@ class GpgsAndroidServiceImpl implements GpgsService {
     // 2. Gửi yêu cầu mở khóa lên Google Play Games SDK
     if (!isSignedIn) return;
     try {
-      if (achievementId.contains('sample')) {
-        TXALogger.logGpgs('ℹ️ [GPGS] Achievement ID "$achievementId" là ID mẫu. Để hiển thị popup native từ Play Games, cấu hình ID từ Google Play Console trong TxaConfig.');
-        return;
-      }
-      TXALogger.logGpgs('Unlocking GPGS Achievement: $achievementId');
+      final targetId = _remoteIdMap[achievementId] ?? achievementId;
+      TXALogger.logGpgs('Unlocking GPGS Achievement: $achievementId (target: $targetId)');
       await GamesServices.unlock(
         achievement: Achievement(
-          androidID: achievementId,
+          androidID: targetId,
         ),
       );
     } catch (e) {
-      TXALogger.logGpgs('GPGS Unlock Achievement error: $e');
+      TXALogger.logGpgs('GPGS Unlock Achievement note: $e');
     }
   }
 
@@ -398,7 +560,11 @@ class GpgsAndroidServiceImpl implements GpgsService {
 
       TXALogger.logGpgs('GPGS Cloud Save hoàn toàn đồng bộ với tiến trình cục bộ.');
     } catch (e) {
-      TXALogger.logGpgs('GPGS Cloud Save sync error: $e');
+      if (e is PlatformException && (e.message?.contains('Cannot use snapshots without enabling') ?? false)) {
+        TXALogger.logGpgs('ℹ️ [GPGS Cloud Save] Tính năng "Saved Games" (Snapshots) chưa được bật trong Google Play Console. Thành tích và bảng xếp hạng vẫn hoạt động bình thường.');
+      } else {
+        TXALogger.logGpgs('GPGS Cloud Save sync error: $e');
+      }
     }
   }
 
@@ -418,7 +584,11 @@ class GpgsAndroidServiceImpl implements GpgsService {
       );
       TXALogger.logGpgs('Đã tải tiến trình cục bộ lên GPGS snapshot thành công.');
     } catch (e) {
-      TXALogger.logGpgs('Lỗi khi tải tiến trình cục bộ lên GPGS: $e');
+      if (e is PlatformException && (e.message?.contains('Cannot use snapshots without enabling') ?? false)) {
+        TXALogger.logGpgs('ℹ️ [GPGS Cloud Save] Không thể tải bản lưu: Cần bật tính năng "Saved Games" trên Google Play Console.');
+      } else {
+        TXALogger.logGpgs('Lỗi khi tải tiến trình cục bộ lên GPGS: $e');
+      }
     }
   }
 
