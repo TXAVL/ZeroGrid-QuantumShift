@@ -55,7 +55,7 @@ class TxaVersion {
       buildNumber: TxaConfig.buildNumber,
       releaseDate: TxaConfig.releaseDate,
       items: const [
-        // [TXA_13_ITEM_1] - Liên Kết 26 Danh Hiệu Google Play Games
+        // [TXA_13_ITEM_1] - Mở Khóa Trọn Bộ 26 Danh Hiệu Đỉnh Cao
         TxaChangelogItem(
           icon: Icons.military_tech_rounded,
           iconColor: Color(0xFFFFD600),
@@ -64,7 +64,7 @@ class TxaVersion {
           badgeKey: 'txa_13_item_1_badge',
         ),
 
-        // [TXA_13_ITEM_2] - Tự Động Khởi Tạo Bản Lưu Đám Mây Ban Đầu
+        // [TXA_13_ITEM_2] - Tự Động Lưu Tiến Trình Lên Đám Mây
         TxaChangelogItem(
           icon: Icons.cloud_sync_rounded,
           iconColor: Color(0xFF00FFA3),
@@ -73,7 +73,7 @@ class TxaVersion {
           badgeKey: 'txa_13_item_2_badge',
         ),
 
-        // [TXA_13_ITEM_3] - Tối Ưu Hệ Thống Tài Nguyên Native & Trải Nghiệm
+        // [TXA_13_ITEM_3] - Trải Nghiệm Mượt Mà & Nhanh Chóng Hơn
         TxaChangelogItem(
           icon: Icons.speed_rounded,
           iconColor: Color(0xFF00E5FF),

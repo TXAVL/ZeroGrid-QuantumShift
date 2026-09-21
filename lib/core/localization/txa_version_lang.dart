@@ -17,22 +17,22 @@ class TxaVersionLang {
       // -----------------------------------------------------------------------
       // [TXA_13] - Phiên bản v1.6.7 (Build 15) - Ngày: 2026-09-21
       // -----------------------------------------------------------------------
-      'txa_13_title': 'Bản Cập Nhật Đồng Bộ Danh Hiệu & Tài Nguyên 1.6.7',
+      'txa_13_title': 'Bản Cập Nhật Vinh Danh & Lưu Trữ Đám Mây 1.6.7',
 
-      // [TXA_13_ITEM_1] - Liên Kết 26 Danh Hiệu Google Play Games
-      'txa_13_item_1_title': 'Liên Kết 26 Danh Hiệu Google Play Games',
-      'txa_13_item_1_desc': 'Tích hợp toàn diện 26 mã định danh thành tựu chính thức từ Google Play Console, đảm bảo từng cột mốc vinh quang của bạn được ghi nhận và đồng bộ tức thì lên máy chủ.',
-      'txa_13_item_1_badge': 'THÀNH TỰU',
+      // [TXA_13_ITEM_1] - Mở Khóa Trọn Bộ 26 Danh Hiệu Đỉnh Cao
+      'txa_13_item_1_title': 'Mở Khóa Trọn Bộ 26 Danh Hiệu Đỉnh Cao',
+      'txa_13_item_1_desc': 'Chinh phục và nhận ngay huy hiệu vinh danh cho mọi cột mốc: từ giải cứu màn đầu tiên, chuỗi Combo bùng nổ cho tới kỷ lục chuỗi thắng bất bại trên bảng vàng Google Play!',
+      'txa_13_item_1_badge': 'DANH HIỆU',
 
-      // [TXA_13_ITEM_2] - Tự Động Khởi Tạo Bản Lưu Đám Mây Ban Đầu
-      'txa_13_item_2_title': 'Tự Động Khởi Tạo Bản Lưu Đám Mây Ban Đầu',
-      'txa_13_item_2_desc': 'Cải tiến cơ chế Cloud Save: Tự động khởi tạo và tải tiến trình chơi lên Google Drive đối với người chơi mới hoặc lần đầu kích hoạt tính năng lưu đám mây.',
-      'txa_13_item_2_badge': 'CLOUD SAVE',
+      // [TXA_13_ITEM_2] - Tự Động Lưu Tiến Trình Lên Đám Mây
+      'txa_13_item_2_title': 'Tự Động Lưu Tiến Trình Lên Đám Mây',
+      'txa_13_item_2_desc': 'Mỗi ngôi sao và cấp độ bạn vượt qua đều được tự động sao lưu an toàn ngay tức thì. Yên tâm đổi máy hoặc chơi lại bất cứ lúc nào mà không lo mất màn!',
+      'txa_13_item_2_badge': 'LƯU GAME',
 
-      // [TXA_13_ITEM_3] - Tối Ưu Hệ Thống Tài Nguyên Native & Trải Nghiệm
-      'txa_13_item_3_title': 'Tối Ưu Hệ Thống Tài Nguyên Native & Trải Nghiệm',
-      'txa_13_item_3_desc': 'Chuẩn hóa tệp tài nguyên games-ids.xml theo khuyến nghị của Google Play, tối ưu kiểm tra khôi phục giao dịch và nâng cao độ ổn định tổng thể của trò chơi.',
-      'txa_13_item_3_badge': 'TỐI ƯU',
+      // [TXA_13_ITEM_3] - Trải Nghiệm Mượt Mà & Nhanh Chóng Hơn
+      'txa_13_item_3_title': 'Trải Nghiệm Mượt Mà & Nhanh Chóng Hơn',
+      'txa_13_item_3_desc': 'Tinh chỉnh tốc độ vào game, phản hồi chạm siêu nhạy và tối ưu hóa hệ thống, mang lại cảm giác giải đố sảng khoái và liền mạch nhất trong từng thao tác.',
+      'txa_13_item_3_badge': 'MƯỢT MÀ',
 
       // -----------------------------------------------------------------------
       // [TXA_12] - Phiên bản v1.6.6 (Build 14) - Ngày: 2026-09-21
@@ -333,22 +333,22 @@ class TxaVersionLang {
       // -----------------------------------------------------------------------
       // [TXA_13] - Version v1.6.7 (Build 15) - Date: 2026-09-21
       // -----------------------------------------------------------------------
-      'txa_13_title': 'Play Games Sync & Native Resources Update 1.6.7',
+      'txa_13_title': 'Apex Achievements & Cloud Save Upgrade 1.6.7',
 
-      // [TXA_13_ITEM_1] - Official 26 Play Games Achievements
-      'txa_13_item_1_title': 'Official 26 Play Games Achievements',
-      'txa_13_item_1_desc': 'Fully integrated all 26 official achievement resource IDs from Google Play Console, guaranteeing immediate and seamless unlocking of your gaming milestones.',
+      // [TXA_13_ITEM_1] - Unlock All 26 Master Achievements
+      'txa_13_item_1_title': 'Unlock All 26 Master Achievements',
+      'txa_13_item_1_desc': 'Conquer every milestone with pride! Earn official Google Play badges for your first clear, explosive multi-combos, and legendary win streaks.',
       'txa_13_item_1_badge': 'ACHIEVEMENTS',
 
-      // [TXA_13_ITEM_2] - Automated Initial Cloud Save Provisioning
-      'txa_13_item_2_title': 'Automated Initial Cloud Save Provisioning',
-      'txa_13_item_2_desc': 'Enhanced Cloud Save resilience: Automatically establishes and uploads the initial Google Drive game snapshot for first-time players without interruption.',
+      // [TXA_13_ITEM_2] - Instant & Worry-Free Cloud Backup
+      'txa_13_item_2_title': 'Instant & Worry-Free Cloud Backup',
+      'txa_13_item_2_desc': 'Every star, high score, and puzzle you solve is automatically backed up in real time. Switch devices anytime without losing a single move!',
       'txa_13_item_2_badge': 'CLOUD SAVE',
 
-      // [TXA_13_ITEM_3] - Native Resource Alignment & Polish
-      'txa_13_item_3_title': 'Native Resource Alignment & Polish',
-      'txa_13_item_3_desc': 'Integrated official games-ids.xml Android resources, refined transaction restoration throttling, and maximized frame rate consistency.',
-      'txa_13_item_3_badge': 'OPTIMIZATION',
+      // [TXA_13_ITEM_3] - Lightning-Fast Performance & Fluid Feel
+      'txa_13_item_3_title': 'Lightning-Fast Performance & Fluid Feel',
+      'txa_13_item_3_desc': 'Polished touch feedback, faster launch speeds, and micro-latency eliminations for the purest and most satisfying puzzle experience.',
+      'txa_13_item_3_badge': 'SMOOTH',
 
       // -----------------------------------------------------------------------
       // [TXA_12] - Version v1.6.6 (Build 14) - Date: 2026-09-21
