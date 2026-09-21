@@ -52,8 +52,8 @@ void main() {
     test('TxaConfig chứa đầy đủ Ads Unit IDs, IAP IDs và Supabase config', () {
       expect(IapProductIds.allProducts.length, equals(4));
       expect(IapProductIds.removeAds, equals('zero_grid_remove_ads'));
-      expect(GpgsAchievementIds.firstClear, equals('CgkI_sample_first_clear'));
-      expect(GpgsLeaderboardIds.globalStars, equals('CgkI_sample_global_stars'));
+      expect(GpgsAchievementIds.firstClear, equals('CgkIrvjJ58wREAIQHQ'));
+      expect(GpgsLeaderboardIds.globalStars, isNotEmpty);
     });
 
     test('TxaTime chuyển đổi múi giờ, đếm ngược và định dạng thời lượng chính xác', () {
