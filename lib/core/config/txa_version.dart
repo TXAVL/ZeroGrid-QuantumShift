@@ -47,14 +47,52 @@ class TxaVersion {
   /// Danh sách các bản phát hành được khai báo (Bản mới nhất đặt ở đầu tiên)
   static final List<TxaVersionRelease> releases = [
     // =========================================================================
-    // [TXA_12] - Zero Grid: Quantum Shift v1.6.6 (Build 14) - 2026-09-21
+    // [TXA_13] - Zero Grid: Quantum Shift v1.6.7 (Build 15) - 2026-09-21
     // =========================================================================
     TxaVersionRelease(
-      id: 'txa_12',
+      id: 'txa_13',
       version: TxaConfig.version,
       buildNumber: TxaConfig.buildNumber,
       releaseDate: TxaConfig.releaseDate,
       items: const [
+        // [TXA_13_ITEM_1] - Liên Kết 26 Danh Hiệu Google Play Games
+        TxaChangelogItem(
+          icon: Icons.military_tech_rounded,
+          iconColor: Color(0xFFFFD600),
+          titleKey: 'txa_13_item_1_title',
+          descKey: 'txa_13_item_1_desc',
+          badgeKey: 'txa_13_item_1_badge',
+        ),
+
+        // [TXA_13_ITEM_2] - Tự Động Khởi Tạo Bản Lưu Đám Mây Ban Đầu
+        TxaChangelogItem(
+          icon: Icons.cloud_sync_rounded,
+          iconColor: Color(0xFF00FFA3),
+          titleKey: 'txa_13_item_2_title',
+          descKey: 'txa_13_item_2_desc',
+          badgeKey: 'txa_13_item_2_badge',
+        ),
+
+        // [TXA_13_ITEM_3] - Tối Ưu Hệ Thống Tài Nguyên Native & Trải Nghiệm
+        TxaChangelogItem(
+          icon: Icons.speed_rounded,
+          iconColor: Color(0xFF00E5FF),
+          titleKey: 'txa_13_item_3_title',
+          descKey: 'txa_13_item_3_desc',
+          badgeKey: 'txa_13_item_3_badge',
+        ),
+      ],
+    ),
+
+    // =========================================================================
+    // [TXA_12] - Zero Grid: Quantum Shift v1.6.6 (Build 14) - 2026-09-21
+    // =========================================================================
+    const TxaVersionRelease(
+      id: 'txa_12',
+      version: '1.6.6',
+      buildNumber: '14',
+      releaseDate: '2026-09-21',
+      items: [
         // [TXA_12_ITEM_1] - Đồng Bộ Đám Mây Google Play Trò Chơi
         TxaChangelogItem(
           icon: Icons.cloud_done_rounded,

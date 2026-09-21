@@ -15,6 +15,26 @@ class TxaVersionLang {
       'whats_new_btn_continue': 'ĐÃ HIỂU & TIẾP TỤC',
 
       // -----------------------------------------------------------------------
+      // [TXA_13] - Phiên bản v1.6.7 (Build 15) - Ngày: 2026-09-21
+      // -----------------------------------------------------------------------
+      'txa_13_title': 'Bản Cập Nhật Đồng Bộ Danh Hiệu & Tài Nguyên 1.6.7',
+
+      // [TXA_13_ITEM_1] - Liên Kết 26 Danh Hiệu Google Play Games
+      'txa_13_item_1_title': 'Liên Kết 26 Danh Hiệu Google Play Games',
+      'txa_13_item_1_desc': 'Tích hợp toàn diện 26 mã định danh thành tựu chính thức từ Google Play Console, đảm bảo từng cột mốc vinh quang của bạn được ghi nhận và đồng bộ tức thì lên máy chủ.',
+      'txa_13_item_1_badge': 'THÀNH TỰU',
+
+      // [TXA_13_ITEM_2] - Tự Động Khởi Tạo Bản Lưu Đám Mây Ban Đầu
+      'txa_13_item_2_title': 'Tự Động Khởi Tạo Bản Lưu Đám Mây Ban Đầu',
+      'txa_13_item_2_desc': 'Cải tiến cơ chế Cloud Save: Tự động khởi tạo và tải tiến trình chơi lên Google Drive đối với người chơi mới hoặc lần đầu kích hoạt tính năng lưu đám mây.',
+      'txa_13_item_2_badge': 'CLOUD SAVE',
+
+      // [TXA_13_ITEM_3] - Tối Ưu Hệ Thống Tài Nguyên Native & Trải Nghiệm
+      'txa_13_item_3_title': 'Tối Ưu Hệ Thống Tài Nguyên Native & Trải Nghiệm',
+      'txa_13_item_3_desc': 'Chuẩn hóa tệp tài nguyên games-ids.xml theo khuyến nghị của Google Play, tối ưu kiểm tra khôi phục giao dịch và nâng cao độ ổn định tổng thể của trò chơi.',
+      'txa_13_item_3_badge': 'TỐI ƯU',
+
+      // -----------------------------------------------------------------------
       // [TXA_12] - Phiên bản v1.6.6 (Build 14) - Ngày: 2026-09-21
       // -----------------------------------------------------------------------
       'txa_12_title': 'Bản Cập Nhật Đồng Bộ Đám Mây & Tối Ưu Hóa 1.6.6',
@@ -309,6 +329,26 @@ class TxaVersionLang {
       // -----------------------------------------------------------------------
       'whats_new_title': "WHAT'S NEW IN THIS VERSION?",
       'whats_new_btn_continue': 'GOT IT & CONTINUE',
+
+      // -----------------------------------------------------------------------
+      // [TXA_13] - Version v1.6.7 (Build 15) - Date: 2026-09-21
+      // -----------------------------------------------------------------------
+      'txa_13_title': 'Play Games Sync & Native Resources Update 1.6.7',
+
+      // [TXA_13_ITEM_1] - Official 26 Play Games Achievements
+      'txa_13_item_1_title': 'Official 26 Play Games Achievements',
+      'txa_13_item_1_desc': 'Fully integrated all 26 official achievement resource IDs from Google Play Console, guaranteeing immediate and seamless unlocking of your gaming milestones.',
+      'txa_13_item_1_badge': 'ACHIEVEMENTS',
+
+      // [TXA_13_ITEM_2] - Automated Initial Cloud Save Provisioning
+      'txa_13_item_2_title': 'Automated Initial Cloud Save Provisioning',
+      'txa_13_item_2_desc': 'Enhanced Cloud Save resilience: Automatically establishes and uploads the initial Google Drive game snapshot for first-time players without interruption.',
+      'txa_13_item_2_badge': 'CLOUD SAVE',
+
+      // [TXA_13_ITEM_3] - Native Resource Alignment & Polish
+      'txa_13_item_3_title': 'Native Resource Alignment & Polish',
+      'txa_13_item_3_desc': 'Integrated official games-ids.xml Android resources, refined transaction restoration throttling, and maximized frame rate consistency.',
+      'txa_13_item_3_badge': 'OPTIMIZATION',
 
       // -----------------------------------------------------------------------
       // [TXA_12] - Version v1.6.6 (Build 14) - Date: 2026-09-21

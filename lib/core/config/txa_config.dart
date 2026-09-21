@@ -12,8 +12,8 @@ class TxaConfig {
   // ==========================================
   static String appName = 'Zero Grid: Quantum Shift';
   static String packageId = 'txa.zerogrid.quantumshift';
-  static String version = '1.6.6';
-  static String buildNumber = '14';
+  static String version = '1.6.7';
+  static String buildNumber = '15';
   static String releaseDate = '2026-09-21'; // Ngày cập nhật phiên bản tập trung
 
   /// Chuỗi phiên bản đầy đủ dạng '1.0.0+1' (Tự động đồng bộ từ pubspec.yaml)
@@ -87,43 +87,43 @@ class TxaConfig {
   static const String gpgsAppId = '604733865006';
   
   // Campaign Progression Milestones
-  static const String achFirstClear = 'CgkI_sample_first_clear';
-  static const String achSector10 = 'CgkI_sample_sector_10';
-  static const String achSector25 = 'CgkI_sample_sector_25';
-  static const String achSector50 = 'CgkI_sample_sector_50';
-  static const String achSector75 = 'CgkI_sample_sector_75';
-  static const String achSector100 = 'CgkI_sample_sector_100';
+  static const String achFirstClear = 'CgkIrvjJ58wREAIQHQ';
+  static const String achSector10 = 'CgkIrvjJ58wREAIQIw';
+  static const String achSector25 = 'CgkIrvjJ58wREAIQJw';
+  static const String achSector50 = 'CgkIrvjJ58wREAIQLA';
+  static const String achSector75 = 'CgkIrvjJ58wREAIQJA';
+  static const String achSector100 = 'CgkIrvjJ58wREAIQIA';
 
   // Star Collection Milestones
-  static const String achStars10 = 'CgkI_sample_stars_10';
-  static const String achStars50 = 'CgkI_sample_stars_50';
-  static const String achStars100 = 'CgkI_sample_stars_100';
-  static const String achStars200 = 'CgkI_sample_stars_200';
-  static const String achStars300 = 'CgkI_sample_stars_300';
-  static const String achPerfectionist20 = 'CgkI_sample_perfectionist_20';
+  static const String achStars10 = 'CgkIrvjJ58wREAIQMg';
+  static const String achStars50 = 'CgkIrvjJ58wREAIQNA';
+  static const String achStars100 = 'CgkIrvjJ58wREAIQKA';
+  static const String achStars200 = 'CgkIrvjJ58wREAIQLQ';
+  static const String achStars300 = 'CgkIrvjJ58wREAIQJg';
+  static const String achPerfectionist20 = 'CgkIrvjJ58wREAIQJQ';
 
   // Win Streak & Dedication Milestones
-  static const String achStreak3 = 'CgkI_sample_streak_3';
+  static const String achStreak3 = 'CgkIrvjJ58wREAIQMQ';
   static const String achStreak5 = 'CgkI_sample_streak_5';
-  static const String achStreak10 = 'CgkI_sample_streak_10';
+  static const String achStreak10 = 'CgkIrvjJ58wREAIQGw';
   static const String achWins10 = 'CgkI_sample_wins_10';
   static const String achWins50 = 'CgkI_sample_wins_50';
-  static const String achWins100 = 'CgkI_sample_wins_100';
+  static const String achWins100 = 'CgkIrvjJ58wREAIQHA';
 
   // Combo & Skill Milestones
-  static const String achCombo3 = 'CgkI_sample_combo_3';
-  static const String achComboMasterX5 = 'CgkI_sample_combo_master_x5';
-  static const String achCombo8 = 'CgkI_sample_combo_8';
-  static const String achSpeedDemon4x4 = 'CgkI_sample_speed_demon_4x4';
-  static const String achNoHintRun = 'CgkI_sample_no_hint_run';
+  static const String achCombo3 = 'CgkIrvjJ58wREAIQLg';
+  static const String achComboMasterX5 = 'CgkIrvjJ58wREAIQKw';
+  static const String achCombo8 = 'CgkIrvjJ58wREAIQMw';
+  static const String achSpeedDemon4x4 = 'CgkIrvjJ58wREAIQKg';
+  static const String achNoHintRun = 'CgkIrvjJ58wREAIQIg';
 
   // Endless & Daily Milestones
-  static const String achEndless100 = 'CgkI_sample_endless_100';
-  static const String achEndless500 = 'CgkI_sample_endless_500';
-  static const String achEndless1000 = 'CgkI_sample_endless_1000';
-  static const String achDaily1 = 'CgkI_sample_daily_1';
-  static const String achDaily3 = 'CgkI_sample_daily_3';
-  static const String achDaily7 = 'CgkI_sample_daily_7';
+  static const String achEndless100 = 'CgkIrvjJ58wREAIQKQ';
+  static const String achEndless500 = 'CgkIrvjJ58wREAIQHw';
+  static const String achEndless1000 = 'CgkIrvjJ58wREAIQLw';
+  static const String achDaily1 = 'CgkIrvjJ58wREAIQIQ';
+  static const String achDaily3 = 'CgkIrvjJ58wREAIQHg';
+  static const String achDaily7 = 'CgkIrvjJ58wREAIQMA';
 
   // Leaderboard Ranking Milestones
   static const String achLbSubmit = 'CgkI_sample_lb_submit';

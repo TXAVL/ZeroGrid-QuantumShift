@@ -52,13 +52,19 @@ class _MainMenuScreenState extends ConsumerState<MainMenuScreen> with WidgetsBin
     super.dispose();
   }
 
+  DateTime? _lastIapRestoreTime;
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      // Tự động kiểm tra và nhận ngay các mã đổi thưởng / gói mua ngoài CH Play
-      try {
-        ref.read(iapServiceProvider).restorePurchases();
-      } catch (_) {}
+      // Giới hạn tần suất khôi phục tối thiểu 60s để tránh spam log khi mở overlay như GPGS
+      final now = DateTime.now();
+      if (_lastIapRestoreTime == null || now.difference(_lastIapRestoreTime!).inSeconds >= 60) {
+        _lastIapRestoreTime = now;
+        try {
+          ref.read(iapServiceProvider).restorePurchases();
+        } catch (_) {}
+      }
     }
   }
 

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--Google Play game services IDs. Save this file as res/values/games-ids.xml in your project.-->
+<resources>
+  <!--app_id-->
+  <string name="app_id" translatable="false">604733865006</string>
+  <!--package_name-->
+  <string name="package_name" translatable="false">txa.zerogrid.quantumshift</string>
+  <!--achievement First Step-->
+  <string name="achievement_first_step" translatable="false">CgkIrvjJ58wREAIQHQ</string>
+  <!--achievement Matrix Apprentice-->
+  <string name="achievement_matrix_apprentice" translatable="false">CgkIrvjJ58wREAIQIw</string>
+  <!--achievement Quantum Pathfinder-->
+  <string name="achievement_quantum_pathfinder" translatable="false">CgkIrvjJ58wREAIQJw</string>
+  <!--achievement Grid Pioneer-->
+  <string name="achievement_grid_pioneer" translatable="false">CgkIrvjJ58wREAIQLA</string>
+  <!--achievement Algorithm Architect-->
+  <string name="achievement_algorithm_architect" translatable="false">CgkIrvjJ58wREAIQJA</string>
+  <!--achievement Zero Grid Legend-->
+  <string name="achievement_zero_grid_legend" translatable="false">CgkIrvjJ58wREAIQIA</string>
+  <!--achievement Novice Starlight-->
+  <string name="achievement_novice_starlight" translatable="false">CgkIrvjJ58wREAIQMg</string>
+  <!--achievement Starlight Explorer-->
+  <string name="achievement_starlight_explorer" translatable="false">CgkIrvjJ58wREAIQNA</string>
+  <!--achievement Cosmic Collector-->
+  <string name="achievement_cosmic_collector" translatable="false">CgkIrvjJ58wREAIQKA</string>
+  <!--achievement Supernova Prodigy-->
+  <string name="achievement_supernova_prodigy" translatable="false">CgkIrvjJ58wREAIQLQ</string>
+  <!--achievement Perfect Grandmaster 300 Stars-->
+  <string name="achievement_perfect_grandmaster_300_stars" translatable="false">CgkIrvjJ58wREAIQJg</string>
+  <!--achievement Optimal Move Virtuoso-->
+  <string name="achievement_optimal_move_virtuoso" translatable="false">CgkIrvjJ58wREAIQJQ</string>
+  <!--achievement Chain Reaction x3-->
+  <string name="achievement_chain_reaction_x3" translatable="false">CgkIrvjJ58wREAIQLg</string>
+  <!--achievement Quantum Storm x5-->
+  <string name="achievement_quantum_storm_x5" translatable="false">CgkIrvjJ58wREAIQKw</string>
+  <!--achievement Reality Warp x8-->
+  <string name="achievement_reality_warp_x8" translatable="false">CgkIrvjJ58wREAIQMw</string>
+  <!--achievement Speed Demon 4x4-->
+  <string name="achievement_speed_demon_4x4" translatable="false">CgkIrvjJ58wREAIQKg</string>
+  <!--achievement Pure Intellect-->
+  <string name="achievement_pure_intellect" translatable="false">CgkIrvjJ58wREAIQIg</string>
+  <!--achievement Endless Century-->
+  <string name="achievement_endless_century" translatable="false">CgkIrvjJ58wREAIQKQ</string>
+  <!--achievement Quantum Voyager 500-->
+  <string name="achievement_quantum_voyager_500" translatable="false">CgkIrvjJ58wREAIQHw</string>
+  <!--achievement Infinity God 1000-->
+  <string name="achievement_infinity_god_1000" translatable="false">CgkIrvjJ58wREAIQLw</string>
+  <!--achievement Daily Initiate-->
+  <string name="achievement_daily_initiate" translatable="false">CgkIrvjJ58wREAIQIQ</string>
+  <!--achievement Consistent Solver-->
+  <string name="achievement_consistent_solver" translatable="false">CgkIrvjJ58wREAIQHg</string>
+  <!--achievement Weekly Master-->
+  <string name="achievement_weekly_master" translatable="false">CgkIrvjJ58wREAIQMA</string>
+  <!--achievement On Fire-->
+  <string name="achievement_on_fire" translatable="false">CgkIrvjJ58wREAIQMQ</string>
+  <!--achievement Invincible Mind-->
+  <string name="achievement_invincible_mind" translatable="false">CgkIrvjJ58wREAIQGw</string>
+  <!--achievement Legendary Centurion-->
+  <string name="achievement_legendary_centurion" translatable="false">CgkIrvjJ58wREAIQHA</string>
+</resources>

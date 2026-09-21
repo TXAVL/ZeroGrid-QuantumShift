@@ -61,6 +61,36 @@ class GpgsAndroidServiceImpl implements GpgsService {
     GpgsAchievementIds.achLbScore50k,
   ];
 
+  /// Bảng ánh xạ chính xác từ tên thành tựu (theo ZIP đã tạo) sang mã local ID
+  static const Map<String, String> _achievementNameToLocalId = {
+    'first step': GpgsAchievementIds.achFirstClear,
+    'matrix apprentice': GpgsAchievementIds.achSector10,
+    'quantum pathfinder': GpgsAchievementIds.achSector25,
+    'grid pioneer': GpgsAchievementIds.achSector50,
+    'algorithm architect': GpgsAchievementIds.achSector75,
+    'zero grid legend': GpgsAchievementIds.achSector100,
+    'novice starlight': GpgsAchievementIds.achStars10,
+    'starlight explorer': GpgsAchievementIds.achStars50,
+    'cosmic collector': GpgsAchievementIds.achStars100,
+    'supernova prodigy': GpgsAchievementIds.achStars200,
+    'perfect grandmaster 300 stars': GpgsAchievementIds.achStars300,
+    'optimal move virtuoso': GpgsAchievementIds.achPerfectionist20,
+    'chain reaction x3': GpgsAchievementIds.achCombo3,
+    'quantum storm x5': GpgsAchievementIds.achComboMasterX5,
+    'reality warp x8': GpgsAchievementIds.achCombo8,
+    'speed demon 4x4': GpgsAchievementIds.achSpeedDemon4x4,
+    'pure intellect': GpgsAchievementIds.achNoHintRun,
+    'endless century': GpgsAchievementIds.achEndless100,
+    'quantum voyager 500': GpgsAchievementIds.achEndless500,
+    'infinity god 1000': GpgsAchievementIds.achEndless1000,
+    'daily initiate': GpgsAchievementIds.achDaily1,
+    'consistent solver': GpgsAchievementIds.achDaily3,
+    'weekly master': GpgsAchievementIds.achDaily7,
+    'on fire': GpgsAchievementIds.achStreak3,
+    'invincible mind': GpgsAchievementIds.achStreak10,
+    'legendary centurion': GpgsAchievementIds.achWins100,
+  };
+
   GpgsAndroidServiceImpl(this._storageService) {
     if (!kIsWeb && Platform.isAndroid) {
       _listenToPlayerStream();
@@ -228,6 +258,14 @@ class GpgsAndroidServiceImpl implements GpgsService {
           final rName = remote.name.toLowerCase().trim();
           final rId = remote.id;
 
+          // 1. Ánh xạ trực tiếp qua tên chuẩn đã tạo từ ZIP
+          final matchedLocalId = _achievementNameToLocalId[rName];
+          if (matchedLocalId != null) {
+            _remoteIdMap[matchedLocalId] = rId;
+            TXALogger.logGpgs('🎯 [GPGS Map] Khớp $matchedLocalId -> $rId ("${remote.name}")');
+          }
+
+          // 2. Fallback tìm theo từ khóa hoặc trùng ID
           for (final localId in _allLocalAchievementIds) {
             final key = localId.replaceFirst('CgkI_sample_', '').replaceAll('_', ' ').toLowerCase();
             if (rName.contains(key) || key.contains(rName) || rId == localId) {
@@ -251,6 +289,10 @@ class GpgsAndroidServiceImpl implements GpgsService {
       for (final localId in _allLocalAchievementIds) {
         if (_storageService.hasUnlockedAchievement(localId)) {
           final targetId = _remoteIdMap[localId] ?? localId;
+          if (targetId.startsWith('CgkI_sample_')) {
+            // Chưa có ID thật từ Google Play Console, bỏ qua để không dính lỗi 26561
+            continue;
+          }
           try {
             await GamesServices.unlock(
               achievement: Achievement(androidID: targetId),
@@ -286,6 +328,10 @@ class GpgsAndroidServiceImpl implements GpgsService {
     if (!isSignedIn) return;
     try {
       final targetId = _remoteIdMap[achievementId] ?? achievementId;
+      if (targetId.startsWith('CgkI_sample_')) {
+        TXALogger.logGpgs('ℹ️ [GPGS] Bỏ qua gửi GPGS unlock cho $achievementId vì chưa cấu hình ID thật từ Google Play Console (hiện tại: $targetId).');
+        return;
+      }
       TXALogger.logGpgs('Unlocking GPGS Achievement: $achievementId (target: $targetId)');
       await GamesServices.unlock(
         achievement: Achievement(
@@ -562,6 +608,11 @@ class GpgsAndroidServiceImpl implements GpgsService {
     } catch (e) {
       if (e is PlatformException && (e.message?.contains('Cannot use snapshots without enabling') ?? false)) {
         TXALogger.logGpgs('ℹ️ [GPGS Cloud Save] Tính năng "Saved Games" (Snapshots) chưa được bật trong Google Play Console. Thành tích và bảng xếp hạng vẫn hoạt động bình thường.');
+      } else if (e is PlatformException &&
+          (e.message?.contains('SNAPSHOT_NOT_FOUND') == true ||
+           e.message?.contains('26570') == true)) {
+        TXALogger.logGpgs('ℹ️ [GPGS Cloud Save] Chưa có bản lưu nào trên đám mây (SNAPSHOT_NOT_FOUND). Đang tự động tạo bản lưu ban đầu...');
+        await uploadLocalToCloud();
       } else {
         TXALogger.logGpgs('GPGS Cloud Save sync error: $e');
       }
