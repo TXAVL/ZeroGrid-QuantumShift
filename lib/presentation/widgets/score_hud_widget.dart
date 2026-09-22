@@ -24,7 +24,7 @@ class ScoreHudWidget extends ConsumerWidget {
       children: [
         // Thanh thống kê trên cùng: [Moves (Trái) | Score Real-time (Giữa) | Timer (Phải)]
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+          padding: const EdgeInsets.only(top: 14.0, left: 16.0, right: 16.0, bottom: 8.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -257,8 +257,8 @@ class _StatItem extends StatelessWidget {
           ),
           if (floatingOverlay != null)
             Positioned(
-              top: -16,
-              right: -8,
+              top: -10,
+              right: -6,
               child: floatingOverlay!,
             ),
         ],

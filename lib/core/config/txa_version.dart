@@ -47,14 +47,52 @@ class TxaVersion {
   /// Danh sách các bản phát hành được khai báo (Bản mới nhất đặt ở đầu tiên)
   static final List<TxaVersionRelease> releases = [
     // =========================================================================
-    // [TXA_13] - Zero Grid: Quantum Shift v1.6.7 (Build 15) - 2026-09-21
+    // [TXA_14] - Zero Grid: Quantum Shift v1.6.8 (Build 16) - 2026-09-22
     // =========================================================================
     TxaVersionRelease(
-      id: 'txa_13',
+      id: 'txa_14',
       version: TxaConfig.version,
       buildNumber: TxaConfig.buildNumber,
       releaseDate: TxaConfig.releaseDate,
       items: const [
+        // [TXA_14_ITEM_1] - Cân Bằng Chế Độ Vô Tận & Mở Khóa Thành Tựu Tức Thì
+        TxaChangelogItem(
+          icon: Icons.all_inclusive_rounded,
+          iconColor: Color(0xFF00FFA3),
+          titleKey: 'txa_14_item_1_title',
+          descKey: 'txa_14_item_1_desc',
+          badgeKey: 'txa_14_item_1_badge',
+        ),
+
+        // [TXA_14_ITEM_2] - Hiệu Ứng Điểm Bay & Tiêu Đề Màn Thông Minh
+        TxaChangelogItem(
+          icon: Icons.auto_awesome_rounded,
+          iconColor: Color(0xFFFFD600),
+          titleKey: 'txa_14_item_2_title',
+          descKey: 'txa_14_item_2_desc',
+          badgeKey: 'txa_14_item_2_badge',
+        ),
+
+        // [TXA_14_ITEM_3] - Việt Hóa Toàn Diện & Tối Ưu Trải Nghiệm
+        TxaChangelogItem(
+          icon: Icons.translate_rounded,
+          iconColor: Color(0xFF00E5FF),
+          titleKey: 'txa_14_item_3_title',
+          descKey: 'txa_14_item_3_desc',
+          badgeKey: 'txa_14_item_3_badge',
+        ),
+      ],
+    ),
+
+    // =========================================================================
+    // [TXA_13] - Zero Grid: Quantum Shift v1.6.7 (Build 15) - 2026-09-21
+    // =========================================================================
+    const TxaVersionRelease(
+      id: 'txa_13',
+      version: '1.6.7',
+      buildNumber: '15',
+      releaseDate: '2026-09-21',
+      items: [
         // [TXA_13_ITEM_1] - Mở Khóa Trọn Bộ 26 Danh Hiệu Đỉnh Cao
         TxaChangelogItem(
           icon: Icons.military_tech_rounded,

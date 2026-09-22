@@ -15,6 +15,26 @@ class TxaVersionLang {
       'whats_new_btn_continue': 'ĐÃ HIỂU & TIẾP TỤC',
 
       // -----------------------------------------------------------------------
+      // [TXA_14] - Phiên bản v1.6.8 (Build 16) - Ngày: 2026-09-22
+      // -----------------------------------------------------------------------
+      'txa_14_title': 'Bản Cập Nhật Cân Bằng Chế Độ Vô Tận & Hoàn Thiện Giao Diện 1.6.8',
+
+      // [TXA_14_ITEM_1] - Cân Bằng Chế Độ Vô Tận & Mở Khóa Thành Tựu Tức Thì
+      'txa_14_item_1_title': 'Cân Bằng Chế Độ Vô Tận & Mở Khóa Thành Tựu Tức Thì',
+      'txa_14_item_1_desc': 'Cân chỉnh cách tính điểm chế độ Vô Tận hợp lý và giàu tính thử thách hơn. Điểm số chỉ tăng khi bạn thực hiện các nước đi làm biến đổi số trên bàn cờ. Các mốc thành tựu Vô Tận giờ đây được vinh danh ngay khi bạn vừa chạm mốc điểm kỷ lục!',
+      'txa_14_item_1_badge': 'CÂN BẰNG',
+
+      // [TXA_14_ITEM_2] - Hiệu Ứng Điểm Bay & Tiêu Đề Màn Thông Minh
+      'txa_14_item_2_title': 'Hiệu Ứng Điểm Bay & Tiêu Đề Màn Thông Minh',
+      'txa_14_item_2_desc': 'Hoạt ảnh cộng điểm (+xx) được tinh chỉnh thanh thoát, nổi bật ngay trên bàn cờ và không còn bị che khuất. Tiêu đề màn chơi Chiến dịch tự động chuyển sang Màn tiếp theo mượt mà khi bạn vượt qua thử thách.',
+      'txa_14_item_2_badge': 'GIAO DIỆN',
+
+      // [TXA_14_ITEM_3] - Việt Hóa Toàn Diện & Tối Ưu Trải Nghiệm
+      'txa_14_item_3_title': 'Việt Hóa Toàn Diện & Tối Ưu Trải Nghiệm',
+      'txa_14_item_3_desc': 'Chuẩn hóa đồng bộ tên gọi Màn chơi và các đơn vị thành tích thuần Việt trong toàn bộ trò chơi, mang lại cảm giác thân thiện, trực quan và liền mạch tối đa cho người chơi.',
+      'txa_14_item_3_badge': 'VIỆT HÓA',
+
+      // -----------------------------------------------------------------------
       // [TXA_13] - Phiên bản v1.6.7 (Build 15) - Ngày: 2026-09-21
       // -----------------------------------------------------------------------
       'txa_13_title': 'Bản Cập Nhật Vinh Danh & Lưu Trữ Đám Mây 1.6.7',
@@ -329,6 +349,26 @@ class TxaVersionLang {
       // -----------------------------------------------------------------------
       'whats_new_title': "WHAT'S NEW IN THIS VERSION?",
       'whats_new_btn_continue': 'GOT IT & CONTINUE',
+
+      // -----------------------------------------------------------------------
+      // [TXA_14] - Version v1.6.8 (Build 16) - Date: 2026-09-22
+      // -----------------------------------------------------------------------
+      'txa_14_title': 'Endless Mode Rebalance & Dynamic UI Polish 1.6.8',
+
+      // [TXA_14_ITEM_1] - Rebalanced Endless Mode & Real-Time Achievements
+      'txa_14_item_1_title': 'Rebalanced Endless Mode & Real-Time Achievements',
+      'txa_14_item_1_desc': 'Scoring in Endless Mode is now finely tuned for rewarding strategy. Points are only awarded for effective moves that reduce grid numbers. Endless achievement milestones now unlock instantly as soon as you hit the score threshold!',
+      'txa_14_item_1_badge': 'BALANCED',
+
+      // [TXA_14_ITEM_2] - Refined Floating Score Popups & Smart Level Header
+      'txa_14_item_2_title': 'Refined Floating Score Popups & Smart Level Header',
+      'txa_14_item_2_desc': 'Floating score badges (+xx) now drift gracefully with perfect visibility. Campaign mode headers smoothly update to your new sector as you advance through the galaxy.',
+      'txa_14_item_2_badge': 'VISUALS',
+
+      // [TXA_14_ITEM_3] - Refined Localization & Overall Experience Polish
+      'txa_14_item_3_title': 'Refined Localization & Overall Experience Polish',
+      'txa_14_item_3_desc': 'Standardized terms and achievement units across all dialogs and screens for a clean, cohesive, and deeply immersive puzzle experience.',
+      'txa_14_item_3_badge': 'POLISH',
 
       // -----------------------------------------------------------------------
       // [TXA_13] - Version v1.6.7 (Build 15) - Date: 2026-09-21

@@ -58,7 +58,7 @@ class _FloatingScoreDeltaWidgetState extends State<FloatingScoreDeltaWidget>
       ),
     ]).animate(_controller);
 
-    _slideAnimation = Tween<double>(begin: 4.0, end: -28.0).animate(
+    _slideAnimation = Tween<double>(begin: 0.0, end: -14.0).animate(
       CurvedAnimation(
         parent: _controller,
         curve: Curves.easeOutCubic,

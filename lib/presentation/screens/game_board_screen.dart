@@ -242,7 +242,9 @@ class _GameBoardScreenState extends ConsumerState<GameBoardScreen> {
         title: Text(
           gameState.mode == GameMode.dailyChallenge
               ? '${TxaLanguage.tr('mode_daily_title', langCode)} - ${int.tryParse(gameState.levelId) == 8882 ? TxaLanguage.tr('daily_stage_2_name', langCode) : (int.tryParse(gameState.levelId) == 8883 ? TxaLanguage.tr('daily_stage_3_name', langCode) : TxaLanguage.tr('daily_stage_1_name', langCode))}'
-              : widget.title,
+              : gameState.mode == GameMode.campaign
+                  ? '${TxaLanguage.tr('sector_label', langCode)} ${gameState.levelId}'
+                  : widget.title,
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,

@@ -221,16 +221,22 @@ class GameNotifier extends StateNotifier<GameState> {
         endlessMovesLeft: state.endlessMovesLeft,
       ));
 
+    final sumReduction = prevBoard.totalSum() - moveResult.newState.totalSum();
+    final partialReductions = max(0, sumReduction - newlyZeros);
+
     // Xử lý riêng cho Endless Mode
     if (state.mode == GameMode.endless) {
       final newMovesLeft = state.endlessMovesLeft - 1;
-      final int endlessMoveScore = (newlyZeros > 0)
-          ? (newlyZeros * 100 * max<int>(1, nextCombo)) + 10
-          : 10;
+      final int endlessMoveScore = (newlyZeros * 10 * max<int>(1, nextCombo)) + (partialReductions * 2);
       final int newEndlessScore = state.endlessScore + endlessMoveScore;
 
       // Cập nhật kỷ lục high score real-time nếu vượt qua kỷ lục cũ
       _storage.updateEndlessHighScore(newEndlessScore);
+
+      // Kích hoạt GPGS Milestones cho Endless Mode theo thời gian thực nếu đạt mốc điểm
+      if (newEndlessScore >= 100) _gpgs.unlockAchievement(GpgsAchievementIds.achEndless100);
+      if (newEndlessScore >= 500) _gpgs.unlockAchievement(GpgsAchievementIds.achEndless500);
+      if (newEndlessScore >= 1000) _gpgs.unlockAchievement(GpgsAchievementIds.achEndless1000);
 
       // Nếu cạn lượt đi mà bàn cờ chưa về 0: Kích hoạt GAME OVER
       if (!isBoardCleared && newMovesLeft <= 0) {
@@ -274,7 +280,7 @@ class GameNotifier extends StateNotifier<GameState> {
         endlessMovesLeft: newMovesLeft,
         endlessScore: newEndlessScore,
         lastScoreDelta: endlessMoveScore,
-        scoreDeltaTrigger: state.scoreDeltaTrigger + 1,
+        scoreDeltaTrigger: endlessMoveScore > 0 ? state.scoreDeltaTrigger + 1 : state.scoreDeltaTrigger,
         isComboDelta: isEndlessCombo,
       );
 
@@ -285,9 +291,7 @@ class GameNotifier extends StateNotifier<GameState> {
     }
 
     // Các chế độ Campaign / Daily / Custom: Cộng điểm real-time theo bước đi & số 0 tạo được
-    final int campaignMoveScore = (newlyZeros > 0)
-        ? (newlyZeros * 150 * max<int>(1, nextCombo)) + 10
-        : 10;
+    final int campaignMoveScore = (newlyZeros * 150 * max<int>(1, nextCombo)) + (partialReductions * 15);
     final int newCurrentScore = state.currentScore + campaignMoveScore;
     final bool isCampaignCombo = newlyZeros >= 2;
 
@@ -304,7 +308,7 @@ class GameNotifier extends StateNotifier<GameState> {
       clearHint: true,
       currentScore: newCurrentScore,
       lastScoreDelta: campaignMoveScore,
-      scoreDeltaTrigger: state.scoreDeltaTrigger + 1,
+      scoreDeltaTrigger: campaignMoveScore > 0 ? state.scoreDeltaTrigger + 1 : state.scoreDeltaTrigger,
       isComboDelta: isCampaignCombo,
     );
 
@@ -319,8 +323,8 @@ class GameNotifier extends StateNotifier<GameState> {
     _audio.playWin();
 
     // 1. Tính điểm thưởng dọn sạch wave này (combo đã được cộng real-time trong từng nước đi):
-    final baseScore = 600 + (state.endlessWave * 150);
-    final remainingMovesBonus = remainingMoves * 120;
+    final baseScore = 50 + (state.endlessWave * 15);
+    final remainingMovesBonus = remainingMoves * 5;
     final wavePoints = baseScore + remainingMovesBonus;
     final int totalEndlessScore = state.endlessScore + wavePoints;
 

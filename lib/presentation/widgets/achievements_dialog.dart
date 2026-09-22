@@ -104,7 +104,7 @@ class _AchievementsDialogState extends ConsumerState<AchievementsDialog>
         category: AchievementCategory.campaign,
         currentProgress: min(unlockedLvl, 10),
         maxProgress: 10,
-        unit: 'Sectors',
+        unit: lang == 'vi' ? 'Màn' : 'Sectors',
         isUnlocked: unlockedLvl >= 10,
       ),
       AchievementItem(
@@ -115,7 +115,7 @@ class _AchievementsDialogState extends ConsumerState<AchievementsDialog>
         category: AchievementCategory.campaign,
         currentProgress: min(unlockedLvl, 25),
         maxProgress: 25,
-        unit: 'Sectors',
+        unit: lang == 'vi' ? 'Màn' : 'Sectors',
         isUnlocked: unlockedLvl >= 25,
       ),
       AchievementItem(
@@ -126,7 +126,7 @@ class _AchievementsDialogState extends ConsumerState<AchievementsDialog>
         category: AchievementCategory.campaign,
         currentProgress: min(unlockedLvl, 50),
         maxProgress: 50,
-        unit: 'Sectors',
+        unit: lang == 'vi' ? 'Màn' : 'Sectors',
         isUnlocked: unlockedLvl >= 50,
       ),
       AchievementItem(
@@ -137,7 +137,7 @@ class _AchievementsDialogState extends ConsumerState<AchievementsDialog>
         category: AchievementCategory.campaign,
         currentProgress: min(unlockedLvl, 75),
         maxProgress: 75,
-        unit: 'Sectors',
+        unit: lang == 'vi' ? 'Màn' : 'Sectors',
         isUnlocked: unlockedLvl >= 75,
       ),
       AchievementItem(
@@ -148,7 +148,7 @@ class _AchievementsDialogState extends ConsumerState<AchievementsDialog>
         category: AchievementCategory.campaign,
         currentProgress: min(unlockedLvl, 100),
         maxProgress: 100,
-        unit: 'Sectors',
+        unit: lang == 'vi' ? 'Màn' : 'Sectors',
         isUnlocked: unlockedLvl >= 100,
       ),
 
@@ -228,7 +228,7 @@ class _AchievementsDialogState extends ConsumerState<AchievementsDialog>
         category: AchievementCategory.streak,
         currentProgress: min(maxStreak, 3),
         maxProgress: 3,
-        unit: 'Streak',
+        unit: lang == 'vi' ? 'Chuỗi' : 'Streak',
         isUnlocked: maxStreak >= 3,
       ),
       AchievementItem(
@@ -239,7 +239,7 @@ class _AchievementsDialogState extends ConsumerState<AchievementsDialog>
         category: AchievementCategory.streak,
         currentProgress: min(maxStreak, 5),
         maxProgress: 5,
-        unit: 'Streak',
+        unit: lang == 'vi' ? 'Chuỗi' : 'Streak',
         isUnlocked: maxStreak >= 5,
       ),
       AchievementItem(
@@ -250,7 +250,7 @@ class _AchievementsDialogState extends ConsumerState<AchievementsDialog>
         category: AchievementCategory.streak,
         currentProgress: min(maxStreak, 10),
         maxProgress: 10,
-        unit: 'Streak',
+        unit: lang == 'vi' ? 'Chuỗi' : 'Streak',
         isUnlocked: maxStreak >= 10,
       ),
       AchievementItem(
@@ -261,7 +261,7 @@ class _AchievementsDialogState extends ConsumerState<AchievementsDialog>
         category: AchievementCategory.streak,
         currentProgress: min(totalWins, 10),
         maxProgress: 10,
-        unit: 'Wins',
+        unit: lang == 'vi' ? 'Trận' : 'Wins',
         isUnlocked: totalWins >= 10,
       ),
       AchievementItem(
@@ -272,7 +272,7 @@ class _AchievementsDialogState extends ConsumerState<AchievementsDialog>
         category: AchievementCategory.streak,
         currentProgress: min(totalWins, 50),
         maxProgress: 50,
-        unit: 'Wins',
+        unit: lang == 'vi' ? 'Trận' : 'Wins',
         isUnlocked: totalWins >= 50,
       ),
       AchievementItem(
@@ -283,7 +283,7 @@ class _AchievementsDialogState extends ConsumerState<AchievementsDialog>
         category: AchievementCategory.streak,
         currentProgress: min(totalWins, 100),
         maxProgress: 100,
-        unit: 'Wins',
+        unit: lang == 'vi' ? 'Trận' : 'Wins',
         isUnlocked: totalWins >= 100,
       ),
 
@@ -346,7 +346,7 @@ class _AchievementsDialogState extends ConsumerState<AchievementsDialog>
         category: AchievementCategory.skill,
         currentProgress: min(endlessHigh, 100),
         maxProgress: 100,
-        unit: 'pts',
+        unit: lang == 'vi' ? 'điểm' : 'pts',
         isUnlocked: endlessHigh >= 100,
       ),
       AchievementItem(
@@ -357,7 +357,7 @@ class _AchievementsDialogState extends ConsumerState<AchievementsDialog>
         category: AchievementCategory.skill,
         currentProgress: min(endlessHigh, 500),
         maxProgress: 500,
-        unit: 'pts',
+        unit: lang == 'vi' ? 'điểm' : 'pts',
         isUnlocked: endlessHigh >= 500,
       ),
       AchievementItem(
@@ -368,7 +368,7 @@ class _AchievementsDialogState extends ConsumerState<AchievementsDialog>
         category: AchievementCategory.skill,
         currentProgress: min(endlessHigh, 1000),
         maxProgress: 1000,
-        unit: 'pts',
+        unit: lang == 'vi' ? 'điểm' : 'pts',
         isUnlocked: endlessHigh >= 1000,
       ),
       AchievementItem(
@@ -441,7 +441,7 @@ class _AchievementsDialogState extends ConsumerState<AchievementsDialog>
         category: AchievementCategory.leaderboard,
         currentProgress: min(accumScore, 50000),
         maxProgress: 50000,
-        unit: 'pts',
+        unit: lang == 'vi' ? 'điểm' : 'pts',
         isUnlocked: accumScore >= 50000,
       ),
     ];

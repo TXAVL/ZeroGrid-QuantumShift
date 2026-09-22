@@ -34,7 +34,7 @@ class TxaLanguage extends ChangeNotifier {
       'app_title': 'ZERO GRID',
       'app_subtitle': 'QUANTUM SHIFT PUZZLE',
       'btn_start': 'BẮT ĐẦU CHƠI',
-      'btn_start_subtitle': '100+ Sector & Thử thách UTC',
+      'btn_start_subtitle': '100+ Màn & Thử thách UTC',
       'btn_how_to_play': 'HƯỚNG DẪN CÁCH CHƠI',
       'btn_how_to_play_sub': 'Quy tắc ma trận & cơ chế tính điểm',
       'btn_settings': 'CÀI ĐẶT TRÒ CHƠI',
@@ -195,8 +195,8 @@ class TxaLanguage extends ChangeNotifier {
 
       // Campaign Level Select
       'campaign_title': 'BẢN ĐỒ CHIẾN DỊCH',
-      'sector_label': 'SECTOR',
-      'level_locked_msg': 'Hãy vượt qua Sector trước để mở khóa màn này!',
+      'sector_label': 'MÀN',
+      'level_locked_msg': 'Hãy vượt qua Màn trước để mở khóa màn này!',
 
       // Stats & Themes Screen
       'stats_title': 'THỐNG KÊ & THEMES',
@@ -297,17 +297,17 @@ class TxaLanguage extends ChangeNotifier {
 
       // Campaign Milestones
       'ach_sector_1_title': 'Bước Chân Đầu Tiên',
-      'ach_sector_1_desc': 'Vượt qua Sector 1 trong Chiến dịch',
+      'ach_sector_1_desc': 'Vượt qua Màn 1 trong Chiến dịch',
       'ach_sector_10_title': 'Học Viên Ma Trận',
-      'ach_sector_10_desc': 'Hoàn thành 10 Sector đầu tiên',
+      'ach_sector_10_desc': 'Hoàn thành 10 Màn đầu tiên',
       'ach_sector_25_title': 'Người Dẫn Đường Lượng Tử',
-      'ach_sector_25_desc': 'Vượt qua 25 Sector Chiến dịch',
+      'ach_sector_25_desc': 'Vượt qua 25 Màn Chiến dịch',
       'ach_sector_50_title': 'Nhà Tiên Phong Lưới Số',
-      'ach_sector_50_desc': 'Giải quyết thành công 50 Sector',
+      'ach_sector_50_desc': 'Giải quyết thành công 50 Màn',
       'ach_sector_75_title': 'Kiến Trúc Sư Thuật Toán',
-      'ach_sector_75_desc': 'Vượt qua 75 Sector đầy thử thách',
+      'ach_sector_75_desc': 'Vượt qua 75 Màn đầy thử thách',
       'ach_sector_100_title': 'Huyền Thoại Zero Grid',
-      'ach_sector_100_desc': 'Chinh phục toàn bộ 100 Sector Campaign',
+      'ach_sector_100_desc': 'Chinh phục toàn bộ 100 Màn Chiến dịch',
 
       // Star Collection Milestones
       'ach_stars_10_title': 'Ngôi Sao Sơ Khởi',

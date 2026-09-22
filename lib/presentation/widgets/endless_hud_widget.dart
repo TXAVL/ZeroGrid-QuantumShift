@@ -27,7 +27,7 @@ class EndlessHudWidget extends ConsumerWidget {
       children: [
         // Hàng 1: [Wave Badge (Trái) | Score & HighScore (Giữa) | Moves Bank (Phải)]
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 10.0),
+          padding: const EdgeInsets.only(top: 14.0, left: 18.0, right: 18.0, bottom: 8.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -106,8 +106,8 @@ class EndlessHudWidget extends ConsumerWidget {
                         ],
                       ),
                       Positioned(
-                        top: -16,
-                        right: -12,
+                        top: -10,
+                        right: -8,
                         child: FloatingScoreDeltaWidget(
                           scoreDelta: gameState.lastScoreDelta,
                           trigger: gameState.scoreDeltaTrigger,

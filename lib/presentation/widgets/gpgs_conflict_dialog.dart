@@ -260,13 +260,13 @@ class GpgsConflictDialog extends StatelessWidget {
             ],
           ),
           const Divider(color: Colors.white12, height: 14),
-          _buildMetricRow(TxaLanguage.tr('gpgs_level_label', langCode), 'Sector $level'),
+          _buildMetricRow(TxaLanguage.tr('gpgs_level_label', langCode), '${TxaLanguage.tr('sector_label', langCode)} $level'),
           const SizedBox(height: 4),
           _buildMetricRow(TxaLanguage.tr('gpgs_stars_label', langCode), '★ $stars'),
           const SizedBox(height: 4),
-          _buildMetricRow(TxaLanguage.tr('gpgs_score_label', langCode), '$endless pts'),
+          _buildMetricRow(TxaLanguage.tr('gpgs_score_label', langCode), '$endless ${langCode == 'vi' ? 'điểm' : 'pts'}'),
           const SizedBox(height: 4),
-          _buildMetricRow('Thắng', '$wins ván'),
+          _buildMetricRow(langCode == 'vi' ? 'Thắng' : 'Wins', '$wins ${langCode == 'vi' ? 'ván' : 'wins'}'),
           if (extraTime != null) ...[
             const Divider(color: Colors.white10, height: 12),
             Text(
