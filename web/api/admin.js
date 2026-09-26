@@ -5,10 +5,14 @@
  * ==============================================================================
  */
 
-const fs = require('fs');
-const path = require('path');
-const crypto = require('crypto');
-const { loadLogList, clearLogs } = require('./logger');
+import fs from 'fs';
+import path from 'path';
+import crypto from 'crypto';
+import { fileURLToPath } from 'url';
+import { loadLogList, clearLogs } from './logger.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const ADMIN_PASS = process.env.ADMIN_PASSWORD || "txa_admin_2026";
 const DATA_FILE = process.env.VERCEL ? '/tmp/txa_keys_db.json' : path.join(__dirname, '../keys.json');
@@ -36,7 +40,7 @@ function saveKeys(keys) {
     } catch (e) {}
 }
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');

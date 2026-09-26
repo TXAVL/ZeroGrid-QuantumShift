@@ -1,10 +1,10 @@
 /**
- * Vercel Serverless Function: API Xác thực Key
+ * Vercel Serverless Function: API Xác thực Key (ESM)
  * Endpoint: https://api.txastudio.click/api/validate_key hoặc https://txastudio.click/api/validate_key
  */
 
-const crypto = require('crypto');
-const { logErrorOrCrash } = require('./logger');
+import crypto from 'crypto';
+import { logErrorOrCrash } from './logger.js';
 
 const SALT = "TXA_STUDIO_CYBER_2026_CLICK";
 
@@ -35,27 +35,34 @@ function isValidKey(key) {
     return checksum.toUpperCase() === expectedChecksum;
 }
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
     // CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Device-Brand, X-Device-Model, X-Device-Android, X-Device-Arch, X-Device-Battery');
 
     if (req.method === 'OPTIONS') {
         return res.status(204).end();
     }
 
     try {
+        let body = req.body;
+        if (typeof body === 'string') {
+            try {
+                body = JSON.parse(body);
+            } catch (e) {}
+        }
+
         let key = '';
-        if (req.body) {
-            key = req.body.key || '';
+        if (body && typeof body === 'object') {
+            key = body.key || '';
         }
         if (!key && req.query) {
             key = req.query.key || '';
         }
         key = String(key).trim();
 
-        const action = (req.query && req.query.action) || '';
+        const action = (req.query && req.query.action) || (body && body.action) || '';
 
         // 1. Hành động lấy thông tin người dùng
         if (action === 'get_user_info') {
@@ -71,7 +78,7 @@ module.exports = async (req, res) => {
             } else {
                 // Key không hợp lệ: GHI LOG LỖI CHI TIẾT
                 logErrorOrCrash('AUTH_FAILURE', `Yêu cầu thông tin với key không hợp lệ: "${key}"`, req, { keyAttempted: key });
-                return res.status(403).json({ status: "error", message: "Key không hợp lệ" });
+                return res.status(403).json({ status: "error", message: "Key không hợp lệ", valid: false });
             }
         }
 
@@ -99,7 +106,8 @@ module.exports = async (req, res) => {
         logErrorOrCrash('CRASH_ENDPOINT_VALIDATE_KEY', crashErr, req);
         return res.status(500).json({
             error: "Internal Server Error",
-            message: crashErr.message
+            message: crashErr.message,
+            valid: false
         });
     }
-};
+}

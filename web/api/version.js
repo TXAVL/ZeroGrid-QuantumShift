@@ -1,12 +1,18 @@
 /**
- * Vercel Serverless Function: API Check Version
+ * Vercel Serverless Function: API Check Version (ESM)
  * Endpoint: https://api.txastudio.click/version.php hoặc /api/version
  */
 
-const { logErrorOrCrash } = require('./logger');
+import { logErrorOrCrash } from './logger.js';
 
-module.exports = (req, res) => {
+export default function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    if (req.method === 'OPTIONS') {
+        return res.status(204).end();
+    }
 
     try {
         res.status(200).json({
@@ -22,4 +28,4 @@ module.exports = (req, res) => {
         logErrorOrCrash('CRASH_ENDPOINT_VERSION', crashErr, req);
         res.status(500).json({ error: "Internal Error" });
     }
-};
+}

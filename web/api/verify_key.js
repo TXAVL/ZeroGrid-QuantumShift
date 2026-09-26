@@ -1,10 +1,10 @@
 /**
- * Vercel Serverless Function: API Verify Key (Dành cho install.sh)
+ * Vercel Serverless Function: API Verify Key (Dành cho install.sh / menu.sh) (ESM)
  * Endpoint: https://api.txastudio.click/verify_key.php hoặc /api/verify_key
  */
 
-const crypto = require('crypto');
-const { logErrorOrCrash } = require('./logger');
+import crypto from 'crypto';
+import { logErrorOrCrash } from './logger.js';
 
 const SALT = "TXA_STUDIO_CYBER_2026_CLICK";
 
@@ -35,16 +35,24 @@ function isValidKey(key) {
     return checksum.toUpperCase() === expectedChecksum;
 }
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
     if (req.method === 'OPTIONS') {
         return res.status(204).end();
     }
 
     try {
-        let key = (req.body && req.body.key) || (req.query && req.query.key) || '';
+        let body = req.body;
+        if (typeof body === 'string') {
+            try {
+                body = JSON.parse(body);
+            } catch (e) {}
+        }
+
+        let key = (body && body.key) || (req.query && req.query.key) || '';
         key = String(key).trim();
 
         if (isValidKey(key)) {
@@ -60,4 +68,4 @@ module.exports = async (req, res) => {
         logErrorOrCrash('CRASH_ENDPOINT_VERIFY_KEY', crashErr, req);
         return res.status(500).send("Internal Server Error: " + crashErr.message);
     }
-};
+}

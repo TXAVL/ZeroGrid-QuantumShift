@@ -1,0 +1,9 @@
+{
+  "name": "zerogrid-quantumshift",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "npm --prefix web run build"
+  }
+}

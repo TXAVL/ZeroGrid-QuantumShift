@@ -2,7 +2,35 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
     {
-      "source": "/((?!app-ads\\.txt).*)",
+      "source": "/api/admin",
+      "destination": "/api/admin.js"
+    },
+    {
+      "source": "/admin",
+      "destination": "/api/admin.js"
+    },
+    {
+      "source": "/api/validate_key.php",
+      "destination": "/api/validate_key.js"
+    },
+    {
+      "source": "/verify_key.php",
+      "destination": "/api/verify_key.js"
+    },
+    {
+      "source": "/version.php",
+      "destination": "/api/version.js"
+    },
+    {
+      "source": "/api/((?!.*\\.js$).*)",
+      "destination": "/api/$1.js"
+    },
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    },
+    {
+      "source": "/((?!api/|admin|verify_key\\.php|version\\.php|app-ads\\.txt).*)",
       "destination": "/index.html"
     }
   ],
