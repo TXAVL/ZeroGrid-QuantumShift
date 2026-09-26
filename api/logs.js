@@ -1,0 +1,30 @@
+/**
+ * Vercel Serverless Function: Xem danh sách Crash & Error Logs trên Server (ESM)
+ * Endpoint: https://api.txastudio.click/api/logs?secret=TXA_SECRET_LOGS_2026
+ */
+
+import { readLogs } from './logger.js';
+
+const ADMIN_SECRET = process.env.LOGS_SECRET || "TXA_SECRET_LOGS_2026";
+
+export default function handler(req, res) {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    if (req.method === 'OPTIONS') {
+        return res.status(204).end();
+    }
+
+    const secret = req.query?.secret || '';
+    if (secret !== ADMIN_SECRET) {
+        return res.status(403).json({
+            error: "Forbidden",
+            message: "Bạn cần cung cấp secret key để xem log lỗi máy chủ (?secret=...)"
+        });
+    }
+
+    const logs = readLogs();
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.status(200).send(logs);
+}

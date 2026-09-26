@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "workspaces": [
+    "web"
+  ],
   "scripts": {
-    "build": "npm --prefix web run build"
+    "build": "npm --prefix web install && npm --prefix web run build"
   }
 }
