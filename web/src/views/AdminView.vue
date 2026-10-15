@@ -142,6 +142,20 @@
           </button>
 
           <button 
+            @click="activeTab = 'mycay'"
+            class="px-4 py-2.5 rounded-xl border transition-all flex items-center gap-2 shrink-0"
+            :class="activeTab === 'mycay' ? 'bg-gradient-to-r from-orange-500/20 to-red-500/20 text-orange-300 border-orange-500/50 shadow-lg shadow-orange-500/20' : 'text-slate-400 border-slate-800 hover:text-white'"
+          >
+            <span>🍜 Game Mỳ Cay</span>
+            <span v-if="mycayPermanentBansCount > 0" class="px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 text-[10px] font-bold border border-red-500/30">
+              🚫 {{ mycayPermanentBansCount }} Ban
+            </span>
+            <span v-else class="px-1.5 py-0.2 rounded bg-orange-500/20 text-orange-300 text-[10px]">
+              {{ mycayViews }} Views
+            </span>
+          </button>
+
+          <button 
             @click="activeTab = 'deletions'"
             class="px-4 py-2.5 rounded-xl border transition-all flex items-center gap-2 shrink-0"
             :class="activeTab === 'deletions' ? 'bg-rose-500/10 text-rose-300 border-rose-500/40 shadow-lg shadow-rose-500/10' : 'text-slate-400 border-slate-800 hover:text-white'"
@@ -827,6 +841,248 @@
 
         </div>
 
+        <!-- ================================================================= -->
+        <!-- TAB 6: GAME MỲ CAY - THỐNG KÊ LƯỢT XEM & BAN THIẾT BỊ VĨNH VIỄN    -->
+        <!-- ================================================================= -->
+        <div v-if="activeTab === 'mycay'" class="space-y-6">
+          
+          <!-- Banner & Quick Controls -->
+          <div class="p-6 rounded-3xl border border-orange-500/30 bg-gradient-to-br from-[#1d0b0b] via-[#240e0e] to-[#0c0505] backdrop-blur-xl shadow-2xl space-y-5">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div class="flex items-center gap-4">
+                <div class="w-14 h-14 rounded-2xl bg-orange-950/80 border border-orange-500/40 p-2 flex items-center justify-center shadow-lg shadow-orange-500/20 shrink-0 text-3xl">
+                  🍜
+                </div>
+                <div>
+                  <div class="flex items-center gap-2 mb-1">
+                    <span class="w-2 h-2 rounded-full bg-orange-400 animate-ping"></span>
+                    <span class="text-[10px] font-mono tracking-widest text-orange-400 uppercase font-bold">
+                      MYCAY ENGINE // ANTI-CHEAT & ANALYTICS TERMINAL
+                    </span>
+                  </div>
+                  <h2 class="text-xl sm:text-2xl font-display font-black text-white">
+                    Quản Lý Game Mỳ Cay & Ban Thiết Bị
+                  </h2>
+                  <p class="text-xs text-slate-400 font-mono">
+                    Theo dõi số liệu thống kê lượt chơi, quản lý danh sách thiết bị bị khóa / ban vĩnh viễn và mở khóa an ninh.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Top Action Controls -->
+              <div class="flex flex-wrap items-center gap-2.5">
+                <button 
+                  @click="loadMycayData"
+                  :disabled="isMycayLoading"
+                  class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white text-xs font-mono font-bold flex items-center gap-1.5 transition-all"
+                >
+                  <span :class="isMycayLoading ? 'animate-spin' : ''">🔄</span>
+                  <span>{{ isMycayLoading ? 'Đang tải...' : 'Làm Mới' }}</span>
+                </button>
+
+                <button 
+                  @click="showMycayBanModal = true"
+                  class="px-4 py-2 rounded-xl bg-gradient-to-r from-orange-500 via-rose-500 to-red-600 text-white font-display font-black text-xs uppercase tracking-wider shadow-lg shadow-rose-500/25 hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-1.5"
+                >
+                  <span>🚫</span>
+                  <span>+ Khóa / Ban Thiết Bị</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- KPI Metric Cards -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 pt-2">
+              <div class="p-4 rounded-2xl bg-black/40 border border-orange-500/30 space-y-1">
+                <div class="text-[10px] font-mono text-orange-400 uppercase font-bold flex items-center gap-1">
+                  <span>🔥</span> Lượt Chơi / Xem Game
+                </div>
+                <div class="text-xl sm:text-3xl font-display font-black text-orange-300">
+                  {{ mycayViews.toLocaleString() }}
+                </div>
+                <div class="text-[10px] font-mono text-slate-400">
+                  Cập nhật: {{ mycayAnalytics?.updated_at ? new Date(mycayAnalytics.updated_at).toLocaleDateString('vi-VN') : 'Mới nhất' }}
+                </div>
+              </div>
+
+              <div class="p-4 rounded-2xl bg-black/40 border border-red-500/30 space-y-1">
+                <div class="text-[10px] font-mono text-red-400 uppercase font-bold flex items-center gap-1">
+                  <span>⛔</span> Ban Vĩnh Viễn
+                </div>
+                <div class="text-xl sm:text-3xl font-display font-black text-red-400">
+                  {{ mycayPermanentBansCount }}
+                </div>
+                <div class="text-[10px] font-mono text-slate-400">Vi phạm DevTools / gian lận</div>
+              </div>
+
+              <div class="p-4 rounded-2xl bg-black/40 border border-amber-500/30 space-y-1">
+                <div class="text-[10px] font-mono text-amber-400 uppercase font-bold flex items-center gap-1">
+                  <span>⏳</span> Khóa Tạm Thời
+                </div>
+                <div class="text-xl sm:text-3xl font-display font-black text-amber-300">
+                  {{ mycayTemporaryLocksCount }}
+                </div>
+                <div class="text-[10px] font-mono text-slate-400">Đang chờ hết cooldown</div>
+              </div>
+
+              <div class="p-4 rounded-2xl bg-black/40 border border-slate-800 space-y-1">
+                <div class="text-[10px] font-mono text-slate-400 uppercase font-bold flex items-center gap-1">
+                  <span>🛡️</span> Tổng Thiết Bị Ghi Nhận
+                </div>
+                <div class="text-xl sm:text-3xl font-display font-black text-white">
+                  {{ mycayLocks.length }}
+                </div>
+                <div class="text-[10px] font-mono text-slate-500">Trong danh sách an ninh</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Filter & Search Controls -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-[#090d1a]/80 border border-slate-800">
+            <div class="flex items-center gap-2 flex-wrap text-xs font-mono">
+              <span class="text-slate-400 font-bold">Lọc:</span>
+              <button 
+                @click="mycayFilter = 'all'"
+                :class="mycayFilter === 'all' ? 'bg-orange-500/20 text-orange-300 border-orange-500/40 font-bold' : 'text-slate-400 hover:text-white border-transparent'"
+                class="px-3 py-1.5 rounded-lg border transition-all"
+              >
+                Tất Cả ({{ mycayLocks.length }})
+              </button>
+              <button 
+                @click="mycayFilter = 'permanent'"
+                :class="mycayFilter === 'permanent' ? 'bg-red-500/20 text-red-300 border-red-500/40 font-bold' : 'text-slate-400 hover:text-white border-transparent'"
+                class="px-3 py-1.5 rounded-lg border transition-all"
+              >
+                ⛔ Ban Vĩnh Viễn ({{ mycayPermanentBansCount }})
+              </button>
+              <button 
+                @click="mycayFilter = 'temporary'"
+                :class="mycayFilter === 'temporary' ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 font-bold' : 'text-slate-400 hover:text-white border-transparent'"
+                class="px-3 py-1.5 rounded-lg border transition-all"
+              >
+                ⏳ Khóa Tạm ({{ mycayTemporaryLocksCount }})
+              </button>
+              <button 
+                @click="mycayFilter = 'unlocked'"
+                :class="mycayFilter === 'unlocked' ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 font-bold' : 'text-slate-400 hover:text-white border-transparent'"
+                class="px-3 py-1.5 rounded-lg border transition-all"
+              >
+                ✅ Đã Mở / Hết Hạn
+              </button>
+            </div>
+
+            <div class="w-full sm:w-72">
+              <input 
+                type="text"
+                v-model="mycaySearch"
+                placeholder="Tìm mã thiết bị (Device ID)..."
+                class="w-full px-3.5 py-2 rounded-xl bg-black/60 border border-slate-700 text-xs font-mono text-white placeholder-slate-500 outline-none focus:border-orange-400"
+              />
+            </div>
+          </div>
+
+          <!-- Security Locks Table -->
+          <div class="border border-slate-800 rounded-3xl overflow-hidden bg-[#090d1a]/80 backdrop-blur-xl">
+            <div v-if="filteredMycayLocks.length === 0" class="p-12 text-center font-mono text-xs text-slate-500 space-y-2">
+              <div class="text-3xl">🛡️</div>
+              <div class="text-slate-400 font-bold">Không có thiết bị nào bị khóa trong danh sách</div>
+              <p class="text-[11px] text-slate-600">Khi người chơi mở DevTools hoặc gian lận trên game Mỳ Cay, mã máy sẽ tự động được ghi nhận tại đây.</p>
+            </div>
+
+            <div v-else class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-xs font-mono">
+                <thead>
+                  <tr class="bg-black/60 border-b border-slate-800 text-slate-400 text-[10px] uppercase tracking-wider">
+                    <th class="p-3.5">Mã Thiết Bị (Device ID)</th>
+                    <th class="p-3.5">Trạng Thái Khóa</th>
+                    <th class="p-3.5">Lý Do</th>
+                    <th class="p-3.5 text-center">Số Lần (Strikes)</th>
+                    <th class="p-3.5">Thời Hạn Khóa Đến</th>
+                    <th class="p-3.5">Cập Nhật</th>
+                    <th class="p-3.5 text-right">Thao Tác</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-800/60">
+                  <tr v-for="lock in filteredMycayLocks" :key="lock.device_id" class="hover:bg-slate-800/20 transition-colors">
+                    <td class="p-3.5">
+                      <div class="flex items-center gap-2">
+                        <span class="font-bold text-white break-all">{{ lock.device_id }}</span>
+                        <button 
+                          @click="copy(lock.device_id)"
+                          class="p-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white text-[10px]"
+                          title="Sao chép Device ID"
+                        >
+                          📋
+                        </button>
+                      </div>
+                    </td>
+                    <td class="p-3.5">
+                      <span 
+                        v-if="lock.is_permanent_ban || (lock.locked_until && new Date(lock.locked_until).getFullYear() >= 9000)"
+                        class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-red-500/20 text-red-300 border border-red-500/40"
+                      >
+                        ⛔ BAN VĨNH VIỄN
+                      </span>
+                      <span 
+                        v-else-if="lock.locked_until && new Date(lock.locked_until) > new Date()"
+                        class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40"
+                      >
+                        ⏳ KHÓA TẠM THỜI
+                      </span>
+                      <span 
+                        v-else
+                        class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"
+                      >
+                        ✅ ĐÃ MỞ / HẾT HẠN
+                      </span>
+                    </td>
+                    <td class="p-3.5 text-slate-300">
+                      <span class="px-2 py-0.5 rounded bg-slate-800 text-[11px] text-slate-300">
+                        {{ lock.reason || 'devtools_violation' }}
+                      </span>
+                    </td>
+                    <td class="p-3.5 text-center font-bold">
+                      <span class="text-rose-400">{{ lock.strikes || 1 }}</span>
+                      <span class="text-slate-500 text-[10px]"> (Khóa {{ lock.lock_count || 1 }} lần)</span>
+                    </td>
+                    <td class="p-3.5 text-slate-400 text-[11px]">
+                      <span v-if="lock.is_permanent_ban || (lock.locked_until && new Date(lock.locked_until).getFullYear() >= 9000)" class="text-red-400 font-bold">
+                        Vô thời hạn (Vĩnh Viễn)
+                      </span>
+                      <span v-else-if="lock.locked_until" class="text-amber-300 font-mono">
+                        {{ new Date(lock.locked_until).toLocaleString('vi-VN') }}
+                      </span>
+                      <span v-else class="text-slate-600">—</span>
+                    </td>
+                    <td class="p-3.5 text-slate-500 text-[11px]">
+                      {{ lock.updated_at ? new Date(lock.updated_at).toLocaleString('vi-VN') : '—' }}
+                    </td>
+                    <td class="p-3.5 text-right">
+                      <div class="flex items-center justify-end gap-2">
+                        <button 
+                          v-if="!lock.is_permanent_ban && (!lock.locked_until || new Date(lock.locked_until).getFullYear() < 9000)"
+                          @click="handleBanMycayDevice(lock.device_id)"
+                          class="px-2.5 py-1 rounded-lg border border-red-500/40 bg-red-500/10 hover:bg-red-500/20 text-red-300 text-[11px] font-bold transition-all"
+                          title="Ban vĩnh viễn thiết bị này"
+                        >
+                          Ban Vĩnh Viễn ⛔
+                        </button>
+                        <button 
+                          @click="handleUnlockMycayDevice(lock.device_id)"
+                          class="px-2.5 py-1 rounded-lg border border-emerald-500/40 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 text-[11px] font-bold transition-all"
+                          title="Mở khóa thiết bị (Gỡ ban)"
+                        >
+                          Mở Khóa 🔓
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
       </div>
 
       <!-- =================================================================== -->
@@ -1257,6 +1513,76 @@
         </div>
       </Teleport>
 
+      <!-- =================================================================== -->
+      <!-- MODAL: MANUAL MYCAY DEVICE BAN                                      -->
+      <!-- =================================================================== -->
+      <Teleport to="body">
+        <div 
+          v-if="showMycayBanModal" 
+          class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4"
+          @click.self="showMycayBanModal = false"
+        >
+          <div class="w-full max-w-md rounded-3xl border border-orange-500/40 bg-[#0d0707] p-6 sm:p-8 space-y-5 text-slate-100 shadow-2xl">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+              <div class="flex items-center gap-2">
+                <span class="text-xl">🚫</span>
+                <div>
+                  <h3 class="font-display font-black text-white text-lg">Khóa Ban Thiết Bị Game Mỳ Cay</h3>
+                  <p class="text-xs text-orange-400 font-mono">Anti-Cheat Security Terminal</p>
+                </div>
+              </div>
+              <button @click="showMycayBanModal = false" class="text-slate-400 hover:text-white">✕</button>
+            </div>
+
+            <form @submit.prevent="handleCreateManualMycayBan" class="space-y-4 text-xs font-mono">
+              <div class="space-y-1.5">
+                <label class="text-slate-400 font-bold block">MÃ THIẾT BỊ (DEVICE ID) *</label>
+                <input 
+                  type="text" 
+                  v-model="mycayBanForm.device_id" 
+                  placeholder="Ví dụ: dev_abc123 hoặc fingerprint ID"
+                  required
+                  class="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-slate-700 text-white font-mono text-xs outline-none focus:border-orange-400"
+                />
+                <p class="text-[10px] text-slate-500 mt-1">Mã thiết bị từ log anti-cheat hoặc fingerprint của người chơi vi phạm.</p>
+              </div>
+
+              <div class="space-y-1.5">
+                <label class="text-slate-400 font-bold block">LÝ DO KHÓA</label>
+                <input 
+                  type="text" 
+                  v-model="mycayBanForm.reason" 
+                  placeholder="devtools_violation, gian lận, can thiệp mã nguồn..."
+                  class="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-slate-700 text-white font-mono text-xs outline-none focus:border-orange-400"
+                />
+              </div>
+
+              <div class="p-3 rounded-xl bg-red-950/40 border border-red-500/30 text-[11px] text-red-300 space-y-1">
+                <div class="font-bold flex items-center gap-1">⚠️ CẢNH BÁO AN NINH:</div>
+                <div>Thiết bị này sẽ bị khóa ban vĩnh viễn (locked_until 9999-12-31). Người dùng trên thiết bị này sẽ bị chặn truy cập game cho đến khi Admin mở khóa thủ công.</div>
+              </div>
+
+              <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+                <button 
+                  type="button"
+                  @click="showMycayBanModal = false"
+                  class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs"
+                >
+                  Hủy Bỏ
+                </button>
+                <button 
+                  type="submit"
+                  :disabled="isMycayLoading"
+                  class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 via-rose-500 to-red-600 text-white font-display font-black text-xs uppercase tracking-wider shadow-lg shadow-rose-500/30 hover:scale-[1.02] active:scale-95 transition-all"
+                >
+                  {{ isMycayLoading ? 'Đang Xử Lý...' : 'Xác Nhận Khóa Vĩnh Viễn' }}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </Teleport>
+
     </div>
     </div>
   </div>
@@ -1284,7 +1610,11 @@ import {
   adminListTDropLicenses,
   adminCreateTDropLicense,
   adminRevokeTDropLicense,
-  sendAutomaticLicenseEmail
+  sendAutomaticLicenseEmail,
+  adminGetMycayAnalytics,
+  adminListMycaySecurityLocks,
+  adminUnlockMycayDevice,
+  adminBanMycayDevicePermanent
 } from '../services/supabase.js';
 import { sound } from '../services/sound.js';
 
@@ -1346,6 +1676,59 @@ const filteredTDropLicenses = computed(() => {
       (l.hardware_id && l.hardware_id.toLowerCase().includes(q)) ||
       (l.device_name && l.device_name.toLowerCase().includes(q)) ||
       (l.user_name && l.user_name.toLowerCase().includes(q))
+    );
+  }
+  return list;
+});
+
+// Game Mỳ Cay Manager State (Security Locks & Views Analytics)
+const mycayAnalytics = ref(null);
+const mycayLocks = ref([]);
+const isMycayLoading = ref(false);
+const mycaySearch = ref('');
+const mycayFilter = ref('all'); // 'all', 'permanent', 'temporary', 'unlocked'
+const showMycayBanModal = ref(false);
+const mycayBanForm = ref({
+  device_id: '',
+  reason: 'devtools_violation'
+});
+
+const mycayViews = computed(() => Number(mycayAnalytics.value?.total_views) || 0);
+
+const mycayPermanentBansCount = computed(() => {
+  return mycayLocks.value.filter(l => 
+    l.is_permanent_ban === true || 
+    (l.locked_until && new Date(l.locked_until).getFullYear() >= 9000)
+  ).length;
+});
+
+const mycayTemporaryLocksCount = computed(() => {
+  const now = new Date();
+  return mycayLocks.value.filter(l => {
+    if (l.is_permanent_ban) return false;
+    if (!l.locked_until) return false;
+    const lockDate = new Date(l.locked_until);
+    return lockDate.getFullYear() < 9000 && lockDate > now;
+  }).length;
+});
+
+const filteredMycayLocks = computed(() => {
+  const now = new Date();
+  let list = mycayLocks.value;
+  
+  if (mycayFilter.value === 'permanent') {
+    list = list.filter(l => l.is_permanent_ban || (l.locked_until && new Date(l.locked_until).getFullYear() >= 9000));
+  } else if (mycayFilter.value === 'temporary') {
+    list = list.filter(l => !l.is_permanent_ban && l.locked_until && new Date(l.locked_until) > now && new Date(l.locked_until).getFullYear() < 9000);
+  } else if (mycayFilter.value === 'unlocked') {
+    list = list.filter(l => !l.is_permanent_ban && (!l.locked_until || new Date(l.locked_until) <= now));
+  }
+  
+  if (mycaySearch.value.trim()) {
+    const q = mycaySearch.value.trim().toLowerCase();
+    list = list.filter(l => 
+      (l.device_id && l.device_id.toLowerCase().includes(q)) ||
+      (l.reason && l.reason.toLowerCase().includes(q))
     );
   }
   return list;
@@ -1511,8 +1894,93 @@ async function loadDashboardData() {
 
     // Load T-Drop Data
     await loadTDropData();
+
+    // Load Game Mỳ Cay Data
+    await loadMycayData();
   } catch (e) {
     console.error('Failed to load admin data', e);
+  }
+}
+
+async function loadMycayData() {
+  isMycayLoading.value = true;
+  try {
+    const [analytics, locks] = await Promise.all([
+      adminGetMycayAnalytics(),
+      adminListMycaySecurityLocks()
+    ]);
+    mycayAnalytics.value = analytics;
+    mycayLocks.value = locks || [];
+  } catch (err) {
+    console.error('Failed to load Game Mỳ Cay data:', err);
+  } finally {
+    isMycayLoading.value = false;
+  }
+}
+
+async function handleUnlockMycayDevice(deviceId) {
+  if (!confirm(`Bạn có chắc chắn muốn MỞ KHÓA (Unban) cho thiết bị: "${deviceId}" không?`)) return;
+  sound.playClick();
+  isMycayLoading.value = true;
+  try {
+    const res = await adminUnlockMycayDevice(deviceId);
+    if (res?.success) {
+      sound.playSuccess();
+      alert(`Đã mở khóa thiết bị "${deviceId}" thành công!`);
+      await loadMycayData();
+    } else {
+      alert(`Lỗi mở khóa: ${res?.message || 'Thao tác không thành công'}`);
+    }
+  } catch (err) {
+    alert(`Lỗi kết nối khi mở khóa: ${err.message}`);
+  } finally {
+    isMycayLoading.value = false;
+  }
+}
+
+async function handleBanMycayDevice(deviceId) {
+  if (!confirm(`CẢNH BÁO: Bạn có chắc chắn muốn KHÓA BAN VĨNH VIỄN thiết bị "${deviceId}" không? Thiết bị này sẽ không thể tiếp tục chơi game Mỳ Cay!`)) return;
+  sound.playClick();
+  isMycayLoading.value = true;
+  try {
+    const res = await adminBanMycayDevicePermanent(deviceId);
+    if (res?.success) {
+      sound.playSuccess();
+      alert(`Đã khóa BAN VĨNH VIỄN thiết bị "${deviceId}" thành công!`);
+      await loadMycayData();
+    } else {
+      alert(`Lỗi khóa thiết bị: ${res?.message || 'Không thành công'}`);
+    }
+  } catch (err) {
+    alert(`Lỗi kết nối khi khóa thiết bị: ${err.message}`);
+  } finally {
+    isMycayLoading.value = false;
+  }
+}
+
+async function handleCreateManualMycayBan() {
+  const devId = mycayBanForm.value.device_id?.trim();
+  if (!devId) {
+    alert('Vui lòng nhập Device ID cần khóa!');
+    return;
+  }
+  sound.playClick();
+  isMycayLoading.value = true;
+  try {
+    const res = await adminBanMycayDevicePermanent(devId);
+    if (res?.success) {
+      sound.playSuccess();
+      alert(`Đã khóa ban vĩnh viễn thiết bị "${devId}" thành công!`);
+      showMycayBanModal.value = false;
+      mycayBanForm.value.device_id = '';
+      await loadMycayData();
+    } else {
+      alert(`Lỗi: ${res?.message || 'Không thể khóa'}`);
+    }
+  } catch (err) {
+    alert(`Lỗi: ${err.message}`);
+  } finally {
+    isMycayLoading.value = false;
   }
 }
 

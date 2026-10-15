@@ -118,7 +118,7 @@
                     </div>
                     <div>
                       <h3 class="font-display font-black text-white text-lg">T-Drop Desktop</h3>
-                      <p class="text-xs font-mono text-cyan-400">v1.2.0 • TXA Studio</p>
+                      <p class="text-xs font-mono text-cyan-400">{{ tdropVersion }} • TXA Studio</p>
                     </div>
                   </div>
                   <span class="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
@@ -349,9 +349,15 @@
 </template>
 
 <script setup>
-import { inject, ref, computed } from 'vue';
+import { inject, ref, computed, onMounted } from 'vue';
 import { sound } from '../services/sound.js';
+import { getTDropLatestVersion } from '../services/github.js';
 
 const currentLang = inject('currentLang', ref('vi'));
 const isEn = computed(() => currentLang.value === 'en');
+const tdropVersion = ref('v0.1.6');
+
+onMounted(async () => {
+  tdropVersion.value = await getTDropLatestVersion();
+});
 </script>

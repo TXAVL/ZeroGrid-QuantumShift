@@ -795,4 +795,53 @@ export async function sendAutomaticLicenseEmail({ email, orderCode, licenseKey, 
   }
 }
 
+// =========================================================================
+// GAME MỲ CAY - SECURITY LOCKS & ANALYTICS MODULE
+// =========================================================================
+
+export async function adminGetMycayAnalytics() {
+  try {
+    const res = await safeFetch(`${SUPABASE_URL}/rest/v1/mycay_analytics?select=*`, {
+      method: 'GET',
+      headers
+    }, 10000);
+    if (!res.ok) return null;
+    const list = await res.json();
+    return list && list.length > 0 ? list[0] : null;
+  } catch (err) {
+    console.error('Failed to fetch Game Mỳ Cay analytics:', err);
+    return null;
+  }
+}
+
+export async function adminListMycaySecurityLocks() {
+  try {
+    const res = await safeFetch(`${SUPABASE_URL}/rest/v1/mycay_security_locks?select=*&order=updated_at.desc`, {
+      method: 'GET',
+      headers
+    }, 10000);
+    if (!res.ok) return [];
+    return await res.json();
+  } catch (err) {
+    console.error('Failed to fetch Game Mỳ Cay security locks:', err);
+    return [];
+  }
+}
+
+export async function adminUnlockMycayDevice(deviceId) {
+  return await callRpc('admin_unlock_device', {
+    p_device_id: String(deviceId).trim(),
+    p_admin_key: 'TXA_DEV_ADMIN_2026'
+  });
+}
+
+export async function adminBanMycayDevicePermanent(deviceId) {
+  return await callRpc('lock_device_security', {
+    p_device_id: String(deviceId).trim(),
+    p_duration_seconds: 0,
+    p_is_permanent: true
+  });
+}
+
+
 

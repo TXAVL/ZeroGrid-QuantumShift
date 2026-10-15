@@ -235,7 +235,7 @@
                   <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span>
                   <span>DESKTOP AI OCR UTILITY</span>
                 </div>
-                <span class="text-xs font-mono text-slate-400">v1.2.0</span>
+                <span class="text-xs font-mono text-slate-400">{{ tdropVersion }}</span>
               </div>
 
               <!-- Graphic / Logo & Title -->
@@ -703,12 +703,18 @@
 </template>
 
 <script setup>
-import { computed, inject, ref } from 'vue';
+import { computed, inject, ref, onMounted } from 'vue';
 import GooglePlayIcon from '../components/GooglePlayIcon.vue';
 import ChromeStoreIcon from '../components/ChromeStoreIcon.vue';
 import { sound } from '../services/sound.js';
+import { getTDropLatestVersion } from '../services/github.js';
 
 const currentLang = inject('currentLang', ref('vi'));
 const isEn = computed(() => currentLang.value === 'en');
 const openDownloadModal = inject('openDownloadModal', () => {});
+const tdropVersion = ref('v0.1.6');
+
+onMounted(async () => {
+  tdropVersion.value = await getTDropLatestVersion();
+});
 </script>
