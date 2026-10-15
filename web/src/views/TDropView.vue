@@ -133,7 +133,7 @@
                       <span class="text-cyan-400 font-bold">📋 CODE SNIPPET (Copied 2m ago)</span>
                       <span>#1</span>
                     </div>
-                    <div class="text-slate-200 truncate">SELECT * FROM public.tdrop_licenses;</div>
+                    <div class="text-slate-200 truncate">npm run build && git push origin main</div>
                   </div>
 
                   <div class="p-3 rounded-xl bg-indigo-950/40 border border-indigo-500/30 space-y-1">
@@ -142,16 +142,16 @@
                       <span>#2</span>
                     </div>
                     <div class="text-indigo-200 text-[11px] leading-relaxed">
-                      "TXA Studio ID - Đồng bộ đám mây và bảo vệ quyền riêng tư người dùng."
+                      "TXA Studio - Nâng tầm năng suất làm việc với bộ tiện ích thông minh."
                     </div>
                   </div>
 
                   <div class="p-3 rounded-xl bg-black/60 border border-slate-800 space-y-1">
                     <div class="flex items-center justify-between text-[10px] text-slate-500">
-                      <span class="text-emerald-400 font-bold">💳 VIETQR LICENSE KEY</span>
+                      <span class="text-emerald-400 font-bold">🎨 COLOR PALETTE / HEX</span>
                       <span>#3</span>
                     </div>
-                    <div class="text-emerald-300 font-bold">TDR_E4F7A1_RZQDX (VIP Active)</div>
+                    <div class="text-emerald-300 font-bold">#00F5FF • rgb(0, 245, 255)</div>
                   </div>
                 </div>
 
