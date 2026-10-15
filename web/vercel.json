@@ -6,10 +6,6 @@
       "destination": "/api/admin.js"
     },
     {
-      "source": "/admin",
-      "destination": "/api/admin.js"
-    },
-    {
       "source": "/api/validate_key.php",
       "destination": "/api/validate_key.js"
     },
@@ -30,7 +26,7 @@
       "destination": "/api/$1"
     },
     {
-      "source": "/((?!api/|admin|verify_key\\.php|version\\.php|app-ads\\.txt).*)",
+      "source": "/((?!api/|verify_key\\.php|version\\.php|app-ads\\.txt).*)",
       "destination": "/index.html"
     }
   ],

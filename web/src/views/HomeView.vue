@@ -50,14 +50,24 @@
               <span class="w-2 h-2 rounded-full bg-pink-400 animate-pulse"></span>
               <span>🎮 Zero Grid: Quantum Shift</span>
             </a>
+
+            <a 
+              href="#tdrop"
+              class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/25 hover:border-cyan-400 font-mono text-xs uppercase tracking-wider transition-all hover:scale-105"
+              @mouseenter="sound.playHover()"
+              @click="sound.playClick()"
+            >
+              <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+              <span>💧 T-Drop AI Desktop</span>
+            </a>
           </div>
 
         </div>
 
         <!-- ============================================================= -->
-        <!-- SPOTLIGHT: DUAL FLAGSHIP PROJECTS GRID -->
+        <!-- SPOTLIGHT: TRIPLE FLAGSHIP PROJECTS GRID                      -->
         <!-- ============================================================= -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-16">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-16">
           
           <!-- Spotlight Card 1: ShieldBlock Pro Extension -->
           <div class="relative rounded-3xl glass-panel p-6 sm:p-8 border border-emerald-500/30 shadow-2xl shadow-emerald-950/40 hover:border-emerald-400/60 transition-all duration-300 flex flex-col justify-between group">
@@ -216,6 +226,84 @@
             </div>
           </div>
 
+          <!-- Spotlight Card 3: T-Drop AI Desktop Utility -->
+          <div class="relative rounded-3xl glass-panel p-6 sm:p-8 border border-cyan-500/30 shadow-2xl shadow-cyan-950/40 hover:border-cyan-400/60 transition-all duration-300 flex flex-col justify-between group">
+            <div class="space-y-5">
+              <!-- Top Row -->
+              <div class="flex items-center justify-between">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 font-mono text-xs font-bold">
+                  <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span>
+                  <span>DESKTOP AI OCR UTILITY</span>
+                </div>
+                <span class="text-xs font-mono text-slate-400">v1.2.0</span>
+              </div>
+
+              <!-- Graphic / Logo & Title -->
+              <div class="flex items-center gap-4">
+                <div class="w-16 h-16 rounded-2xl bg-slate-900 border border-cyan-500/40 p-2.5 flex items-center justify-center shadow-lg shadow-cyan-500/20 group-hover:scale-105 transition-transform">
+                  <img src="/tdrop.png" alt="T-Drop" class="w-full h-full object-contain" />
+                </div>
+                <div>
+                  <h2 class="text-2xl font-display font-black text-white group-hover:text-cyan-300 transition-colors">
+                    T-Drop Desktop
+                  </h2>
+                  <p class="text-xs font-mono text-cyan-400">
+                    AI Clipboard • Smart OCR • VietQR Auto
+                  </p>
+                </div>
+              </div>
+
+              <!-- Description -->
+              <p class="text-slate-300 text-sm leading-relaxed">
+                {{ isEn 
+                  ? 'High-speed desktop clipboard manager with instantaneous AI OCR text extraction, infinite history vault, and seamless VietQR automatic VIP licensing for Windows & macOS.'
+                  : 'Trợ lý quản lý bộ nhớ tạm vô tận và bóc tách chữ từ hình ảnh AI OCR siêu tốc độ. Tích hợp thanh toán VietQR tự động duyệt đơn và cấp mã bản quyền VIP & PREMIUM tức thì.' }}
+              </p>
+
+              <!-- Feature Highlights Pills -->
+              <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+                <div class="px-3 py-2 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300 flex items-center gap-2">
+                  <span class="text-cyan-400">⚡</span>
+                  <span>Infinite Vault</span>
+                </div>
+                <div class="px-3 py-2 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300 flex items-center gap-2">
+                  <span class="text-cyan-400">👁️</span>
+                  <span>Instant AI OCR</span>
+                </div>
+                <div class="px-3 py-2 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300 flex items-center gap-2">
+                  <span class="text-cyan-400">💳</span>
+                  <span>VietQR Auto Key</span>
+                </div>
+                <div class="px-3 py-2 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300 flex items-center gap-2">
+                  <span class="text-cyan-400">🔒</span>
+                  <span>Local Vault</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex flex-wrap items-center gap-3 pt-6 mt-6 border-t border-slate-800/80">
+              <router-link 
+                to="/tdrop"
+                class="inline-flex items-center gap-2.5 px-6 py-3 rounded-2xl bg-gradient-to-r from-cyan-400 via-sky-500 to-indigo-500 text-slate-950 font-display font-black text-xs uppercase tracking-wider shadow-lg shadow-cyan-500/25 hover:shadow-cyan-400/40 hover:scale-[1.02] active:scale-95 transition-all"
+                @mouseenter="sound.playHover()"
+                @click="sound.playClick()"
+              >
+                <span>💾</span>
+                <span>{{ isEn ? 'GET T-DROP APP' : 'TẢI APP T-DROP' }}</span>
+              </router-link>
+
+              <a 
+                href="#tdrop"
+                class="inline-flex items-center gap-1.5 px-4 py-3 rounded-2xl border border-slate-700 hover:border-cyan-400 text-slate-300 hover:text-white text-xs font-mono transition-all"
+                @mouseenter="sound.playHover()"
+                @click="sound.playClick()"
+              >
+                <span>Chi tiết tiện ích →</span>
+              </a>
+            </div>
+          </div>
+
         </div>
 
       </div>
@@ -314,6 +402,114 @@
           >
             <ChromeStoreIcon customClass="w-5 h-5" />
             <span>{{ isEn ? 'INSTALL SHIELDBLOCK PRO ON CHROME WEB STORE' : 'CÀI ĐẶT SHIELDBLOCK PRO TRÊN CHROME WEB STORE' }}</span>
+          </a>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- 2.5 T-DROP DESKTOP DEEP DIVE (#tdrop)                             -->
+    <!-- ================================================================= -->
+    <section id="tdrop" class="py-20 border-t border-slate-800/80 relative">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
+          <div class="inline-block text-xs font-mono font-bold tracking-widest text-cyan-400 uppercase bg-cyan-500/10 px-3.5 py-1 rounded-full border border-cyan-500/20">
+            DESKTOP PRODUCTIVITY & AI WORKSPACE
+          </div>
+          <h2 class="text-3xl sm:text-5xl font-display font-black text-white tracking-tight">
+            T-DROP <span class="bg-gradient-to-r from-cyan-400 to-indigo-400 bg-clip-text text-transparent">AI CLIPBOARD & OCR</span>
+          </h2>
+          <p class="text-slate-400 text-sm sm:text-base leading-relaxed">
+            {{ isEn 
+              ? 'Maximize your computer workflow speed with instant global hotkey access, infinite copy history vault, intelligent Vietnamese AI OCR, and VietQR automatic VIP activation.'
+              : 'Nâng cấp năng suất làm việc vượt trội với phím tắt toàn cục siêu tốc, kho lưu trữ lịch sử copy vô tận, bóc tách chữ từ ảnh chụp màn hình AI OCR cực chuẩn và cấp bản quyền VietQR tự động.' }}
+          </p>
+        </div>
+
+        <!-- 4 Cyber Feature Cards for T-Drop -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          
+          <div class="glass-card p-6 rounded-2xl space-y-4 border border-cyan-500/20">
+            <div class="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 text-2xl font-bold">
+              📋
+            </div>
+            <h3 class="font-display font-bold text-lg text-white">
+              {{ isEn ? 'Infinite History Vault' : 'Lịch Sử Copy Vô Tận' }}
+            </h3>
+            <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
+              {{ isEn 
+                ? 'Stores all text snippets, image clips, hex colors, and code. Search instantaneously with fuzzy search.' 
+                : 'Lưu trữ tự động mọi dữ liệu copy từ trước đến nay. Tìm lại bất kỳ nội dung nào chỉ với 1 phím tắt và tìm kiếm thông minh.' }}
+            </p>
+          </div>
+
+          <div class="glass-card p-6 rounded-2xl space-y-4 border border-indigo-500/20">
+            <div class="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 text-2xl font-bold">
+              👁️
+            </div>
+            <h3 class="font-display font-bold text-lg text-white">
+              {{ isEn ? 'Instant AI OCR Engine' : 'Trích Xuất Ảnh Thành Chữ' }}
+            </h3>
+            <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
+              {{ isEn 
+                ? 'Capture any area on screen to extract accurate text with full Vietnamese diacritics support without retyping.' 
+                : 'Bóc tách văn bản từ ảnh chụp màn hình cực nhạy. Không cần gõ lại chữ từ hình ảnh hay tài liệu scan, hỗ trợ trọn vẹn dấu tiếng Việt.' }}
+            </p>
+          </div>
+
+          <div class="glass-card p-6 rounded-2xl space-y-4 border border-emerald-500/20">
+            <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-2xl font-bold">
+              💳
+            </div>
+            <h3 class="font-display font-bold text-lg text-white">
+              {{ isEn ? 'VietQR Auto VIP Key' : 'Tự Động Kích Hoạt VietQR' }}
+            </h3>
+            <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
+              {{ isEn 
+                ? 'Fast VietQR bank transfer with automated order checking and machine ID license key generation.' 
+                : 'Quét mã VietQR chuyển khoản ngân hàng tự động. Hệ thống duyệt đơn và cấp mã bản quyền VIP hoặc PREMIUM gắn liền mã máy an toàn.' }}
+            </p>
+          </div>
+
+          <div class="glass-card p-6 rounded-2xl space-y-4 border border-purple-500/20">
+            <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 text-2xl font-bold">
+              🔒
+            </div>
+            <h3 class="font-display font-bold text-lg text-white">
+              {{ isEn ? 'Local-First Vault' : 'Bảo Mật Cục Bộ 100%' }}
+            </h3>
+            <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
+              {{ isEn 
+                ? 'Your clipboard history remains strictly encrypted on your local machine with 0 telemetry upload.' 
+                : 'Dữ liệu clipboard của bạn nằm trọn vẹn trong ổ cứng máy tính cá nhân. Cam kết không gửi lịch sử copy lên bất kỳ máy chủ bên thứ ba nào.' }}
+            </p>
+          </div>
+
+        </div>
+
+        <div class="mt-10 text-center flex flex-wrap items-center justify-center gap-4">
+          <router-link 
+            to="/tdrop"
+            class="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-gradient-to-r from-cyan-400 via-sky-500 to-indigo-600 text-slate-950 font-display font-black text-sm uppercase tracking-wider shadow-lg shadow-cyan-500/25 hover:shadow-cyan-400/40 transition-all hover:scale-105"
+            @mouseenter="sound.playHover()"
+            @click="sound.playClick()"
+          >
+            <span>💧</span>
+            <span>{{ isEn ? 'EXPLORE T-DROP FULL PRODUCT PAGE' : 'KHÁM PHÁ CHI TIẾT SẢN PHẨM T-DROP' }}</span>
+          </router-link>
+
+          <a 
+            href="https://github.com/TXAVL/T-Drop/releases"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-slate-900 border border-slate-700 text-slate-300 hover:text-white font-mono text-sm transition-all hover:scale-105"
+            @mouseenter="sound.playHover()"
+            @click="sound.playClick()"
+          >
+            <span>💾</span>
+            <span>{{ isEn ? 'Download Releases (GitHub)' : 'Tải File Cài Đặt (GitHub Releases)' }}</span>
           </a>
         </div>
 

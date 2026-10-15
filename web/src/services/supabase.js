@@ -63,6 +63,22 @@ export const KNOWN_PRODUCTS = {
     description: 'Ultra-fast, zero-telemetry ad and tracker blocker extension for Chromium browsers with cloud sync via TXA Studio ID.',
     short_description: 'Tiện ích chặn quảng cáo và mã theo dõi bảo vệ quyền riêng tư tốc độ cao, đồng bộ cloud qua TXA Studio ID.',
     created_at: '2026-09-16T00:00:00Z'
+  },
+  tdrop: {
+    slug: 'tdrop',
+    title: 'T-Drop — AI Clipboard & Smart OCR Desktop',
+    package_id: 'txa.tdrop.desktop',
+    developer_name: 'TXA Studio',
+    support_email: 'txasoftdev@gmail.com',
+    genre: 'Productivity / AI OCR Desktop Suite',
+    platform: 'Windows & macOS',
+    icon: '/tdrop.png',
+    store_url: '/tdrop',
+    github_url: 'https://github.com/TXAVL/T-Drop',
+    type: 'app',
+    description: 'Next-Gen High-Speed Desktop Clipboard Manager with Instant AI OCR Text Recognition, Infinite History Vault & VietQR Automatic VIP Licensing.',
+    short_description: 'Trợ lý quản lý Clipboard thông minh & OCR trích xuất ảnh thành văn bản AI cho Windows & macOS.',
+    created_at: '2026-10-15T00:00:00Z'
   }
 };
 
@@ -70,6 +86,7 @@ export const KNOWN_PRODUCTS = {
 export function normalizeProductSlug(raw = '') {
   if (!raw) return 'quantumshift';
   const lower = String(raw).trim().toLowerCase();
+  if (lower.includes('tdrop') || lower.includes('drop')) return 'tdrop';
   if (lower.includes('shield')) return 'shieldblock';
   if (lower.includes('zero') || lower.includes('quantum')) return 'quantumshift';
   return KNOWN_PRODUCTS[lower]?.slug || lower || 'quantumshift';
@@ -727,3 +744,55 @@ export async function adminListFeedbacks(limit = 50, offset = 0) {
     p_offset: offset
   });
 }
+
+// =========================================================================
+// T-DROP CLIPBOARD & AI OCR DESKTOP - ADMIN MANAGEMENT MODULE
+// =========================================================================
+
+export async function adminListTDropOrders(status = 'all') {
+  return await callRpc('admin_list_orders', {
+    p_status: status === 'all' ? '' : status
+  });
+}
+
+export async function adminApproveTDropOrder(orderCode) {
+  return await callRpc('admin_approve_order', {
+    p_order_code: String(orderCode).trim()
+  });
+}
+
+export async function adminListTDropLicenses(search = '', role = 'all') {
+  return await callRpc('admin_list_licenses', {
+    p_search: String(search || '').trim(),
+    p_role: role === 'all' ? '' : role
+  });
+}
+
+export async function adminCreateTDropLicense(hardwareId, role = 'VIP', deviceName = '') {
+  return await callRpc('admin_create_tdrop_license', {
+    p_hardware_id: String(hardwareId).trim(),
+    p_role: role || 'VIP',
+    p_device_name: deviceName ? String(deviceName).trim() : 'Desktop App'
+  });
+}
+
+export async function adminRevokeTDropLicense(targetKey) {
+  return await callRpc('admin_revoke_license', {
+    p_target_key: String(targetKey).trim()
+  });
+}
+
+export async function sendAutomaticLicenseEmail({ email, orderCode, licenseKey, role, machineId }) {
+  try {
+    const res = await safeFetch('/api/send_tdrop_email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, orderCode, licenseKey, role, machineId })
+    }, 15000);
+    return await res.json();
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+}
+
+

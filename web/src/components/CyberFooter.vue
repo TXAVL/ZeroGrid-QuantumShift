@@ -52,6 +52,12 @@
                 <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400">Extension v1.1</span>
               </router-link>
             </li>
+            <li>
+              <router-link to="/tdrop" class="text-slate-300 hover:text-cyan-400 transition-colors flex items-center justify-between">
+                <span>T-Drop Desktop</span>
+                <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-400">Desktop v1.2</span>
+              </router-link>
+            </li>
           </ul>
         </div>
 

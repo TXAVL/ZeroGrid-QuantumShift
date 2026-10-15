@@ -128,6 +128,20 @@
           </button>
 
           <button 
+            @click="activeTab = 'tdrop'"
+            class="px-4 py-2.5 rounded-xl border transition-all flex items-center gap-2 shrink-0"
+            :class="activeTab === 'tdrop' ? 'bg-gradient-to-r from-cyan-500/20 to-indigo-500/20 text-cyan-300 border-cyan-500/50 shadow-lg shadow-cyan-500/20' : 'text-slate-400 border-slate-800 hover:text-white'"
+          >
+            <span>💧 Quản Lý T-Drop</span>
+            <span v-if="tdropPendingOrdersCount > 0" class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] animate-pulse font-bold">
+              ⚡ {{ tdropPendingOrdersCount }} Đơn Chờ
+            </span>
+            <span v-else class="px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-300 text-[10px]">
+              {{ tdropOrders.length }}
+            </span>
+          </button>
+
+          <button 
             @click="activeTab = 'deletions'"
             class="px-4 py-2.5 rounded-xl border transition-all flex items-center gap-2 shrink-0"
             :class="activeTab === 'deletions' ? 'bg-rose-500/10 text-rose-300 border-rose-500/40 shadow-lg shadow-rose-500/10' : 'text-slate-400 border-slate-800 hover:text-white'"
@@ -446,6 +460,371 @@
               </div>
             </div>
           </div>
+        <!-- ================================================================= -->
+        <!-- TAB 5: T-DROP CLIPBOARD & AI OCR DESKTOP MANAGER                   -->
+        <!-- ================================================================= -->
+        <div v-if="activeTab === 'tdrop'" class="space-y-6">
+          
+          <!-- Banner & Quick Controls -->
+          <div class="p-6 rounded-3xl border border-indigo-500/30 bg-gradient-to-br from-[#090d24] via-[#0b102c] to-[#070a18] backdrop-blur-xl shadow-2xl space-y-5">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div class="flex items-center gap-4">
+                <div class="w-14 h-14 rounded-2xl bg-indigo-950/80 border border-indigo-500/40 p-2 flex items-center justify-center shadow-lg shadow-indigo-500/20 shrink-0">
+                  <img src="/tdrop.png" alt="T-Drop" class="w-full h-full object-contain" />
+                </div>
+                <div>
+                  <div class="flex items-center gap-2 mb-1">
+                    <span class="w-2 h-2 rounded-full bg-indigo-400 animate-ping"></span>
+                    <span class="text-[10px] font-mono tracking-widest text-indigo-400 uppercase font-bold">
+                      T-DROP ECOSYSTEM // DESKTOP CLIPBOARD & AI OCR
+                    </span>
+                  </div>
+                  <h2 class="text-xl sm:text-2xl font-display font-black text-white">
+                    Quản Lý Bản Quyền & Đơn Hàng VietQR T-Drop
+                  </h2>
+                  <p class="text-xs text-slate-400 font-mono">
+                    Hệ thống tự động duyệt mã VietQR và cấp phát License Key VIP (30 ngày) / PREMIUM (60 ngày).
+                  </p>
+                </div>
+              </div>
+
+              <!-- Top Action Controls -->
+              <div class="flex flex-wrap items-center gap-2.5">
+                <button 
+                  @click="loadTDropData"
+                  :disabled="isTDropLoading"
+                  class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white text-xs font-mono font-bold flex items-center gap-1.5 transition-all"
+                >
+                  <span :class="isTDropLoading ? 'animate-spin' : ''">🔄</span>
+                  <span>{{ isTDropLoading ? 'Đang tải...' : 'Làm Mới' }}</span>
+                </button>
+
+                <button 
+                  @click="showManualLicenseModal = true"
+                  class="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-400 via-sky-500 to-indigo-500 text-slate-950 font-display font-black text-xs uppercase tracking-wider shadow-lg shadow-cyan-500/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-1.5"
+                >
+                  <span>+</span>
+                  <span>Tạo Key Thủ Công</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- KPI Metric Cards -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 pt-2">
+              <div class="p-4 rounded-2xl bg-black/40 border border-slate-800/80 space-y-1">
+                <div class="text-[10px] font-mono text-slate-500 uppercase font-bold">Tổng Đơn VietQR</div>
+                <div class="text-xl sm:text-2xl font-display font-black text-white">{{ tdropOrders.length }}</div>
+                <div class="text-[10px] font-mono text-cyan-400">Giao dịch hệ thống</div>
+              </div>
+
+              <div class="p-4 rounded-2xl border space-y-1 transition-all"
+                   :class="tdropPendingOrdersCount > 0 ? 'bg-amber-500/10 border-amber-500/40 shadow-lg shadow-amber-500/10' : 'bg-black/40 border-slate-800/80'">
+                <div class="text-[10px] font-mono uppercase font-bold" :class="tdropPendingOrdersCount > 0 ? 'text-amber-400' : 'text-slate-500'">
+                  Đơn Chờ Duyệt (Pending)
+                </div>
+                <div class="text-xl sm:text-2xl font-display font-black" :class="tdropPendingOrdersCount > 0 ? 'text-amber-300' : 'text-white'">
+                  {{ tdropPendingOrdersCount }}
+                </div>
+                <div class="text-[10px] font-mono" :class="tdropPendingOrdersCount > 0 ? 'text-amber-400 font-bold' : 'text-slate-500'">
+                  {{ tdropPendingOrdersCount > 0 ? '⚡ Cần duyệt cấp key ngay' : 'Không có đơn tồn' }}
+                </div>
+              </div>
+
+              <div class="p-4 rounded-2xl bg-black/40 border border-slate-800/80 space-y-1">
+                <div class="text-[10px] font-mono text-slate-500 uppercase font-bold">Doanh Thu Đã Duyệt</div>
+                <div class="text-xl sm:text-2xl font-display font-black text-emerald-400">
+                  {{ tdropTotalRevenue.toLocaleString('vi-VN') }} đ
+                </div>
+                <div class="text-[10px] font-mono text-slate-400">{{ tdropApprovedOrdersCount }} đơn đã duyệt</div>
+              </div>
+
+              <div class="p-4 rounded-2xl bg-black/40 border border-slate-800/80 space-y-1">
+                <div class="text-[10px] font-mono text-slate-500 uppercase font-bold">License Đang Hoạt Động</div>
+                <div class="text-xl sm:text-2xl font-display font-black text-indigo-400">{{ tdropActiveLicensesCount }}</div>
+                <div class="text-[10px] font-mono text-slate-400">Tổng {{ tdropLicenses.length }} mã key</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sub-Tab Navigation Bar -->
+          <div class="flex items-center justify-between flex-wrap gap-3 border-b border-slate-800 pb-3">
+            <div class="flex items-center gap-2">
+              <button 
+                @click="tdropActiveSubTab = 'orders'"
+                class="px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all flex items-center gap-2"
+                :class="tdropActiveSubTab === 'orders' ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-lg shadow-cyan-500/10' : 'text-slate-400 hover:text-white border border-transparent'"
+              >
+                <span>🧾 Đơn Hàng VietQR</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px]" :class="tdropPendingOrdersCount > 0 ? 'bg-amber-500 text-slate-950 font-black' : 'bg-slate-800 text-slate-400'">
+                  {{ tdropOrders.length }}
+                </span>
+              </button>
+
+              <button 
+                @click="tdropActiveSubTab = 'licenses'"
+                class="px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all flex items-center gap-2"
+                :class="tdropActiveSubTab === 'licenses' ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 shadow-lg shadow-indigo-500/10' : 'text-slate-400 hover:text-white border border-transparent'"
+              >
+                <span>🔑 Quản Lý Bản Quyền (Licenses)</span>
+                <span class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 text-[10px]">
+                  {{ tdropLicenses.length }}
+                </span>
+              </button>
+            </div>
+
+            <!-- Filters for active sub tab -->
+            <div v-if="tdropActiveSubTab === 'orders'" class="flex items-center gap-2 text-xs font-mono">
+              <span class="text-slate-500">Lọc đơn:</span>
+              <select 
+                v-model="tdropOrderFilter" 
+                @change="loadTDropData"
+                class="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-cyan-300 text-xs font-bold outline-none cursor-pointer"
+              >
+                <option value="all">Tất cả trạng thái</option>
+                <option value="pending">⏳ Chờ duyệt (Pending)</option>
+                <option value="approved">✓ Đã duyệt (Approved)</option>
+                <option value="rejected">✕ Đã từ chối (Rejected)</option>
+              </select>
+            </div>
+
+            <div v-if="tdropActiveSubTab === 'licenses'" class="flex items-center gap-2 flex-wrap text-xs font-mono">
+              <input 
+                type="text" 
+                v-model="tdropLicenseSearch" 
+                @input="debounceTDropSearch"
+                placeholder="Tìm mã key, machine ID..." 
+                class="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs outline-none focus:border-indigo-400 w-48"
+              />
+              <select 
+                v-model="tdropLicenseRoleFilter" 
+                @change="loadTDropData"
+                class="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-indigo-300 text-xs font-bold outline-none cursor-pointer"
+              >
+                <option value="all">Tất cả gói</option>
+                <option value="VIP">VIP (30 ngày)</option>
+                <option value="PREMIUM">PREMIUM (60 ngày)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- SUB-TAB 1: ORDERS LIST -->
+          <div v-if="tdropActiveSubTab === 'orders'" class="space-y-4">
+            <div v-if="filteredTDropOrders.length === 0" class="p-12 rounded-3xl border border-slate-800 bg-[#090d1a]/80 text-center font-mono text-xs text-slate-500 space-y-2">
+              <div class="text-3xl">📭</div>
+              <div>Không tìm thấy đơn hàng VietQR nào phù hợp với bộ lọc.</div>
+            </div>
+
+            <div v-else class="grid grid-cols-1 gap-4">
+              <div 
+                v-for="order in filteredTDropOrders" 
+                :key="order.id || order.order_code"
+                class="p-5 sm:p-6 rounded-2xl border bg-[#090d1a]/90 backdrop-blur-xl transition-all space-y-4"
+                :class="order.status === 'pending' ? 'border-amber-500/40 shadow-xl shadow-amber-500/5' : 'border-slate-800'"
+              >
+                <!-- Order Top Line -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800/80">
+                  <div class="flex items-center gap-3 flex-wrap">
+                    <span class="text-base font-display font-black text-white tracking-wide">
+                      {{ order.order_code }}
+                    </span>
+                    <span 
+                      class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider border"
+                      :class="order.role === 'PREMIUM' ? 'bg-purple-500/20 text-purple-300 border-purple-500/40' : 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40'"
+                    >
+                      ★ GÓI {{ order.role }} ({{ order.role === 'PREMIUM' ? '60 Ngày' : '30 Ngày' }})
+                    </span>
+                    <span 
+                      class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider border"
+                      :class="{
+                        'bg-amber-500/20 text-amber-300 border-amber-500/40 animate-pulse': order.status === 'pending',
+                        'bg-emerald-500/20 text-emerald-300 border-emerald-500/40': order.status === 'approved',
+                        'bg-rose-500/20 text-rose-300 border-rose-500/40': order.status === 'rejected'
+                      }"
+                    >
+                      {{ order.status === 'pending' ? '⏳ CHỜ DUYỆT' : order.status === 'approved' ? '✓ ĐÃ DUYỆT' : '✕ ĐÃ TỪ CHỐI' }}
+                    </span>
+                  </div>
+
+                  <!-- Amount & Date -->
+                  <div class="flex items-center gap-3 text-xs font-mono">
+                    <span class="text-sm font-bold text-emerald-400">
+                      {{ (Number(order.amount) || (order.role === 'PREMIUM' ? 49000 : 29000)).toLocaleString('vi-VN') }} VNĐ
+                    </span>
+                    <span class="text-slate-500 text-[11px]">
+                      {{ new Date(order.created_at).toLocaleString('vi-VN') }}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Order Details Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-mono">
+                  <div class="p-3 rounded-xl bg-black/50 border border-slate-800 space-y-1">
+                    <div class="text-[10px] text-slate-500 font-bold uppercase">MÃ MÁY KHÁCH HÀNG (MACHINE ID):</div>
+                    <div class="flex items-center justify-between gap-2">
+                      <span class="text-cyan-300 font-bold font-mono break-all">{{ order.machine_id }}</span>
+                      <button @click="copy(order.machine_id)" class="text-cyan-400 hover:text-cyan-200 text-[11px] underline shrink-0 font-bold">Copy</button>
+                    </div>
+                  </div>
+
+                  <div class="p-3 rounded-xl bg-black/50 border border-slate-800 space-y-1">
+                    <div class="text-[10px] text-slate-500 font-bold uppercase">EMAIL NHẬN MÃ BẢN QUYỀN:</div>
+                    <div class="flex items-center justify-between gap-2">
+                      <span class="text-white font-mono break-all">{{ order.email }}</span>
+                      <a :href="'mailto:' + order.email" class="text-pink-400 hover:text-pink-300 text-[11px] underline shrink-0 font-bold">Mail</a>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Transfer Content -->
+                <div v-if="order.transfer_content" class="p-3 rounded-xl bg-slate-900/60 border border-slate-800 text-xs font-mono flex items-center justify-between gap-2">
+                  <div class="truncate">
+                    <span class="text-slate-500">Nội dung CK:</span> 
+                    <span class="text-slate-200 ml-1.5">{{ order.transfer_content }}</span>
+                  </div>
+                  <button @click="copy(order.transfer_content)" class="text-slate-400 hover:text-slate-200 text-[10px] shrink-0">Copy ND</button>
+                </div>
+
+                <!-- License Key Generated Card (If Approved) -->
+                <div v-if="order.license_key" class="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-mono">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span class="text-emerald-400 font-bold">🔑 MÃ KEY ĐÃ CẤP:</span>
+                    <span class="text-emerald-200 font-bold font-mono text-sm px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/40">
+                      {{ order.license_key }}
+                    </span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <button @click="copy(order.license_key)" class="px-3 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 font-bold text-[11px] transition-all">
+                      Sao Chép Key
+                    </button>
+                    <button @click="openMailtoClient(order)" class="px-3 py-1 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 font-bold text-[11px] transition-all flex items-center gap-1">
+                      <span>📧</span>
+                      <span>Gửi Lại Email</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Action Footer -->
+                <div class="flex items-center justify-between flex-wrap gap-3 pt-2">
+                  <div class="text-[11px] font-mono text-slate-500">
+                    <span v-if="order.approved_at">Duyệt lúc: {{ new Date(order.approved_at).toLocaleString('vi-VN') }}</span>
+                    <span v-else>Đang chờ duyệt thanh toán VietQR</span>
+                  </div>
+
+                  <div class="flex items-center gap-2">
+                    <!-- Approve Button -->
+                    <button 
+                      v-if="order.status === 'pending'"
+                      @click="handleApproveTDropOrder(order)"
+                      class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500 text-slate-950 font-display font-black text-xs uppercase tracking-wider shadow-lg shadow-emerald-500/25 hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-1.5"
+                    >
+                      <span>⚡</span>
+                      <span>Duyệt & Cấp Key</span>
+                    </button>
+
+                    <!-- Auto Send & Mailto for Approved -->
+                    <div v-if="order.status === 'approved'" class="flex items-center gap-2">
+                      <button 
+                        @click="sendAutoEmail(order)"
+                        :disabled="sendingEmailOrderId === order.order_code"
+                        class="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500/20 via-teal-500/20 to-cyan-500/20 hover:from-emerald-500/30 hover:to-cyan-500/30 border border-emerald-500/40 text-emerald-300 font-mono text-xs font-bold transition-all flex items-center gap-1.5"
+                      >
+                        <span v-if="sendingEmailOrderId === order.order_code" class="animate-spin">⏳</span>
+                        <span v-else>🚀</span>
+                        <span>{{ sendingEmailOrderId === order.order_code ? 'Đang gửi email...' : 'Gửi Email Tự Động' }}</span>
+                      </button>
+
+                      <button 
+                        @click="openMailtoClient(order)"
+                        class="px-2.5 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white font-mono text-[11px] transition-all"
+                        title="Mở ứng dụng email dự phòng (Mailto)"
+                      >
+                        Mailto
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUB-TAB 2: LICENSES LIST -->
+          <div v-if="tdropActiveSubTab === 'licenses'" class="space-y-4">
+            <div v-if="filteredTDropLicenses.length === 0" class="p-12 rounded-3xl border border-slate-800 bg-[#090d1a]/80 text-center font-mono text-xs text-slate-500 space-y-2">
+              <div class="text-3xl">🔑</div>
+              <div>Không tìm thấy mã bản quyền nào. Bạn có thể bấm "Tạo Key Thủ Công" để tạo mới.</div>
+            </div>
+
+            <!-- Licenses Table -->
+            <div v-else class="overflow-x-auto rounded-2xl border border-slate-800 bg-[#090d1a]/80">
+              <table class="w-full text-left text-xs font-mono">
+                <thead class="bg-slate-900/90 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
+                  <tr>
+                    <th class="p-3.5">Mã Bản Quyền (License Key)</th>
+                    <th class="p-3.5">Gói</th>
+                    <th class="p-3.5">Machine ID</th>
+                    <th class="p-3.5">Thiết Bị / Khách Hàng</th>
+                    <th class="p-3.5">Hạn Dùng</th>
+                    <th class="p-3.5">Trạng Thái</th>
+                    <th class="p-3.5 text-right">Thao Tác</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-800/60">
+                  <tr v-for="lic in filteredTDropLicenses" :key="lic.id || lic.key" class="hover:bg-slate-800/20 transition-colors">
+                    <td class="p-3.5">
+                      <div class="flex items-center gap-2">
+                        <span class="font-bold text-cyan-300 font-mono">{{ lic.key }}</span>
+                        <button @click="copy(lic.key)" class="text-[10px] text-slate-500 hover:text-cyan-400 font-bold">Copy</button>
+                      </div>
+                      <div class="text-[10px] text-slate-500">{{ new Date(lic.created_at).toLocaleDateString('vi-VN') }}</div>
+                    </td>
+                    <td class="p-3.5">
+                      <span 
+                        class="px-2 py-0.5 rounded text-[10px] font-bold"
+                        :class="lic.role === 'PREMIUM' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'"
+                      >
+                        {{ lic.role }}
+                      </span>
+                    </td>
+                    <td class="p-3.5 max-w-[160px] truncate">
+                      <span class="text-slate-300" :title="lic.hardware_id">{{ lic.hardware_id || 'Chưa gắn' }}</span>
+                    </td>
+                    <td class="p-3.5 max-w-[180px] truncate">
+                      <div class="text-white">{{ lic.device_name || lic.user_name || 'Khách hàng' }}</div>
+                      <div v-if="lic.note" class="text-[10px] text-slate-500 truncate" :title="lic.note">{{ lic.note }}</div>
+                    </td>
+                    <td class="p-3.5">
+                      <span 
+                        class="text-[11px] font-bold"
+                        :class="calculateRemainingDays(lic.expires_at).includes('hết hạn') ? 'text-rose-400' : 'text-emerald-400'"
+                      >
+                        {{ calculateRemainingDays(lic.expires_at) }}
+                      </span>
+                    </td>
+                    <td class="p-3.5">
+                      <span 
+                        class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider"
+                        :class="lic.status === 'active' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'"
+                      >
+                        {{ lic.status === 'active' ? 'ACTIVE' : 'REVOKED' }}
+                      </span>
+                    </td>
+                    <td class="p-3.5 text-right">
+                      <button 
+                        v-if="lic.status === 'active'"
+                        @click="handleRevokeTDropLicense(lic)"
+                        class="px-2.5 py-1 rounded-lg border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 text-[11px] font-bold transition-all"
+                        title="Thu hồi bản quyền key này"
+                      >
+                        Thu Hồi
+                      </button>
+                      <span v-else class="text-slate-600 text-[11px] italic">Đã thu hồi</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
         </div>
 
       </div>
@@ -705,6 +1084,175 @@
             </div>
           </div>
         </div>
+      <!-- =================================================================== -->
+      <!-- MODAL: MANUAL TDROP LICENSE CREATION                                -->
+      <!-- =================================================================== -->
+      <Teleport to="body">
+        <div 
+          v-if="showManualLicenseModal" 
+          class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4"
+          @click.self="showManualLicenseModal = false"
+        >
+          <div class="w-full max-w-lg rounded-3xl border border-indigo-500/40 bg-[#090d1f] p-6 sm:p-8 space-y-5 text-slate-100 shadow-2xl">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+              <div class="flex items-center gap-3">
+                <span class="text-2xl">💧</span>
+                <h3 class="font-display font-black text-white text-lg">Tạo Key Bản Quyền T-Drop Thủ Công</h3>
+              </div>
+              <button @click="showManualLicenseModal = false" class="text-slate-400 hover:text-white">✕</button>
+            </div>
+
+            <form @submit.prevent="handleCreateManualLicense" class="space-y-4 text-xs font-mono">
+              <div>
+                <label class="block text-slate-300 mb-1 font-bold">MÃ MÁY KHÁCH HÀNG (MACHINE ID / HARDWARE HASH): *</label>
+                <input 
+                  type="text" 
+                  v-model="manualLicenseForm.hardware_id" 
+                  required 
+                  placeholder="Ví dụ: A8B9C1D2E3F4G5H6 hoặc hash máy"
+                  class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 focus:border-cyan-400 text-cyan-300 font-bold outline-none"
+                />
+                <p class="text-[10px] text-slate-500 mt-1">Mã máy hiển thị trong màn hình Kích Hoạt của ứng dụng T-Drop Desktop.</p>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-slate-300 mb-1 font-bold">GÓI BẢN QUYỀN:</label>
+                  <select 
+                    v-model="manualLicenseForm.role"
+                    class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 focus:border-indigo-400 text-white font-bold outline-none cursor-pointer"
+                  >
+                    <option value="VIP">VIP (Hạn dùng 30 Ngày)</option>
+                    <option value="PREMIUM">PREMIUM (Hạn dùng 60 Ngày)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-slate-300 mb-1 font-bold">TÊN THIẾT BỊ / GHI CHÚ:</label>
+                  <input 
+                    type="text" 
+                    v-model="manualLicenseForm.device_name" 
+                    placeholder="VD: Windows PC, MacBook"
+                    class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 focus:border-indigo-400 text-white outline-none"
+                  />
+                </div>
+              </div>
+
+              <div class="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-[11px] text-indigo-300 space-y-1">
+                <div class="font-bold">✓ Quy tắc cấp phát tự động:</div>
+                <div>• Format mã key: <span class="font-mono text-cyan-300">TDR_{HardwareHash}_{Random5}</span></div>
+                <div>• Thời hạn tính từ thời điểm tạo key và lưu trực tiếp vào cơ sở dữ liệu Supabase.</div>
+              </div>
+
+              <div class="flex items-center gap-3 pt-2">
+                <button 
+                  type="button"
+                  @click="showManualLicenseModal = false"
+                  class="flex-1 py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold"
+                >
+                  Hủy Bỏ
+                </button>
+                <button 
+                  type="submit" 
+                  :disabled="isTDropLoading"
+                  class="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-cyan-400 via-sky-500 to-indigo-500 text-slate-950 font-display font-black text-xs uppercase tracking-wider shadow-lg shadow-cyan-500/20 hover:scale-[1.02] active:scale-95 transition-all"
+                >
+                  {{ isTDropLoading ? 'Đang Khởi Tạo...' : 'Khởi Tạo Key Ngay' }}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </Teleport>
+
+      <!-- =================================================================== -->
+      <!-- MODAL: TDROP LICENSE SUCCESS NOTIFICATION & 1-CLICK EMAIL           -->
+      <!-- =================================================================== -->
+      <Teleport to="body">
+        <div 
+          v-if="createdLicenseModalData" 
+          class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4"
+          @click.self="createdLicenseModalData = null"
+        >
+          <div class="w-full max-w-lg rounded-3xl border border-emerald-500/40 bg-[#070b18] p-6 sm:p-8 space-y-5 text-slate-100 shadow-2xl text-center">
+            <div class="w-16 h-16 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-3xl mx-auto shadow-lg shadow-emerald-500/20">
+              🎉
+            </div>
+
+            <div class="space-y-1">
+              <h3 class="font-display font-black text-white text-xl">
+                {{ createdLicenseModalData.title || 'Cấp Phát Bản Quyền Thành Công!' }}
+              </h3>
+              <p class="text-xs text-slate-400 font-mono">
+                Mã bản quyền đã được kích hoạt trên hệ thống Cloud Supabase.
+              </p>
+            </div>
+
+            <!-- Big Glowing License Key Box -->
+            <div class="p-4 rounded-2xl bg-black/80 border-2 border-emerald-500/50 space-y-2">
+              <div class="text-[10px] font-mono text-slate-400 uppercase tracking-widest font-bold">MÃ LICENSE KEY T-DROP:</div>
+              <div class="text-xl sm:text-2xl font-mono font-black text-emerald-300 tracking-wider break-all select-all">
+                {{ createdLicenseModalData.license_key }}
+              </div>
+              <button 
+                @click="copy(createdLicenseModalData.license_key)"
+                class="px-4 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 text-xs font-mono font-bold transition-all inline-flex items-center gap-1.5"
+              >
+                <span>📋</span>
+                <span>1-Click Sao Chép Key</span>
+              </button>
+            </div>
+
+            <!-- Details Summary -->
+            <div class="border border-slate-800 rounded-xl p-3 bg-slate-900/60 text-xs font-mono text-left space-y-1">
+              <div v-if="createdLicenseModalData.order_code" class="flex justify-between">
+                <span class="text-slate-500">Mã đơn:</span>
+                <span class="text-white font-bold">{{ createdLicenseModalData.order_code }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-500">Gói bản quyền:</span>
+                <span class="text-cyan-400 font-bold">{{ createdLicenseModalData.role }} ({{ createdLicenseModalData.role === 'PREMIUM' ? '60 ngày' : '30 ngày' }})</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-500">Mã máy (Machine ID):</span>
+                <span class="text-slate-300 break-all">{{ createdLicenseModalData.machine_id }}</span>
+              </div>
+              <div v-if="createdLicenseModalData.email" class="flex justify-between">
+                <span class="text-slate-500">Email khách hàng:</span>
+                <span class="text-pink-400 font-bold">{{ createdLicenseModalData.email }}</span>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="space-y-2 pt-2">
+              <button 
+                v-if="createdLicenseModalData.email"
+                @click="sendAutoEmail(createdLicenseModalData)"
+                :disabled="sendingEmailOrderId === (createdLicenseModalData.order_code || createdLicenseModalData.license_key)"
+                class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500 text-slate-950 font-display font-black text-xs uppercase tracking-wider shadow-lg shadow-emerald-500/30 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2"
+              >
+                <span v-if="sendingEmailOrderId === (createdLicenseModalData.order_code || createdLicenseModalData.license_key)" class="animate-spin">⏳</span>
+                <span v-else>🚀</span>
+                <span>{{ sendingEmailOrderId === (createdLicenseModalData.order_code || createdLicenseModalData.license_key) ? 'ĐANG GỬI EMAIL TỰ ĐỘNG...' : 'GỬI EMAIL TỰ ĐỘNG CHO KHÁCH HÀNG' }}</span>
+              </button>
+
+              <button 
+                v-if="createdLicenseModalData.email"
+                @click="openMailtoClient(createdLicenseModalData)"
+                class="w-full py-2.5 px-4 rounded-xl bg-slate-900 border border-slate-700 text-slate-400 hover:text-white text-xs font-mono font-bold transition-all flex items-center justify-center gap-2"
+              >
+                <span>📧</span>
+                <span>Mở Email Thủ Công (Mailto Dự Phòng)</span>
+              </button>
+
+              <button 
+                @click="createdLicenseModalData = null"
+                class="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-mono font-bold"
+              >
+                Đóng Cửa Sổ
+              </button>
+            </div>
+          </div>
+        </div>
       </Teleport>
 
     </div>
@@ -727,7 +1275,13 @@ import {
   clearCurrentWebUser,
   promoteToAdmin,
   getAllGames,
-  adminListFeedbacks
+  adminListFeedbacks,
+  adminListTDropOrders,
+  adminApproveTDropOrder,
+  adminListTDropLicenses,
+  adminCreateTDropLicense,
+  adminRevokeTDropLicense,
+  sendAutomaticLicenseEmail
 } from '../services/supabase.js';
 import { sound } from '../services/sound.js';
 
@@ -745,6 +1299,54 @@ const feedbackList = ref([]);
 const selectedFeedback = ref(null);
 const systemConfigs = ref({});
 const availableGames = ref([]);
+
+// T-Drop Manager State (Bỏ mã PIN hoàn toàn, bảo mật trực tiếp theo quyền Admin của tài khoản)
+const tdropActiveSubTab = ref('orders');
+const tdropOrders = ref([]);
+const tdropLicenses = ref([]);
+const tdropOrderFilter = ref('all');
+const tdropLicenseSearch = ref('');
+const tdropLicenseRoleFilter = ref('all');
+const isTDropLoading = ref(false);
+const sendingEmailOrderId = ref(null);
+const showManualLicenseModal = ref(false);
+const manualLicenseForm = ref({
+  hardware_id: '',
+  role: 'VIP',
+  device_name: ''
+});
+const createdLicenseModalData = ref(null);
+
+const tdropPendingOrdersCount = computed(() => tdropOrders.value.filter(o => o.status === 'pending').length);
+const tdropApprovedOrdersCount = computed(() => tdropOrders.value.filter(o => o.status === 'approved').length);
+const tdropTotalRevenue = computed(() => {
+  return tdropOrders.value
+    .filter(o => o.status === 'approved')
+    .reduce((sum, o) => sum + (Number(o.amount) || (o.role === 'PREMIUM' ? 49000 : 29000)), 0);
+});
+const tdropActiveLicensesCount = computed(() => tdropLicenses.value.filter(l => l.status === 'active').length);
+
+const filteredTDropOrders = computed(() => {
+  if (tdropOrderFilter.value === 'all') return tdropOrders.value;
+  return tdropOrders.value.filter(o => o.status === tdropOrderFilter.value);
+});
+
+const filteredTDropLicenses = computed(() => {
+  let list = tdropLicenses.value;
+  if (tdropLicenseRoleFilter.value !== 'all') {
+    list = list.filter(l => l.role === tdropLicenseRoleFilter.value);
+  }
+  if (tdropLicenseSearch.value.trim()) {
+    const q = tdropLicenseSearch.value.trim().toLowerCase();
+    list = list.filter(l => 
+      (l.key && l.key.toLowerCase().includes(q)) ||
+      (l.hardware_id && l.hardware_id.toLowerCase().includes(q)) ||
+      (l.device_name && l.device_name.toLowerCase().includes(q)) ||
+      (l.user_name && l.user_name.toLowerCase().includes(q))
+    );
+  }
+  return list;
+});
 
 const expirySecondsInput = ref('300');
 const previewExpiryLabel = computed(() => formatSecondsToHumanLabel(expirySecondsInput.value, isEn.value));
@@ -903,9 +1505,202 @@ async function loadDashboardData() {
       selectedPreset.value = found.slug;
       applyGamePreset(found);
     }
+
+    // Load T-Drop Data
+    await loadTDropData();
   } catch (e) {
     console.error('Failed to load admin data', e);
   }
+}
+
+let tdropSearchTimer = null;
+function debounceTDropSearch() {
+  clearTimeout(tdropSearchTimer);
+  tdropSearchTimer = setTimeout(() => {
+    loadTDropData();
+  }, 400);
+}
+
+async function loadTDropData() {
+  isTDropLoading.value = true;
+  try {
+    const [ordersRes, licensesRes] = await Promise.all([
+      adminListTDropOrders(tdropOrderFilter.value),
+      adminListTDropLicenses(tdropLicenseSearch.value, tdropLicenseRoleFilter.value)
+    ]);
+    if (ordersRes?.ok) {
+      tdropOrders.value = ordersRes.orders || [];
+    }
+    if (licensesRes?.ok) {
+      tdropLicenses.value = licensesRes.licenses || [];
+    }
+  } catch (err) {
+    console.error('Failed to load T-Drop data:', err);
+  } finally {
+    isTDropLoading.value = false;
+  }
+}
+
+async function handleApproveTDropOrder(order) {
+  if (!confirm(`Xác nhận duyệt đơn hàng "${order.order_code}" cho thiết bị "${order.machine_id}"?`)) return;
+  sound.playClick();
+  isTDropLoading.value = true;
+  try {
+    const res = await adminApproveTDropOrder(order.order_code);
+    if (res?.ok) {
+      sound.playSuccess();
+      const approvedData = {
+        title: 'Duyệt Đơn & Cấp Key Thành Công!',
+        order_code: order.order_code,
+        license_key: res.license_key,
+        role: res.role || order.role,
+        email: res.email || order.email,
+        machine_id: res.machine_id || order.machine_id
+      };
+      createdLicenseModalData.value = approvedData;
+      await loadTDropData();
+
+      // TỰ ĐỘNG GỬI EMAIL NGAY KHI DUYỆT ĐƠN!
+      if (approvedData.email) {
+        sendAutoEmail(approvedData);
+      }
+    } else {
+      alert('Không thể duyệt đơn: ' + (res?.message || 'Lỗi không xác định'));
+    }
+  } catch (err) {
+    alert('Lỗi duyệt đơn: ' + err.message);
+  } finally {
+    isTDropLoading.value = false;
+  }
+}
+
+async function sendAutoEmail(order) {
+  if (!order?.email || !order?.license_key) {
+    alert('Đơn hàng chưa có email hoặc mã key!');
+    return;
+  }
+  sound.playClick();
+  const targetId = order.order_code || order.license_key;
+  sendingEmailOrderId.value = targetId;
+  try {
+    const res = await sendAutomaticLicenseEmail({
+      email: order.email,
+      orderCode: order.order_code,
+      licenseKey: order.license_key,
+      role: order.role,
+      machineId: order.machine_id
+    });
+
+    if (res?.success) {
+      sound.playSuccess();
+      alert(`✓ ĐÃ GỬI EMAIL TỰ ĐỘNG THÀNH CÔNG!\n\nĐã gửi thư kích hoạt kèm mã bản quyền ${order.license_key} tới địa chỉ "${order.email}".`);
+    } else if (res?.not_configured) {
+      const useMailto = confirm(`Hệ thống chưa tìm thấy RESEND_API_KEY hoặc BREVO_API_KEY trên Vercel để gửi tự động.\n\nBạn có muốn mở ứng dụng email (mailto) để gửi thủ công ngay bây giờ không?`);
+      if (useMailto) {
+        openMailtoClient(order);
+      }
+    } else {
+      alert(`Lỗi gửi email tự động: ${res?.error || 'Không gửi được'}\nĐang mở mailto dự phòng...`);
+      openMailtoClient(order);
+    }
+  } catch (err) {
+    alert(`Lỗi gửi email: ${err.message}`);
+    openMailtoClient(order);
+  } finally {
+    sendingEmailOrderId.value = null;
+  }
+}
+
+function openMailtoClient(order) {
+  sound.playClick();
+  const subject = `[TXA Studio - T-Drop] Kích Hoạt Bản Quyền ${order.role || 'VIP'} - Mã Key Của Bạn`;
+  const body = `Xin chào bạn,
+
+Cảm ơn bạn đã tin tưởng và ủng hộ phần mềm T-Drop (AI Clipboard & Smart OCR Desktop App) của TXA Studio!
+
+Đơn hàng VietQR của bạn (${order.order_code || 'T-Drop Order'}) đã được kiểm tra và duyệt thành công.
+
+Dưới đây là thông tin bản quyền của bạn:
+- Gói bản quyền: ${order.role} (${order.role === 'PREMIUM' ? '60 ngày' : '30 ngày'})
+- Mã máy (Hardware ID): ${order.machine_id}
+- MÃ BẢN QUYỀN (LICENSE KEY): ${order.license_key}
+
+HƯỚNG DẪN KÍCH HOẠT:
+1. Mở ứng dụng T-Drop trên máy tính của bạn.
+2. Mở Cài Đặt (Settings) -> Kích Hoạt Bản Quyền (License Activation).
+3. Dán mã key ở trên vào ô nhập rồi bấm "Kích Hoạt".
+
+Nếu bạn cần hỗ trợ thêm, vui lòng phản hồi lại email này. Chúc bạn có trải nghiệm làm việc năng suất tuyệt vời cùng T-Drop!
+
+Trân trọng,
+TXA Studio Team
+Website: https://txastudio.click
+Support: txasoftdev@gmail.com`;
+
+  const mailtoUrl = `mailto:${order.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  window.open(mailtoUrl, '_blank');
+}
+
+async function handleRevokeTDropLicense(license) {
+  if (!confirm(`Bạn có chắc chắn muốn THU HỒI mã bản quyền "${license.key}"? Người dùng sẽ không thể sử dụng gói ${license.role} được nữa.`)) return;
+  sound.playClick();
+  isTDropLoading.value = true;
+  try {
+    const res = await adminRevokeTDropLicense(license.key);
+    if (res?.ok) {
+      sound.playSuccess();
+      await loadTDropData();
+    } else {
+      alert('Không thể thu hồi: ' + (res?.message || 'Lỗi'));
+    }
+  } catch (err) {
+    alert('Lỗi thu hồi key: ' + err.message);
+  } finally {
+    isTDropLoading.value = false;
+  }
+}
+
+async function handleCreateManualLicense() {
+  if (!manualLicenseForm.value.hardware_id) {
+    alert('Vui lòng nhập Machine ID / Hardware ID của khách!');
+    return;
+  }
+  sound.playClick();
+  isTDropLoading.value = true;
+  try {
+    const res = await adminCreateTDropLicense(
+      manualLicenseForm.value.hardware_id,
+      manualLicenseForm.value.role,
+      manualLicenseForm.value.device_name
+    );
+    if (res?.ok) {
+      sound.playSuccess();
+      showManualLicenseModal.value = false;
+      createdLicenseModalData.value = {
+        title: 'Tạo Mã Bản Quyền Thủ Công Thành Công!',
+        license_key: res.license_key || res.key,
+        role: res.role,
+        machine_id: res.hardware_id,
+        device_name: res.device_name
+      };
+      manualLicenseForm.value = { hardware_id: '', role: 'VIP', device_name: '' };
+      await loadTDropData();
+    } else {
+      alert('Không thể tạo key: ' + (res?.message || 'Lỗi'));
+    }
+  } catch (err) {
+    alert('Lỗi tạo key: ' + err.message);
+  } finally {
+    isTDropLoading.value = false;
+  }
+}
+
+function calculateRemainingDays(expiresAt) {
+  if (!expiresAt) return 'Vĩnh viễn / Chưa kích hoạt';
+  const diffMs = new Date(expiresAt).getTime() - Date.now();
+  if (diffMs <= 0) return 'Đã hết hạn';
+  const days = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+  return `Còn ${days} ngày`;
 }
 
 async function loadFeedbacks() {

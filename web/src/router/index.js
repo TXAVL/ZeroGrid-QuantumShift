@@ -11,6 +11,7 @@ import AdminView from '../views/AdminView.vue';
 import UnlockView from '../views/UnlockView.vue';
 import ZeroGridView from '../views/ZeroGridView.vue';
 import ShieldBlockView from '../views/ShieldBlockView.vue';
+import TDropView from '../views/TDropView.vue';
 import InstalledView from '../views/InstalledView.vue';
 import UninstalledView from '../views/UninstalledView.vue';
 
@@ -33,6 +34,11 @@ const routes = [
     path: '/shieldblock',
     name: 'shieldblock',
     component: ShieldBlockView,
+  },
+  {
+    path: '/tdrop',
+    name: 'tdrop',
+    component: TDropView,
   },
   {
     path: '/installed',
