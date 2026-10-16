@@ -898,6 +898,92 @@ export async function adminClearAllMycayVisitLogs() {
   }
 }
 
+// Real-time Supabase WebSocket Channel for Game Mỳ Cay
+export function subscribeToMycayRealtime(callback) {
+  if (typeof window === 'undefined' || !window.WebSocket) return () => {};
+
+  let ws = null;
+  let heartbeatTimer = null;
+  let refCount = 1;
+  let isClosed = false;
+
+  const connect = () => {
+    if (isClosed) return;
+    try {
+      const wsUrl = `${SUPABASE_URL.replace(/^http/, 'ws')}/realtime/v1/websocket?apikey=${SUPABASE_ANON_KEY}&vsn=1.0.0`;
+      ws = new WebSocket(wsUrl);
+
+      ws.onopen = () => {
+        const joinMsg = {
+          topic: 'realtime:public',
+          event: 'phx_join',
+          payload: {
+            config: {
+              postgres_changes: [
+                { event: '*', schema: 'public', table: 'mycay_visit_logs' },
+                { event: '*', schema: 'public', table: 'mycay_security_locks' },
+                { event: '*', schema: 'public', table: 'mycay_analytics' }
+              ]
+            }
+          },
+          ref: String(refCount++)
+        };
+        ws.send(JSON.stringify(joinMsg));
+
+        if (heartbeatTimer) clearInterval(heartbeatTimer);
+        heartbeatTimer = setInterval(() => {
+          if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({
+              topic: 'phoenix',
+              event: 'heartbeat',
+              payload: {},
+              ref: String(refCount++)
+            }));
+          }
+        }, 25000);
+
+        if (callback) callback({ type: 'STATUS', status: 'connected' });
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const msg = JSON.parse(event.data);
+          if (msg.event === 'postgres_changes' && msg.payload?.data) {
+            if (callback) callback({ type: 'CHANGE', ...msg.payload.data });
+          }
+        } catch (e) {
+          console.error('Error parsing realtime payload:', e);
+        }
+      };
+
+      ws.onerror = () => {
+        if (callback) callback({ type: 'STATUS', status: 'error' });
+      };
+
+      ws.onclose = () => {
+        if (heartbeatTimer) clearInterval(heartbeatTimer);
+        if (!isClosed) {
+          if (callback) callback({ type: 'STATUS', status: 'reconnecting' });
+          setTimeout(connect, 3000);
+        }
+      };
+    } catch (e) {
+      console.error('Realtime setup error:', e);
+    }
+  };
+
+  connect();
+
+  return () => {
+    isClosed = true;
+    if (heartbeatTimer) clearInterval(heartbeatTimer);
+    if (ws) {
+      try { ws.close(); } catch {}
+    }
+  };
+}
+
+
 
 
 

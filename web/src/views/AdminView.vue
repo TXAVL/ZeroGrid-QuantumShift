@@ -872,8 +872,27 @@
 
               <!-- Top Action Controls -->
               <div class="flex flex-wrap items-center gap-2.5">
+                <!-- Real-time Live Status Badge -->
+                <div 
+                  class="flex items-center gap-2 px-3 py-1.5 rounded-xl border font-mono text-xs shadow-sm transition-all"
+                  :class="mycayRealtimeStatus === 'connected' 
+                    ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-300' 
+                    : 'border-amber-500/40 bg-amber-500/10 text-amber-300'"
+                >
+                  <span 
+                    class="w-2 h-2 rounded-full"
+                    :class="mycayRealtimeStatus === 'connected' ? 'bg-emerald-400 animate-ping' : 'bg-amber-400 animate-pulse'"
+                  ></span>
+                  <span class="font-bold">
+                    {{ mycayRealtimeStatus === 'connected' ? '⚡ REAL-TIME LIVE' : '⏳ ĐANG KẾT NỐI' }}
+                  </span>
+                  <span class="text-[10px] opacity-80 hidden sm:inline">
+                    (Tự động đồng bộ)
+                  </span>
+                </div>
+
                 <button 
-                  @click="loadMycayData"
+                  @click="() => loadMycayData(false)"
                   :disabled="isMycayLoading"
                   class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white text-xs font-mono font-bold flex items-center gap-1.5 transition-all"
                 >
@@ -2006,7 +2025,8 @@ import {
   adminGetMycayAdminStats,
   adminListMycayVisitLogs,
   adminDeleteMycayVisitLog,
-  adminClearAllMycayVisitLogs
+  adminClearAllMycayVisitLogs,
+  subscribeToMycayRealtime
 } from '../services/supabase.js';
 import { sound } from '../services/sound.js';
 import { loadChartJs } from '../services/chartLoader.js';
@@ -2085,6 +2105,10 @@ const isMycayLoading = ref(false);
 const mycaySearch = ref('');
 const mycayFilter = ref('all'); // 'all', 'permanent', 'temporary', 'unlocked'
 const showMycayBanModal = ref(false);
+const mycayRealtimeStatus = ref('connecting'); // 'connecting', 'connected', 'error', 'reconnecting'
+const lastRealtimeEventAt = ref(null);
+let mycayRealtimeCleanup = null;
+let mycayPollingInterval = null;
 const mycayBanForm = ref({
   device_id: '',
   reason: 'devtools_violation'
@@ -2310,8 +2334,8 @@ async function loadDashboardData() {
   }
 }
 
-async function loadMycayData() {
-  isMycayLoading.value = true;
+async function loadMycayData(silent = false) {
+  if (!silent) isMycayLoading.value = true;
   try {
     const [analytics, locks, stats, visitLogs] = await Promise.all([
       adminGetMycayAnalytics(),
@@ -2329,7 +2353,74 @@ async function loadMycayData() {
   } catch (err) {
     console.error('Failed to load Game Mỳ Cay data:', err);
   } finally {
-    isMycayLoading.value = false;
+    if (!silent) isMycayLoading.value = false;
+  }
+}
+
+function startMycayRealtime() {
+  stopMycayRealtime();
+  mycayRealtimeStatus.value = 'connecting';
+
+  // 1. Supabase Phoenix Channel over WebSocket
+  mycayRealtimeCleanup = subscribeToMycayRealtime((event) => {
+    if (event.type === 'STATUS') {
+      mycayRealtimeStatus.value = event.status;
+      return;
+    }
+    if (event.type === 'CHANGE') {
+      lastRealtimeEventAt.value = new Date();
+      mycayRealtimeStatus.value = 'connected';
+
+      const { table, eventType, record, old_record } = event;
+
+      if (table === 'mycay_visit_logs') {
+        if (eventType === 'INSERT' && record) {
+          // Real-time prepend visit log
+          if (!mycayVisitLogs.value.some(l => l.id === record.id)) {
+            mycayVisitLogs.value.unshift(record);
+            if (mycayVisitLogs.value.length > 50) mycayVisitLogs.value.pop();
+          }
+          if (mycayAnalytics.value) {
+            mycayAnalytics.value.total_views = (Number(mycayAnalytics.value.total_views) || 0) + 1;
+          }
+          if (mycayStats.value) {
+            mycayStats.value.total_views = (Number(mycayStats.value.total_views) || 0) + 1;
+          }
+          if (showMycayCharts.value && mycaySubTab.value === 'overview' && activeTab.value === 'mycay') {
+            nextTick(() => renderMycayCharts());
+          }
+        } else if (eventType === 'DELETE' && old_record) {
+          mycayVisitLogs.value = mycayVisitLogs.value.filter(l => l.id !== old_record.id);
+        } else {
+          loadMycayData(true);
+        }
+      } else if (table === 'mycay_security_locks') {
+        loadMycayData(true);
+      } else if (table === 'mycay_analytics') {
+        if (record?.total_views) {
+          if (mycayAnalytics.value) mycayAnalytics.value.total_views = record.total_views;
+          if (mycayStats.value) mycayStats.value.total_views = record.total_views;
+        }
+      }
+    }
+  });
+
+  // 2. Continuous real-time sync poller fallback (every 4s)
+  mycayPollingInterval = setInterval(() => {
+    if (activeTab.value === 'mycay' && !isMycayLoading.value) {
+      loadMycayData(true);
+    }
+  }, 4000);
+}
+
+function stopMycayRealtime() {
+  if (mycayRealtimeCleanup) {
+    try { mycayRealtimeCleanup(); } catch {}
+    mycayRealtimeCleanup = null;
+  }
+  if (mycayPollingInterval) {
+    clearInterval(mycayPollingInterval);
+    mycayPollingInterval = null;
   }
 }
 
@@ -2499,9 +2590,15 @@ async function renderMycayCharts() {
 }
 
 watch([mycaySubTab, activeTab], ([newSub, newTab]) => {
-  if (newTab === 'mycay' && newSub === 'overview' && showMycayCharts.value) {
-    nextTick(() => renderMycayCharts());
+  if (newTab === 'mycay') {
+    startMycayRealtime();
+    if (newSub === 'overview' && showMycayCharts.value) {
+      nextTick(() => renderMycayCharts());
+    } else {
+      destroyMycayCharts();
+    }
   } else {
+    stopMycayRealtime();
     destroyMycayCharts();
   }
 });
@@ -2920,10 +3017,14 @@ onMounted(() => {
   window.addEventListener('storage', syncUser);
   window.addEventListener('txa-auth-change', syncUser);
   syncUser();
+  if (activeTab.value === 'mycay') {
+    startMycayRealtime();
+  }
 });
 
 onUnmounted(() => {
   destroyMycayCharts();
+  stopMycayRealtime();
   window.removeEventListener('storage', syncUser);
   window.removeEventListener('txa-auth-change', syncUser);
 });
