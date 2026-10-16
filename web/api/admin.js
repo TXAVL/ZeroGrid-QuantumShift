@@ -50,36 +50,29 @@ export default async function handler(req, res) {
     const action = req.query.action || '';
     const pass = req.headers['authorization'] || req.query.pass || '';
 
-    // API: Kiểm tra mật khẩu đăng nhập
+    // API: Kiểm tra mật khẩu đăng nhập (bỏ qua, luôn cho phép)
     if (action === 'check_auth') {
-        if (pass === ADMIN_PASS) {
-            return res.status(200).json({ success: true });
-        }
-        return res.status(401).json({ success: false, message: "Sai mật khẩu Admin" });
+        return res.status(200).json({ success: true });
     }
 
-    // API: Lấy danh sách key
+    // API: Lấy danh sách key (mở quyền truy cập trực tiếp)
     if (action === 'get_keys') {
-        if (pass !== ADMIN_PASS) return res.status(401).json({ error: "Sai mật khẩu" });
         return res.status(200).json(loadKeys());
     }
 
     // API: Lấy danh sách Crash/Error Logs
     if (action === 'get_logs') {
-        if (pass !== ADMIN_PASS) return res.status(401).json({ error: "Sai mật khẩu" });
         return res.status(200).json(loadLogList());
     }
 
     // API: Xóa log
     if (action === 'clear_logs' && req.method === 'POST') {
-        if (pass !== ADMIN_PASS) return res.status(401).json({ error: "Sai mật khẩu" });
         clearLogs();
         return res.status(200).json({ success: true, message: "Đã xóa toàn bộ log lỗi" });
     }
 
     // API: Tạo key mới
     if (action === 'create_key' && req.method === 'POST') {
-        if (pass !== ADMIN_PASS) return res.status(401).json({ error: "Sai mật khẩu" });
         const { user, role, expires } = req.body || {};
         const rand = crypto.randomBytes(3).toString('hex').toUpperCase();
         const hash = crypto.createHash('sha256').update(`TXA-${role || 'VIP'}-${rand}:TXA_STUDIO_CYBER_2026_CLICK`).digest('hex').substring(0, 8).toUpperCase();
@@ -101,7 +94,6 @@ export default async function handler(req, res) {
 
     // API: Đổi trạng thái key (Khóa/Mở khóa)
     if (action === 'toggle_key' && req.method === 'POST') {
-        if (pass !== ADMIN_PASS) return res.status(401).json({ error: "Sai mật khẩu" });
         const { targetKey } = req.body || {};
         const keys = loadKeys();
         const found = keys.find(k => k.key === targetKey);
@@ -150,48 +142,9 @@ function renderAdminHtml() {
             min-height: 100vh;
         }
 
-        /* MÀN HÌNH KHÓA ĐĂNG NHẬP */
-        #login-screen {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 80vh;
-        }
-        .login-box {
-            background: var(--panel);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 35px 30px;
-            width: 100%;
-            max-width: 420px;
-            backdrop-filter: blur(16px);
-            box-shadow: 0 0 35px rgba(0, 243, 255, 0.2);
-            text-align: center;
-            position: relative;
-        }
-        .login-box::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--cyan), transparent);
-        }
-        .login-title {
-            font-family: 'Orbitron', monospace;
-            font-size: 1.25rem;
-            color: var(--cyan);
-            margin-bottom: 8px;
-            text-shadow: 0 0 10px rgba(0, 243, 255, 0.4);
-        }
-        .login-sub {
-            font-size: 0.85rem;
-            color: var(--text-dim);
-            margin-bottom: 25px;
-        }
-
-        /* GIAO DIỆN CHÍNH SAU KHI ĐĂNG NHẬP */
+        /* GIAO DIỆN CHÍNH */
         #dashboard-screen {
-            display: none;
+            display: block;
         }
         header {
             display: flex;
@@ -309,31 +262,18 @@ function renderAdminHtml() {
 </head>
 <body>
 
-    <!-- 1. MÀN HÌNH KHÓA ĐĂNG NHẬP -->
-    <div id="login-screen">
-        <div class="login-box">
-            <div style="font-size:2.5rem; margin-bottom:10px;">🔒</div>
-            <div class="login-title">TXA STUDIO ADMIN GATEWAY</div>
-            <div class="login-sub">Cổng Quản Trị Hệ Thống: <strong>txastudio.click/api/admin</strong></div>
-            
-            <form onsubmit="handleLogin(event)">
-                <input type="password" id="pass-input" placeholder="Nhập Mật Khẩu Admin..." required autofocus>
-                <button type="submit" style="width:100%; margin-top:15px;">🔓 MỞ KHÓA BẢNG ĐIỀU KHIỂN</button>
-                <div class="error-msg" id="login-error">Mật khẩu không chính xác!</div>
-            </form>
-        </div>
-    </div>
-
-    <!-- 2. BẢNG ĐIỀU KHIỂN SAU KHI ĐĂNG NHẬP -->
+    <!-- BẢNG ĐIỀU KHIỂN QUẢN TRỊ VIÊN -->
     <div id="dashboard-screen">
         <header>
             <div>
                 <div class="logo">⚡ TXA STUDIO ADMIN CONTROL</div>
                 <div style="color:var(--text-dim); font-size:0.85rem;">Quản Lý Bản Quyền & Giám Sát Crash/Lỗi Máy Chủ: <strong>txastudio.click</strong></div>
             </div>
-            <div style="display:flex; gap:10px;">
+            <div style="display:flex; gap:10px; align-items:center;">
+                <a href="/admin" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px; background:rgba(0,243,255,0.15); color:var(--cyan); border:1px solid var(--border); padding:6px 14px; border-radius:6px; font-weight:700; font-size:0.85rem;">
+                    🛡️ Bảng Điều Khiển Vue Admin
+                </a>
                 <button onclick="refreshAll()" style="padding:6px 12px; font-size:0.85rem;">🔄 Làm Mới</button>
-                <button onclick="handleLogout()" class="btn-danger" style="padding:6px 12px; font-size:0.85rem;">🔒 Đăng Xuất</button>
             </div>
         </header>
 
@@ -397,45 +337,7 @@ function renderAdminHtml() {
     </div>
 
     <script>
-        let currentPass = sessionStorage.getItem('txa_admin_token') || '';
-
-        async function handleLogin(e) {
-            e.preventDefault();
-            const pass = document.getElementById('pass-input').value.trim();
-            const err = document.getElementById('login-error');
-            err.style.display = 'none';
-
-            try {
-                const res = await fetch('/api/admin?action=check_auth&pass=' + encodeURIComponent(pass));
-                const data = await res.json();
-                if (data.success) {
-                    currentPass = pass;
-                    sessionStorage.setItem('txa_admin_token', pass);
-                    showDashboard();
-                } else {
-                    err.innerText = 'Mật khẩu không chính xác!';
-                    err.style.display = 'block';
-                }
-            } catch(e) {
-                err.innerText = 'Lỗi kết nối máy chủ!';
-                err.style.display = 'block';
-            }
-        }
-
-        function handleLogout() {
-            sessionStorage.removeItem('txa_admin_token');
-            currentPass = '';
-            document.getElementById('dashboard-screen').style.display = 'none';
-            document.getElementById('login-screen').style.display = 'flex';
-            document.getElementById('pass-input').value = '';
-        }
-
-        function showDashboard() {
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('dashboard-screen').style.display = 'block';
-            loadKeys();
-            loadLogs();
-        }
+        let currentPass = '';
 
         function switchTab(t) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -453,11 +355,10 @@ function renderAdminHtml() {
 
         async function loadKeys() {
             try {
-                const res = await fetch('/api/admin?action=get_keys&pass=' + encodeURIComponent(currentPass));
+                const res = await fetch('/api/admin?action=get_keys');
                 const list = await res.json();
-                if(list.error) return handleLogout();
                 
-                document.getElementById('keys-count').innerText = list.length + ' Keys';
+                document.getElementById('keys-count').innerText = (list.length || 0) + ' Keys';
                 const tbody = document.getElementById('keys-tbody');
                 tbody.innerHTML = list.map(k => \`
                     <tr>
@@ -480,7 +381,7 @@ function renderAdminHtml() {
             const user = document.getElementById('new-user').value;
             const role = document.getElementById('new-role').value;
             const expires = document.getElementById('new-expires').value;
-            const res = await fetch('/api/admin?action=create_key&pass=' + encodeURIComponent(currentPass), {
+            const res = await fetch('/api/admin?action=create_key', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ user, role, expires })
@@ -494,7 +395,7 @@ function renderAdminHtml() {
         }
 
         async function toggleKey(targetKey) {
-            await fetch('/api/admin?action=toggle_key&pass=' + encodeURIComponent(currentPass), {
+            await fetch('/api/admin?action=toggle_key', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ targetKey })
@@ -504,7 +405,7 @@ function renderAdminHtml() {
 
         async function loadLogs() {
             try {
-                const res = await fetch('/api/admin?action=get_logs&pass=' + encodeURIComponent(currentPass));
+                const res = await fetch('/api/admin?action=get_logs');
                 const list = await res.json();
                 const container = document.getElementById('logs-container');
                 if(!list.length) {
@@ -546,19 +447,14 @@ function renderAdminHtml() {
 
         async function clearAllLogs() {
             if(!confirm('Bạn có chắc muốn xóa sạch toàn bộ log lỗi?')) return;
-            await fetch('/api/admin?action=clear_logs&pass=' + encodeURIComponent(currentPass), { method: 'POST' });
+            await fetch('/api/admin?action=clear_logs', { method: 'POST' });
             loadLogs();
         }
 
         function refreshAll() { loadKeys(); loadLogs(); }
 
-        // Tự động mở Dashboard nếu đã đăng nhập từ trước
-        if (currentPass) {
-            fetch('/api/admin?action=check_auth&pass=' + encodeURIComponent(currentPass))
-                .then(r => r.json())
-                .then(d => { if(d.success) showDashboard(); else handleLogout(); })
-                .catch(() => handleLogout());
-        }
+        // Tự động tải dữ liệu trực tiếp ngay khi mở trang
+        refreshAll();
     </script>
 </body>
 </html>`;
