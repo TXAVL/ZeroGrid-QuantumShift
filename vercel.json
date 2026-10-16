@@ -1,70 +1,70 @@
-﻿{
-    "$schema":  "https://openapi.vercel.sh/vercel.json",
-    "outputDirectory":  "web/dist",
-    "rewrites":  [
-                     {
-                         "source":  "/api/admin",
-                         "destination":  "/api/admin.js"
-                     },
-                     {
-                         "source":  "/api/send_tdrop_email",
-                         "destination":  "/api/send_tdrop_email.js"
-                     },
-                     {
-                         "source":  "/api/validate_key.php",
-                         "destination":  "/api/validate_key.js"
-                     },
-                     {
-                         "source":  "/verify_key.php",
-                         "destination":  "/api/verify_key.js"
-                     },
-                     {
-                         "source":  "/version.php",
-                         "destination":  "/api/version.js"
-                     },
-                     {
-                         "source":  "/api/((?!.*\\.js$).*)",
-                         "destination":  "/api/$1.js"
-                     },
-                     {
-                         "source":  "/api/(.*)",
-                         "destination":  "/api/$1"
-                     },
-                     {
-                         "source":  "/((?!api/|verify_key\\.php|version\\.php|app-ads\\.txt).*)",
-                         "destination":  "/index.html"
-                     }
-                 ],
-    "headers":  [
-                    {
-                        "source":  "/app-ads.txt",
-                        "headers":  [
-                                        {
-                                            "key":  "Content-Type",
-                                            "value":  "text/plain; charset=utf-8"
-                                        },
-                                        {
-                                            "key":  "Cache-Control",
-                                            "value":  "public, max-age=3600"
-                                        }
-                                    ]
-                    },
-                    {
-                        "source":  "/(.*)",
-                        "headers":  [
-                                        {
-                                            "key":  "X-Content-Type-Options",
-                                            "value":  "nosniff"
-                                        },
-                                        {
-                                            "key":  "X-Frame-Options",
-                                            "value":  "SAMEORIGIN"
-                                        },
-                                        {
-                                            "key":  "X-XSS-Protection",
-                                            "value":  "1; mode=block"
-                                        }
-                                    ]
-                    }
-                ]
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "outputDirectory": "web/dist",
+  "rewrites": [
+    {
+      "source": "/api/admin",
+      "destination": "/api/admin.js"
+    },
+    {
+      "source": "/api/send_tdrop_email",
+      "destination": "/api/send_tdrop_email.js"
+    },
+    {
+      "source": "/api/validate_key.php",
+      "destination": "/api/validate_key.js"
+    },
+    {
+      "source": "/verify_key.php",
+      "destination": "/api/verify_key.js"
+    },
+    {
+      "source": "/version.php",
+      "destination": "/api/version.js"
+    },
+    {
+      "source": "/api/((?!.*\\.js$).*)",
+      "destination": "/api/$1.js"
+    },
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    },
+    {
+      "source": "/((?!api/|verify_key\\.php|version\\.php|app-ads\\.txt).*)",
+      "destination": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/app-ads.txt",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/plain; charset=utf-8"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        }
+      ]
+    }
+  ]
 }
