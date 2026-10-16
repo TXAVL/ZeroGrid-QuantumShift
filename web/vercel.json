@@ -6,6 +6,10 @@
       "destination": "/api/admin.js"
     },
     {
+      "source": "/api/send_tdrop_email",
+      "destination": "/api/send_tdrop_email.js"
+    },
+    {
       "source": "/api/validate_key.php",
       "destination": "/api/validate_key.js"
     },
