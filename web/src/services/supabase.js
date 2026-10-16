@@ -843,5 +843,62 @@ export async function adminBanMycayDevicePermanent(deviceId) {
   });
 }
 
+export async function adminGetMycayAdminStats() {
+  try {
+    return await callRpc('get_mycay_admin_stats');
+  } catch (err) {
+    console.error('Failed to get MyCay admin stats:', err);
+    return null;
+  }
+}
+
+export async function adminListMycayVisitLogs(limit = 50) {
+  try {
+    const res = await safeFetch(`${SUPABASE_URL}/rest/v1/mycay_visit_logs?select=*&order=created_at.desc&limit=${limit}`, {
+      method: 'GET',
+      headers
+    }, 10000);
+    if (!res.ok) return [];
+    return await res.json();
+  } catch (err) {
+    console.error('Failed to fetch MyCay visit logs:', err);
+    return [];
+  }
+}
+
+export async function adminDeleteMycayVisitLog(logId) {
+  try {
+    const res = await safeFetch(`${SUPABASE_URL}/rest/v1/mycay_visit_logs?id=eq.${logId}`, {
+      method: 'DELETE',
+      headers: {
+        ...headers,
+        'Prefer': 'return=representation'
+      }
+    }, 10000);
+    return { success: res.ok };
+  } catch (err) {
+    console.error('Failed to delete MyCay visit log:', err);
+    return { success: false, error: err.message };
+  }
+}
+
+export async function adminClearAllMycayVisitLogs() {
+  try {
+    const res = await safeFetch(`${SUPABASE_URL}/rest/v1/mycay_visit_logs?id=gt.0`, {
+      method: 'DELETE',
+      headers: {
+        ...headers,
+        'Prefer': 'return=representation'
+      }
+    }, 15000);
+    return { success: res.ok };
+  } catch (err) {
+    console.error('Failed to clear all MyCay visit logs:', err);
+    return { success: false, error: err.message };
+  }
+}
+
+
+
 
 

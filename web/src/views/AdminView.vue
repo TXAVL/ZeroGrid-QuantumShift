@@ -842,6 +842,7 @@
         </div>
 
         <!-- ================================================================= -->
+        <!-- ================================================================= -->
         <!-- TAB 6: GAME MỲ CAY - THỐNG KÊ LƯỢT XEM & BAN THIẾT BỊ VĨNH VIỄN    -->
         <!-- ================================================================= -->
         <div v-if="activeTab === 'mycay'" class="space-y-6">
@@ -857,14 +858,14 @@
                   <div class="flex items-center gap-2 mb-1">
                     <span class="w-2 h-2 rounded-full bg-orange-400 animate-ping"></span>
                     <span class="text-[10px] font-mono tracking-widest text-orange-400 uppercase font-bold">
-                      MYCAY ENGINE // ANTI-CHEAT & ANALYTICS TERMINAL
+                      MYCAY ENGINE // ANTI-CHEAT & LIVE ANALYTICS
                     </span>
                   </div>
                   <h2 class="text-xl sm:text-2xl font-display font-black text-white">
-                    Quản Lý Game Mỳ Cay & Ban Thiết Bị
+                    Quản Lý & Thống Kê Game Mỳ Cay
                   </h2>
                   <p class="text-xs text-slate-400 font-mono">
-                    Theo dõi số liệu thống kê lượt chơi, quản lý danh sách thiết bị bị khóa / ban vĩnh viễn và mở khóa an ninh.
+                    Hệ thống theo dõi telemetry thời gian thực, biểu đồ Chart.js trực quan và quản lý khóa ban thiết bị gian lận.
                   </p>
                 </div>
               </div>
@@ -904,6 +905,16 @@
                 </div>
               </div>
 
+              <div class="p-4 rounded-2xl bg-black/40 border border-sky-500/30 space-y-1">
+                <div class="text-[10px] font-mono text-sky-400 uppercase font-bold flex items-center gap-1">
+                  <span>🌐</span> Nhật Ký Đã Ghi Nhận
+                </div>
+                <div class="text-xl sm:text-3xl font-display font-black text-sky-300">
+                  {{ mycayVisitLogs.length }}
+                </div>
+                <div class="text-[10px] font-mono text-slate-400">Phiên truy cập chi tiết</div>
+              </div>
+
               <div class="p-4 rounded-2xl bg-black/40 border border-red-500/30 space-y-1">
                 <div class="text-[10px] font-mono text-red-400 uppercase font-bold flex items-center gap-1">
                   <span>⛔</span> Ban Vĩnh Viễn
@@ -923,162 +934,539 @@
                 </div>
                 <div class="text-[10px] font-mono text-slate-400">Đang chờ hết cooldown</div>
               </div>
+            </div>
+          </div>
 
-              <div class="p-4 rounded-2xl bg-black/40 border border-slate-800 space-y-1">
-                <div class="text-[10px] font-mono text-slate-400 uppercase font-bold flex items-center gap-1">
-                  <span>🛡️</span> Tổng Thiết Bị Ghi Nhận
+          <!-- Sub-Tab Navigation Bar & Chart.js ON/OFF Toggle -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-[#090d1a]/90 border border-slate-800">
+            <div class="flex items-center gap-2 flex-wrap text-xs font-mono font-bold">
+              <button 
+                @click="mycaySubTab = 'overview'"
+                class="px-3.5 py-2 rounded-xl border transition-all flex items-center gap-1.5"
+                :class="mycaySubTab === 'overview' ? 'bg-orange-500/20 text-orange-300 border-orange-500/50 shadow-lg shadow-orange-500/20' : 'text-slate-400 hover:text-white border-transparent'"
+              >
+                <span>📊</span>
+                <span>Tổng Quan & Biểu Đồ</span>
+              </button>
+
+              <button 
+                @click="mycaySubTab = 'locks'"
+                class="px-3.5 py-2 rounded-xl border transition-all flex items-center gap-1.5"
+                :class="mycaySubTab === 'locks' ? 'bg-red-500/20 text-red-300 border-red-500/50 shadow-lg shadow-red-500/20' : 'text-slate-400 hover:text-white border-transparent'"
+              >
+                <span>⛔</span>
+                <span>Danh Sách Ban & Khóa</span>
+                <span class="px-1.5 py-0.2 rounded bg-red-500/20 text-red-300 text-[10px]">{{ mycayLocks.length }}</span>
+              </button>
+
+              <button 
+                @click="mycaySubTab = 'logs'"
+                class="px-3.5 py-2 rounded-xl border transition-all flex items-center gap-1.5"
+                :class="mycaySubTab === 'logs' ? 'bg-sky-500/20 text-sky-300 border-sky-500/50 shadow-lg shadow-sky-500/20' : 'text-slate-400 hover:text-white border-transparent'"
+              >
+                <span>🌐</span>
+                <span>Nhật Ký Truy Cập</span>
+                <span class="px-1.5 py-0.2 rounded bg-sky-500/20 text-sky-300 text-[10px]">{{ mycayVisitLogs.length }}</span>
+              </button>
+            </div>
+
+            <!-- CHART.JS ON / OFF TOGGLE SWITCH -->
+            <div class="flex items-center gap-2 font-mono text-xs">
+              <button 
+                @click="toggleMycayCharts"
+                class="px-3.5 py-2 rounded-xl border transition-all flex items-center gap-2 text-xs font-bold"
+                :class="showMycayCharts 
+                  ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300 shadow-lg shadow-emerald-500/10' 
+                  : 'bg-slate-800/80 border-slate-700 text-slate-400 hover:text-slate-200'"
+                title="Bật hoặc Tắt biểu đồ Chart.js"
+              >
+                <span>{{ showMycayCharts ? '📈' : '📉' }}</span>
+                <span>Biểu Đồ Chart.js:</span>
+                <span 
+                  class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase transition-all"
+                  :class="showMycayCharts ? 'bg-emerald-500 text-slate-950 shadow-sm' : 'bg-slate-700 text-slate-300'"
+                >
+                  {{ showMycayCharts ? 'BẬT' : 'TẮT' }}
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <!-- ============================================================= -->
+          <!-- SUB-TAB 1: OVERVIEW & CHART.JS DASHBOARD                      -->
+          <!-- ============================================================= -->
+          <div v-if="mycaySubTab === 'overview'" class="space-y-6">
+
+            <!-- Chart.js Visualization Section (Conditional on Toggle) -->
+            <div v-if="showMycayCharts" class="space-y-6">
+              
+              <!-- 3 Interactive Cyber Charts Grid -->
+              <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- Chart 1: 30-Day Daily Visits Trend (Span 2 Cols) -->
+                <div class="lg:col-span-2 p-5 rounded-3xl border border-orange-500/25 bg-[#090d1a]/90 backdrop-blur-xl space-y-4 shadow-xl">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <span class="w-2.5 h-2.5 rounded-full bg-orange-500 animate-pulse"></span>
+                      <h3 class="font-display font-black text-white text-sm sm:text-base">
+                        Xu Hướng Lượt Truy Cập Theo Ngày (30 Ngày Qua)
+                      </h3>
+                    </div>
+                    <span class="text-[10px] font-mono text-orange-400 px-2 py-0.5 rounded bg-orange-500/10 border border-orange-500/20">
+                      Line Area Chart
+                    </span>
+                  </div>
+
+                  <div class="h-64 sm:h-72 w-full relative">
+                    <canvas ref="dailyTrendCanvas"></canvas>
+                  </div>
                 </div>
-                <div class="text-xl sm:text-3xl font-display font-black text-white">
-                  {{ mycayLocks.length }}
+
+                <!-- Chart 2: Device Distribution Doughnut -->
+                <div class="p-5 rounded-3xl border border-cyan-500/25 bg-[#090d1a]/90 backdrop-blur-xl space-y-4 shadow-xl flex flex-col justify-between">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
+                      <h3 class="font-display font-black text-white text-sm sm:text-base">
+                        Phân Bố Loại Thiết Bị
+                      </h3>
+                    </div>
+                    <span class="text-[10px] font-mono text-cyan-300 px-2 py-0.5 rounded bg-cyan-500/10 border border-cyan-500/20">
+                      Doughnut
+                    </span>
+                  </div>
+
+                  <div class="h-56 w-full relative flex items-center justify-center">
+                    <canvas ref="devicesCanvas"></canvas>
+                  </div>
+
+                  <div class="text-[11px] font-mono text-slate-400 text-center border-t border-slate-800/80 pt-2">
+                    Tỉ lệ truy cập từ Mobile vs Desktop vs Tablet
+                  </div>
                 </div>
-                <div class="text-[10px] font-mono text-slate-500">Trong danh sách an ninh</div>
+
+              </div>
+
+              <!-- Chart 3 & Geographic Distribution Row -->
+              <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- Chart 3: Browsers Breakdown Bar -->
+                <div class="lg:col-span-2 p-5 rounded-3xl border border-sky-500/25 bg-[#090d1a]/90 backdrop-blur-xl space-y-4 shadow-xl">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <span class="w-2.5 h-2.5 rounded-full bg-sky-400"></span>
+                      <h3 class="font-display font-black text-white text-sm sm:text-base">
+                        Thống Kê Trình Duyệt Phổ Biến
+                      </h3>
+                    </div>
+                    <span class="text-[10px] font-mono text-sky-300 px-2 py-0.5 rounded bg-sky-500/10 border border-sky-500/20">
+                      Bar Chart
+                    </span>
+                  </div>
+
+                  <div class="h-56 sm:h-64 w-full relative">
+                    <canvas ref="browsersCanvas"></canvas>
+                  </div>
+                </div>
+
+                <!-- Geographic Distribution Countries Card -->
+                <div class="p-5 rounded-3xl border border-emerald-500/25 bg-[#090d1a]/90 backdrop-blur-xl space-y-4 shadow-xl flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-center justify-between mb-3">
+                      <div class="flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                        <h3 class="font-display font-black text-white text-sm sm:text-base">
+                          Khu Vực & Quốc Gia
+                        </h3>
+                      </div>
+                      <span class="text-[10px] font-mono text-emerald-300 px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20">
+                        Geo Breakdown
+                      </span>
+                    </div>
+
+                    <div class="space-y-2 max-h-56 overflow-y-auto pr-1">
+                      <div 
+                        v-for="country in (mycayStats?.countries || [{ code: 'VN', label: 'Việt Nam', count: mycayViews }])" 
+                        :key="country.code"
+                        class="p-2.5 rounded-xl bg-black/40 border border-slate-800 flex items-center justify-between text-xs font-mono"
+                      >
+                        <div class="flex items-center gap-2">
+                          <span class="text-base">🇻🇳</span>
+                          <span class="text-white font-bold">{{ country.label || country.code || 'Việt Nam' }}</span>
+                        </div>
+                        <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold text-[11px]">
+                          {{ country.count }} lượt
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="text-[10px] font-mono text-slate-500 text-center border-t border-slate-800/80 pt-2">
+                    Ghi nhận qua IP & header Cloudflare/Supabase
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+            <!-- COLLAPSED NOTICE WHEN CHARTS ARE TOGGLED OFF -->
+            <div 
+              v-else 
+              class="p-8 rounded-3xl border border-slate-800 bg-[#090d1a]/60 text-center space-y-3"
+            >
+              <div class="text-3xl">📉</div>
+              <h3 class="font-display font-bold text-white text-base">
+                Biểu Đồ Chart.js Đang Được TẮT
+              </h3>
+              <p class="text-xs font-mono text-slate-400 max-w-md mx-auto">
+                Chế độ rút gọn giúp giao diện mượt mà và tiết kiệm diện tích. Bạn có thể bật lại bất cứ lúc nào để xem các biểu đồ đường, tròn và cột trực quan.
+              </p>
+              <button 
+                @click="toggleMycayCharts"
+                class="px-4 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 font-mono font-bold text-xs transition-all inline-flex items-center gap-1.5"
+              >
+                <span>📈</span>
+                <span>Bật Lại Biểu Đồ Chart.js Ngay</span>
+              </button>
+            </div>
+
+            <!-- Quick Jump Summaries Row -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              
+              <!-- Quick Jump: Security Locks -->
+              <div class="p-5 rounded-2xl border border-red-500/20 bg-[#090d1a]/80 space-y-3">
+                <div class="flex items-center justify-between">
+                  <div class="font-display font-black text-white text-sm flex items-center gap-2">
+                    <span>⛔</span>
+                    <span>An Ninh: Thiết Bị Đang Bị Khóa ({{ mycayLocks.length }})</span>
+                  </div>
+                  <button 
+                    @click="mycaySubTab = 'locks'"
+                    class="text-xs font-mono text-red-400 hover:text-red-300 underline"
+                  >
+                    Xem Chi Tiết →
+                  </button>
+                </div>
+                <div v-if="mycayLocks.length === 0" class="text-xs font-mono text-slate-500 italic">
+                  Chưa có thiết bị nào bị khóa.
+                </div>
+                <div v-else class="space-y-1.5">
+                  <div 
+                    v-for="lock in mycayLocks.slice(0, 3)" 
+                    :key="lock.device_id"
+                    class="p-2 rounded-xl bg-black/40 border border-slate-800/80 flex items-center justify-between text-xs font-mono"
+                  >
+                    <span class="text-slate-300 break-all font-bold">{{ lock.device_id }}</span>
+                    <span 
+                      class="text-[10px] px-2 py-0.5 rounded font-bold uppercase"
+                      :class="lock.is_permanent_ban ? 'bg-red-500/20 text-red-300' : 'bg-amber-500/20 text-amber-300'"
+                    >
+                      {{ lock.is_permanent_ban ? 'Ban Vĩnh Viễn' : 'Khóa Tạm' }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Quick Jump: Visit Logs -->
+              <div class="p-5 rounded-2xl border border-sky-500/20 bg-[#090d1a]/80 space-y-3">
+                <div class="flex items-center justify-between">
+                  <div class="font-display font-black text-white text-sm flex items-center gap-2">
+                    <span>🌐</span>
+                    <span>Nhật Ký Truy Cập Mới Nhất ({{ mycayVisitLogs.length }})</span>
+                  </div>
+                  <button 
+                    @click="mycaySubTab = 'logs'"
+                    class="text-xs font-mono text-sky-400 hover:text-sky-300 underline"
+                  >
+                    Xem Nhật Ký →
+                  </button>
+                </div>
+                <div v-if="mycayVisitLogs.length === 0" class="text-xs font-mono text-slate-500 italic">
+                  Chưa có nhật ký truy cập nào được ghi nhận.
+                </div>
+                <div v-else class="space-y-1.5">
+                  <div 
+                    v-for="log in mycayVisitLogs.slice(0, 3)" 
+                    :key="log.id"
+                    class="p-2 rounded-xl bg-black/40 border border-slate-800/80 flex items-center justify-between text-xs font-mono"
+                  >
+                    <div class="flex items-center gap-2">
+                      <span class="text-sky-300 font-bold">{{ log.browser || 'Browser' }}</span>
+                      <span class="text-slate-500 text-[11px]">({{ log.device_type || 'Desktop' }})</span>
+                    </div>
+                    <span class="text-slate-400 text-[10px]">
+                      {{ log.created_at ? new Date(log.created_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : '—' }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- ============================================================= -->
+          <!-- SUB-TAB 2: SECURITY LOCKS & BAN MANAGEMENT                    -->
+          <!-- ============================================================= -->
+          <div v-if="mycaySubTab === 'locks'" class="space-y-4">
+            
+            <!-- Filter & Search Controls -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-[#090d1a]/80 border border-slate-800">
+              <div class="flex items-center gap-2 flex-wrap text-xs font-mono">
+                <span class="text-slate-400 font-bold">Lọc:</span>
+                <button 
+                  @click="mycayFilter = 'all'"
+                  :class="mycayFilter === 'all' ? 'bg-orange-500/20 text-orange-300 border-orange-500/40 font-bold' : 'text-slate-400 hover:text-white border-transparent'"
+                  class="px-3 py-1.5 rounded-lg border transition-all"
+                >
+                  Tất Cả ({{ mycayLocks.length }})
+                </button>
+                <button 
+                  @click="mycayFilter = 'permanent'"
+                  :class="mycayFilter === 'permanent' ? 'bg-red-500/20 text-red-300 border-red-500/40 font-bold' : 'text-slate-400 hover:text-white border-transparent'"
+                  class="px-3 py-1.5 rounded-lg border transition-all"
+                >
+                  ⛔ Ban Vĩnh Viễn ({{ mycayPermanentBansCount }})
+                </button>
+                <button 
+                  @click="mycayFilter = 'temporary'"
+                  :class="mycayFilter === 'temporary' ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 font-bold' : 'text-slate-400 hover:text-white border-transparent'"
+                  class="px-3 py-1.5 rounded-lg border transition-all"
+                >
+                  ⏳ Khóa Tạm ({{ mycayTemporaryLocksCount }})
+                </button>
+                <button 
+                  @click="mycayFilter = 'unlocked'"
+                  :class="mycayFilter === 'unlocked' ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 font-bold' : 'text-slate-400 hover:text-white border-transparent'"
+                  class="px-3 py-1.5 rounded-lg border transition-all"
+                >
+                  ✅ Đã Mở / Hết Hạn
+                </button>
+              </div>
+
+              <div class="w-full sm:w-72">
+                <input 
+                  type="text"
+                  v-model="mycaySearch"
+                  placeholder="Tìm mã thiết bị (Device ID)..."
+                  class="w-full px-3.5 py-2 rounded-xl bg-black/60 border border-slate-700 text-xs font-mono text-white placeholder-slate-500 outline-none focus:border-orange-400"
+                />
               </div>
             </div>
+
+            <!-- Security Locks Table -->
+            <div class="border border-slate-800 rounded-3xl overflow-hidden bg-[#090d1a]/80 backdrop-blur-xl">
+              <div v-if="filteredMycayLocks.length === 0" class="p-12 text-center font-mono text-xs text-slate-500 space-y-2">
+                <div class="text-3xl">🛡️</div>
+                <div class="text-slate-400 font-bold">Không có thiết bị nào bị khóa trong danh sách</div>
+                <p class="text-[11px] text-slate-600">Khi người chơi mở DevTools hoặc gian lận trên game Mỳ Cay, mã máy sẽ tự động được ghi nhận tại đây.</p>
+              </div>
+
+              <div v-else class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs font-mono">
+                  <thead>
+                    <tr class="bg-black/60 border-b border-slate-800 text-slate-400 text-[10px] uppercase tracking-wider">
+                      <th class="p-3.5">Mã Thiết Bị (Device ID)</th>
+                      <th class="p-3.5">Trạng Thái Khóa</th>
+                      <th class="p-3.5">Lý Do</th>
+                      <th class="p-3.5 text-center">Số Lần (Strikes)</th>
+                      <th class="p-3.5">Thời Hạn Khóa Đến</th>
+                      <th class="p-3.5">Cập Nhật</th>
+                      <th class="p-3.5 text-right">Thao Tác</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-800/60">
+                    <tr v-for="lock in filteredMycayLocks" :key="lock.device_id" class="hover:bg-slate-800/20 transition-colors">
+                      <td class="p-3.5">
+                        <div class="flex items-center gap-2">
+                          <span class="font-bold text-white break-all">{{ lock.device_id }}</span>
+                          <button 
+                            @click="copy(lock.device_id)"
+                            class="p-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white text-[10px]"
+                            title="Sao chép Device ID"
+                          >
+                            📋
+                          </button>
+                        </div>
+                      </td>
+                      <td class="p-3.5">
+                        <span 
+                          v-if="lock.is_permanent_ban || (lock.locked_until && new Date(lock.locked_until).getFullYear() >= 9000)"
+                          class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-red-500/20 text-red-300 border border-red-500/40"
+                        >
+                          ⛔ BAN VĨNH VIỄN
+                        </span>
+                        <span 
+                          v-else-if="lock.locked_until && new Date(lock.locked_until) > new Date()"
+                          class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40"
+                        >
+                          ⏳ KHÓA TẠM THỜI
+                        </span>
+                        <span 
+                          v-else
+                          class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"
+                        >
+                          ✅ ĐÃ MỞ / HẾT HẠN
+                        </span>
+                      </td>
+                      <td class="p-3.5 text-slate-300">
+                        <span class="px-2 py-0.5 rounded bg-slate-800 text-[11px] text-slate-300">
+                          {{ lock.reason || 'devtools_violation' }}
+                        </span>
+                      </td>
+                      <td class="p-3.5 text-center font-bold">
+                        <span class="text-rose-400">{{ lock.strikes || 1 }}</span>
+                        <span class="text-slate-500 text-[10px]"> (Khóa {{ lock.lock_count || 1 }} lần)</span>
+                      </td>
+                      <td class="p-3.5 text-slate-400 text-[11px]">
+                        <span v-if="lock.is_permanent_ban || (lock.locked_until && new Date(lock.locked_until).getFullYear() >= 9000)" class="text-red-400 font-bold">
+                          Vô thời hạn (Vĩnh Viễn)
+                        </span>
+                        <span v-else-if="lock.locked_until" class="text-amber-300 font-mono">
+                          {{ new Date(lock.locked_until).toLocaleString('vi-VN') }}
+                        </span>
+                        <span v-else class="text-slate-600">—</span>
+                      </td>
+                      <td class="p-3.5 text-slate-500 text-[11px]">
+                        {{ lock.updated_at ? new Date(lock.updated_at).toLocaleString('vi-VN') : '—' }}
+                      </td>
+                      <td class="p-3.5 text-right">
+                        <div class="flex items-center justify-end gap-2">
+                          <button 
+                            v-if="!lock.is_permanent_ban && (!lock.locked_until || new Date(lock.locked_until).getFullYear() < 9000)"
+                            @click="handleBanMycayDevice(lock.device_id)"
+                            class="px-2.5 py-1 rounded-lg border border-red-500/40 bg-red-500/10 hover:bg-red-500/20 text-red-300 text-[11px] font-bold transition-all"
+                            title="Ban vĩnh viễn thiết bị này"
+                          >
+                            Ban Vĩnh Viễn ⛔
+                          </button>
+                          <button 
+                            @click="handleUnlockMycayDevice(lock.device_id)"
+                            class="px-2.5 py-1 rounded-lg border border-emerald-500/40 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 text-[11px] font-bold transition-all"
+                            title="Mở khóa thiết bị (Gỡ ban)"
+                          >
+                            Mở Khóa 🔓
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
           </div>
 
-          <!-- Filter & Search Controls -->
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-[#090d1a]/80 border border-slate-800">
-            <div class="flex items-center gap-2 flex-wrap text-xs font-mono">
-              <span class="text-slate-400 font-bold">Lọc:</span>
-              <button 
-                @click="mycayFilter = 'all'"
-                :class="mycayFilter === 'all' ? 'bg-orange-500/20 text-orange-300 border-orange-500/40 font-bold' : 'text-slate-400 hover:text-white border-transparent'"
-                class="px-3 py-1.5 rounded-lg border transition-all"
-              >
-                Tất Cả ({{ mycayLocks.length }})
-              </button>
-              <button 
-                @click="mycayFilter = 'permanent'"
-                :class="mycayFilter === 'permanent' ? 'bg-red-500/20 text-red-300 border-red-500/40 font-bold' : 'text-slate-400 hover:text-white border-transparent'"
-                class="px-3 py-1.5 rounded-lg border transition-all"
-              >
-                ⛔ Ban Vĩnh Viễn ({{ mycayPermanentBansCount }})
-              </button>
-              <button 
-                @click="mycayFilter = 'temporary'"
-                :class="mycayFilter === 'temporary' ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 font-bold' : 'text-slate-400 hover:text-white border-transparent'"
-                class="px-3 py-1.5 rounded-lg border transition-all"
-              >
-                ⏳ Khóa Tạm ({{ mycayTemporaryLocksCount }})
-              </button>
-              <button 
-                @click="mycayFilter = 'unlocked'"
-                :class="mycayFilter === 'unlocked' ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 font-bold' : 'text-slate-400 hover:text-white border-transparent'"
-                class="px-3 py-1.5 rounded-lg border transition-all"
-              >
-                ✅ Đã Mở / Hết Hạn
-              </button>
+          <!-- ============================================================= -->
+          <!-- SUB-TAB 3: LIVE VISIT LOGS TELEMETRY TABLE                     -->
+          <!-- ============================================================= -->
+          <div v-if="mycaySubTab === 'logs'" class="space-y-4">
+            
+            <div class="p-4 rounded-2xl bg-[#090d1a]/80 border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div>
+                <h3 class="font-display font-black text-white text-sm">
+                  Nhật Ký Phiên Truy Cập Trực Tiếp (Live Visit Logs)
+                </h3>
+                <p class="text-xs font-mono text-slate-400">
+                  Dữ liệu ghi nhận tự động từ bảng <code class="text-sky-300">mycay_visit_logs</code>
+                </p>
+              </div>
+
+              <div class="flex items-center gap-3">
+                <span class="text-xs font-mono text-slate-400">
+                  Hiển thị {{ mycayVisitLogs.length }} phiên gần nhất
+                </span>
+                <button 
+                  v-if="mycayVisitLogs.length > 0"
+                  @click="handleClearAllMycayVisitLogs"
+                  class="px-3 py-1.5 rounded-xl border border-rose-500/40 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 text-xs font-mono font-bold transition-all flex items-center gap-1.5 shadow-sm"
+                  title="Xóa sạch toàn bộ nhật ký truy cập"
+                >
+                  <span>🗑️</span>
+                  <span>Xóa Tất Cả Logs</span>
+                </button>
+              </div>
             </div>
 
-            <div class="w-full sm:w-72">
-              <input 
-                type="text"
-                v-model="mycaySearch"
-                placeholder="Tìm mã thiết bị (Device ID)..."
-                class="w-full px-3.5 py-2 rounded-xl bg-black/60 border border-slate-700 text-xs font-mono text-white placeholder-slate-500 outline-none focus:border-orange-400"
-              />
-            </div>
-          </div>
+            <div class="border border-slate-800 rounded-3xl overflow-hidden bg-[#090d1a]/80 backdrop-blur-xl">
+              <div v-if="mycayVisitLogs.length === 0" class="p-12 text-center font-mono text-xs text-slate-500 space-y-2">
+                <div class="text-3xl">🌐</div>
+                <div class="text-slate-400 font-bold">Chưa có nhật ký truy cập nào trong hệ thống</div>
+              </div>
 
-          <!-- Security Locks Table -->
-          <div class="border border-slate-800 rounded-3xl overflow-hidden bg-[#090d1a]/80 backdrop-blur-xl">
-            <div v-if="filteredMycayLocks.length === 0" class="p-12 text-center font-mono text-xs text-slate-500 space-y-2">
-              <div class="text-3xl">🛡️</div>
-              <div class="text-slate-400 font-bold">Không có thiết bị nào bị khóa trong danh sách</div>
-              <p class="text-[11px] text-slate-600">Khi người chơi mở DevTools hoặc gian lận trên game Mỳ Cay, mã máy sẽ tự động được ghi nhận tại đây.</p>
+              <div v-else class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs font-mono">
+                  <thead>
+                    <tr class="bg-black/60 border-b border-slate-800 text-slate-400 text-[10px] uppercase tracking-wider">
+                      <th class="p-3.5">ID / Thiết Bị</th>
+                      <th class="p-3.5">Địa Lý (Quốc Gia / Thành Phố)</th>
+                      <th class="p-3.5">Loại Thiết Bị & HĐH</th>
+                      <th class="p-3.5">Trình Duyệt</th>
+                      <th class="p-3.5">Độ Phân Giải</th>
+                      <th class="p-3.5">Ngôn Ngữ</th>
+                      <th class="p-3.5">Thời Gian</th>
+                      <th class="p-3.5 text-right">Thao Tác</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-800/60">
+                    <tr v-for="log in mycayVisitLogs" :key="log.id" class="hover:bg-slate-800/20 transition-colors">
+                      <td class="p-3.5">
+                        <div class="flex items-center gap-2">
+                          <span class="text-white font-bold">{{ log.device_id || 'Ẩn danh' }}</span>
+                          <button 
+                            v-if="log.device_id"
+                            @click="copy(log.device_id)"
+                            class="p-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white text-[10px]"
+                            title="Sao chép Device ID"
+                          >
+                            📋
+                          </button>
+                        </div>
+                      </td>
+                      <td class="p-3.5">
+                        <span class="text-emerald-300 font-bold">
+                          {{ log.country_name || log.country || 'Việt Nam' }}
+                        </span>
+                        <span v-if="log.city" class="text-slate-400 text-[11px]"> • {{ log.city }}</span>
+                      </td>
+                      <td class="p-3.5">
+                        <span 
+                          class="px-2 py-0.5 rounded text-[10px] font-bold uppercase"
+                          :class="log.device_type === 'Mobile' ? 'bg-orange-500/20 text-orange-300' : 'bg-cyan-500/20 text-cyan-300'"
+                        >
+                          {{ log.device_type || 'Desktop' }}
+                        </span>
+                        <span class="text-slate-300 ml-1.5">{{ log.os || 'HĐH' }}</span>
+                      </td>
+                      <td class="p-3.5 text-sky-300 font-bold">
+                        {{ log.browser || 'Google Chrome' }}
+                      </td>
+                      <td class="p-3.5 text-slate-400 text-[11px]">
+                        {{ log.screen_resolution || '1920x1080' }}
+                      </td>
+                      <td class="p-3.5 text-slate-400 text-[11px]">
+                        {{ log.language || 'vi-VN' }}
+                      </td>
+                      <td class="p-3.5 text-slate-400 text-[11px]">
+                        {{ log.created_at ? new Date(log.created_at).toLocaleString('vi-VN') : '—' }}
+                      </td>
+                      <td class="p-3.5 text-right">
+                        <button 
+                          @click="handleDeleteMycayVisitLog(log.id)"
+                          class="px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-300 hover:text-rose-100 text-[11px] font-bold transition-all inline-flex items-center gap-1 shadow-sm"
+                          title="Xóa bản ghi nhật ký này"
+                        >
+                          <span>🗑️</span>
+                          <span>Xóa</span>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
 
-            <div v-else class="overflow-x-auto">
-              <table class="w-full text-left border-collapse text-xs font-mono">
-                <thead>
-                  <tr class="bg-black/60 border-b border-slate-800 text-slate-400 text-[10px] uppercase tracking-wider">
-                    <th class="p-3.5">Mã Thiết Bị (Device ID)</th>
-                    <th class="p-3.5">Trạng Thái Khóa</th>
-                    <th class="p-3.5">Lý Do</th>
-                    <th class="p-3.5 text-center">Số Lần (Strikes)</th>
-                    <th class="p-3.5">Thời Hạn Khóa Đến</th>
-                    <th class="p-3.5">Cập Nhật</th>
-                    <th class="p-3.5 text-right">Thao Tác</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-800/60">
-                  <tr v-for="lock in filteredMycayLocks" :key="lock.device_id" class="hover:bg-slate-800/20 transition-colors">
-                    <td class="p-3.5">
-                      <div class="flex items-center gap-2">
-                        <span class="font-bold text-white break-all">{{ lock.device_id }}</span>
-                        <button 
-                          @click="copy(lock.device_id)"
-                          class="p-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white text-[10px]"
-                          title="Sao chép Device ID"
-                        >
-                          📋
-                        </button>
-                      </div>
-                    </td>
-                    <td class="p-3.5">
-                      <span 
-                        v-if="lock.is_permanent_ban || (lock.locked_until && new Date(lock.locked_until).getFullYear() >= 9000)"
-                        class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-red-500/20 text-red-300 border border-red-500/40"
-                      >
-                        ⛔ BAN VĨNH VIỄN
-                      </span>
-                      <span 
-                        v-else-if="lock.locked_until && new Date(lock.locked_until) > new Date()"
-                        class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40"
-                      >
-                        ⏳ KHÓA TẠM THỜI
-                      </span>
-                      <span 
-                        v-else
-                        class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"
-                      >
-                        ✅ ĐÃ MỞ / HẾT HẠN
-                      </span>
-                    </td>
-                    <td class="p-3.5 text-slate-300">
-                      <span class="px-2 py-0.5 rounded bg-slate-800 text-[11px] text-slate-300">
-                        {{ lock.reason || 'devtools_violation' }}
-                      </span>
-                    </td>
-                    <td class="p-3.5 text-center font-bold">
-                      <span class="text-rose-400">{{ lock.strikes || 1 }}</span>
-                      <span class="text-slate-500 text-[10px]"> (Khóa {{ lock.lock_count || 1 }} lần)</span>
-                    </td>
-                    <td class="p-3.5 text-slate-400 text-[11px]">
-                      <span v-if="lock.is_permanent_ban || (lock.locked_until && new Date(lock.locked_until).getFullYear() >= 9000)" class="text-red-400 font-bold">
-                        Vô thời hạn (Vĩnh Viễn)
-                      </span>
-                      <span v-else-if="lock.locked_until" class="text-amber-300 font-mono">
-                        {{ new Date(lock.locked_until).toLocaleString('vi-VN') }}
-                      </span>
-                      <span v-else class="text-slate-600">—</span>
-                    </td>
-                    <td class="p-3.5 text-slate-500 text-[11px]">
-                      {{ lock.updated_at ? new Date(lock.updated_at).toLocaleString('vi-VN') : '—' }}
-                    </td>
-                    <td class="p-3.5 text-right">
-                      <div class="flex items-center justify-end gap-2">
-                        <button 
-                          v-if="!lock.is_permanent_ban && (!lock.locked_until || new Date(lock.locked_until).getFullYear() < 9000)"
-                          @click="handleBanMycayDevice(lock.device_id)"
-                          class="px-2.5 py-1 rounded-lg border border-red-500/40 bg-red-500/10 hover:bg-red-500/20 text-red-300 text-[11px] font-bold transition-all"
-                          title="Ban vĩnh viễn thiết bị này"
-                        >
-                          Ban Vĩnh Viễn ⛔
-                        </button>
-                        <button 
-                          @click="handleUnlockMycayDevice(lock.device_id)"
-                          class="px-2.5 py-1 rounded-lg border border-emerald-500/40 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 text-[11px] font-bold transition-all"
-                          title="Mở khóa thiết bị (Gỡ ban)"
-                        >
-                          Mở Khóa 🔓
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
           </div>
 
         </div>
@@ -1589,7 +1977,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, inject } from 'vue';
+import { ref, computed, onMounted, onUnmounted, inject, nextTick, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { 
   adminListApps, 
@@ -1614,9 +2002,14 @@ import {
   adminGetMycayAnalytics,
   adminListMycaySecurityLocks,
   adminUnlockMycayDevice,
-  adminBanMycayDevicePermanent
+  adminBanMycayDevicePermanent,
+  adminGetMycayAdminStats,
+  adminListMycayVisitLogs,
+  adminDeleteMycayVisitLog,
+  adminClearAllMycayVisitLogs
 } from '../services/supabase.js';
 import { sound } from '../services/sound.js';
+import { loadChartJs } from '../services/chartLoader.js';
 
 const router = useRouter();
 const currentLang = inject('currentLang', ref('vi'));
@@ -1684,6 +2077,10 @@ const filteredTDropLicenses = computed(() => {
 // Game Mỳ Cay Manager State (Security Locks & Views Analytics)
 const mycayAnalytics = ref(null);
 const mycayLocks = ref([]);
+const mycayStats = ref(null);
+const mycayVisitLogs = ref([]);
+const mycaySubTab = ref('overview'); // 'overview', 'locks', 'logs'
+const showMycayCharts = ref(localStorage.getItem('mycay_show_charts') !== 'false');
 const isMycayLoading = ref(false);
 const mycaySearch = ref('');
 const mycayFilter = ref('all'); // 'all', 'permanent', 'temporary', 'unlocked'
@@ -1693,7 +2090,18 @@ const mycayBanForm = ref({
   reason: 'devtools_violation'
 });
 
-const mycayViews = computed(() => Number(mycayAnalytics.value?.total_views) || 0);
+// Canvas refs for Chart.js
+const dailyTrendCanvas = ref(null);
+const devicesCanvas = ref(null);
+const browsersCanvas = ref(null);
+
+let dailyTrendChart = null;
+let devicesChart = null;
+let browsersChart = null;
+
+const mycayViews = computed(() => {
+  return Number(mycayStats.value?.total_views) || Number(mycayAnalytics.value?.total_views) || 0;
+});
 
 const mycayPermanentBansCount = computed(() => {
   return mycayLocks.value.filter(l => 
@@ -1905,18 +2313,198 @@ async function loadDashboardData() {
 async function loadMycayData() {
   isMycayLoading.value = true;
   try {
-    const [analytics, locks] = await Promise.all([
+    const [analytics, locks, stats, visitLogs] = await Promise.all([
       adminGetMycayAnalytics(),
-      adminListMycaySecurityLocks()
+      adminListMycaySecurityLocks(),
+      adminGetMycayAdminStats(),
+      adminListMycayVisitLogs(50)
     ]);
     mycayAnalytics.value = analytics;
     mycayLocks.value = locks || [];
+    mycayStats.value = stats || null;
+    mycayVisitLogs.value = visitLogs || [];
+    if (showMycayCharts.value && mycaySubTab.value === 'overview' && activeTab.value === 'mycay') {
+      nextTick(() => renderMycayCharts());
+    }
   } catch (err) {
     console.error('Failed to load Game Mỳ Cay data:', err);
   } finally {
     isMycayLoading.value = false;
   }
 }
+
+function toggleMycayCharts() {
+  sound.playClick();
+  showMycayCharts.value = !showMycayCharts.value;
+  try {
+    localStorage.setItem('mycay_show_charts', String(showMycayCharts.value));
+  } catch {}
+  if (showMycayCharts.value) {
+    nextTick(() => {
+      renderMycayCharts();
+    });
+  } else {
+    destroyMycayCharts();
+  }
+}
+
+function destroyMycayCharts() {
+  if (dailyTrendChart) {
+    dailyTrendChart.destroy();
+    dailyTrendChart = null;
+  }
+  if (devicesChart) {
+    devicesChart.destroy();
+    devicesChart = null;
+  }
+  if (browsersChart) {
+    browsersChart.destroy();
+    browsersChart = null;
+  }
+}
+
+async function renderMycayCharts() {
+  if (!showMycayCharts.value || mycaySubTab.value !== 'overview' || activeTab.value !== 'mycay') return;
+  try {
+    const Chart = await loadChartJs();
+    if (!Chart) return;
+
+    destroyMycayCharts();
+
+    // 1. Daily Trend Line Chart
+    if (dailyTrendCanvas.value) {
+      const trendData = mycayStats.value?.daily_trend || [];
+      const labels = trendData.length > 0 ? trendData.map(d => d.date) : ['Hôm nay'];
+      const counts = trendData.length > 0 ? trendData.map(d => Number(d.visits) || 0) : [mycayViews.value || 0];
+
+      dailyTrendChart = new Chart(dailyTrendCanvas.value, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Lượt Truy Cập / Chơi',
+            data: counts,
+            borderColor: '#FF5722',
+            backgroundColor: 'rgba(255, 87, 34, 0.15)',
+            borderWidth: 2.5,
+            fill: true,
+            tension: 0.35,
+            pointBackgroundColor: '#FF9800',
+            pointBorderColor: '#fff',
+            pointRadius: 4,
+            pointHoverRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#0f172a',
+              titleColor: '#FF9800',
+              bodyColor: '#fff',
+              borderColor: '#FF5722',
+              borderWidth: 1,
+              padding: 10,
+              displayColors: false
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: { color: '#94a3b8', font: { family: 'monospace', size: 10 } }
+            },
+            y: {
+              beginAtZero: true,
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: { color: '#94a3b8', font: { family: 'monospace', size: 10 }, stepSize: 1 }
+            }
+          }
+        }
+      });
+    }
+
+    // 2. Devices Doughnut Chart
+    if (devicesCanvas.value) {
+      const devices = mycayStats.value?.devices || [];
+      const labels = devices.length > 0 ? devices.map(d => d.label) : ['Mobile', 'Desktop'];
+      const counts = devices.length > 0 ? devices.map(d => Number(d.count) || 0) : [1, 0];
+
+      devicesChart = new Chart(devicesCanvas.value, {
+        type: 'doughnut',
+        data: {
+          labels,
+          datasets: [{
+            data: counts,
+            backgroundColor: ['#FF5722', '#00F5FF', '#A855F7', '#10B981', '#F59E0B'],
+            borderColor: '#0d0707',
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '70%',
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: { color: '#cbd5e1', font: { family: 'monospace', size: 11 }, boxWidth: 12, padding: 12 }
+            }
+          }
+        }
+      });
+    }
+
+    // 3. Browsers Bar Chart
+    if (browsersCanvas.value) {
+      const browsers = mycayStats.value?.browsers || [];
+      const labels = browsers.length > 0 ? browsers.map(b => b.label) : ['Google Chrome'];
+      const counts = browsers.length > 0 ? browsers.map(b => Number(b.count) || 0) : [1];
+
+      browsersChart = new Chart(browsersCanvas.value, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Lượt dùng',
+            data: counts,
+            backgroundColor: ['#3B82F6', '#EC4899', '#10B981', '#F59E0B', '#8B5CF6'],
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: { color: '#94a3b8', font: { family: 'monospace', size: 10 } }
+            },
+            y: {
+              beginAtZero: true,
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: { color: '#94a3b8', font: { family: 'monospace', size: 10 }, stepSize: 1 }
+            }
+          }
+        }
+      });
+    }
+  } catch (e) {
+    console.error('Error rendering MyCay charts:', e);
+  }
+}
+
+watch([mycaySubTab, activeTab], ([newSub, newTab]) => {
+  if (newTab === 'mycay' && newSub === 'overview' && showMycayCharts.value) {
+    nextTick(() => renderMycayCharts());
+  } else {
+    destroyMycayCharts();
+  }
+});
 
 async function handleUnlockMycayDevice(deviceId) {
   if (!confirm(`Bạn có chắc chắn muốn MỞ KHÓA (Unban) cho thiết bị: "${deviceId}" không?`)) return;
@@ -1979,6 +2567,47 @@ async function handleCreateManualMycayBan() {
     }
   } catch (err) {
     alert(`Lỗi: ${err.message}`);
+  } finally {
+    isMycayLoading.value = false;
+  }
+}
+
+async function handleDeleteMycayVisitLog(logId) {
+  if (!confirm(`Bạn có chắc chắn muốn xóa bản ghi nhật ký này (ID: #${logId}) không?`)) return;
+  sound.playClick();
+  isMycayLoading.value = true;
+  try {
+    const res = await adminDeleteMycayVisitLog(logId);
+    if (res?.success) {
+      sound.playSuccess();
+      mycayVisitLogs.value = mycayVisitLogs.value.filter(l => l.id !== logId);
+    } else {
+      alert(`Không thể xóa nhật ký: ${res?.error || 'Lỗi không xác định'}`);
+    }
+  } catch (err) {
+    alert(`Lỗi kết nối khi xóa: ${err.message}`);
+  } finally {
+    isMycayLoading.value = false;
+  }
+}
+
+async function handleClearAllMycayVisitLogs() {
+  if (mycayVisitLogs.value.length === 0) return;
+  if (!confirm(`CẢNH BÁO: Bạn có chắc chắn muốn XÓA TOÀN BỘ ${mycayVisitLogs.value.length} bản ghi nhật ký truy cập không? Dữ liệu đã xóa không thể khôi phục!`)) return;
+  sound.playClick();
+  isMycayLoading.value = true;
+  try {
+    const res = await adminClearAllMycayVisitLogs();
+    if (res?.success) {
+      sound.playSuccess();
+      mycayVisitLogs.value = [];
+      alert('Đã xóa toàn bộ nhật ký truy cập thành công!');
+      await loadMycayData();
+    } else {
+      alert(`Không thể xóa toàn bộ nhật ký: ${res?.error || 'Lỗi không xác định'}`);
+    }
+  } catch (err) {
+    alert(`Lỗi kết nối khi xóa: ${err.message}`);
   } finally {
     isMycayLoading.value = false;
   }
@@ -2294,6 +2923,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
+  destroyMycayCharts();
   window.removeEventListener('storage', syncUser);
   window.removeEventListener('txa-auth-change', syncUser);
 });
