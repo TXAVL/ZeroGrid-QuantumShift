@@ -10,6 +10,7 @@ import DocsView from '../views/DocsView.vue';
 import AdminView from '../views/AdminView.vue';
 import UnlockView from '../views/UnlockView.vue';
 import ZeroGridView from '../views/ZeroGridView.vue';
+import { getCurrentWebUser } from '../services/supabase.js';
 import ShieldBlockView from '../views/ShieldBlockView.vue';
 import TDropView from '../views/TDropView.vue';
 import InstalledView from '../views/InstalledView.vue';
@@ -124,6 +125,21 @@ const router = createRouter({
     }
     return { top: 0, behavior: 'smooth' };
   },
+});
+
+router.beforeEach((to, from, next) => {
+  if (to.path === '/admin') {
+    const user = getCurrentWebUser();
+    if (!user) {
+      // Chưa đăng nhập -> chuyển thẳng sang trang login kèm redirect
+      return next({ path: '/login', query: { redirect: '/admin' } });
+    }
+    if (user.role !== 'admin') {
+      // Đang đăng nhập nhưng không phải role admin -> đưa về trang chủ
+      return next({ path: '/' });
+    }
+  }
+  next();
 });
 
 export default router;

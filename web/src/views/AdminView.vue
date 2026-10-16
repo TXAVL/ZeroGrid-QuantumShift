@@ -50,71 +50,8 @@
           </div>
         </div>
 
-      <!-- =================================================================== -->
-      <!-- AUTHENTICATION GATE (WEBSITE ACCOUNT WITH ROLE: ADMIN)              -->
-      <!-- =================================================================== -->
-      
-      <!-- STATE A: NOT LOGGED IN -->
-      <div v-if="!currentUser" class="max-w-md mx-auto p-6 sm:p-8 rounded-3xl border border-slate-800 bg-[#090d1a]/95 backdrop-blur-xl shadow-2xl text-center space-y-6">
-        <div class="inline-flex p-4 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-3xl">
-          🔐
-        </div>
-        <div class="space-y-2">
-          <span class="px-3 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-widest bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
-            ADMIN ACCESS REQUIRED
-          </span>
-          <h2 class="text-xl font-display font-black text-white">
-            {{ isEn ? 'Master Admin Login Required' : 'Yêu Cầu Đăng Nhập Quản Trị' }}
-          </h2>
-          <p class="text-xs text-slate-300 font-mono leading-relaxed">
-            {{ isEn 
-              ? 'You must sign in with a TXA Studio account that has the "admin" role to access this control terminal.' 
-              : 'Bạn cần đăng nhập bằng tài khoản TXA Studio có vai trò Quản trị viên (role: admin) để truy cập Bảng Điều Khiển này.' }}
-          </p>
-        </div>
-
-        <router-link 
-          to="/login?redirect=/admin"
-          class="block w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-cyan-400 via-sky-500 to-pink-500 text-slate-950 font-display font-black text-xs uppercase tracking-wider shadow-lg shadow-cyan-500/30 hover:scale-[1.02] active:scale-95 transition-all text-center"
-        >
-          {{ isEn ? 'SIGN IN WITH ADMIN ACCOUNT' : 'ĐĂNG NHẬP TÀI KHOẢN ADMIN' }}
-        </router-link>
-      </div>
-
-      <!-- STATE B: LOGGED IN BUT NOT ADMIN -->
-      <div v-else-if="!isAdmin" class="max-w-md mx-auto p-6 sm:p-8 rounded-3xl border border-rose-500/30 bg-[#090d1a]/95 backdrop-blur-xl shadow-2xl text-center space-y-6">
-        <div class="inline-flex p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-3xl">
-          🚫
-        </div>
-        <div class="space-y-2">
-          <span class="px-3 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-widest bg-rose-500/20 text-rose-300 border border-rose-500/30">
-            ACCESS RESTRICTED // 403 FORBIDDEN
-          </span>
-          <h2 class="text-xl font-display font-black text-white">
-            {{ isEn ? 'Insufficient Privileges' : 'Từ Chối Truy Cập' }}
-          </h2>
-          <p class="text-xs text-slate-300 font-mono leading-relaxed">
-            {{ isEn 
-              ? `Your account (${currentUser.email}) has role "${currentUser.role || 'player'}". Only accounts with role "admin" can access the system terminal.` 
-              : `Tài khoản hiện tại (${currentUser.email}) chỉ có vai trò "${currentUser.role || 'player'}". Chỉ tài khoản có vai trò "admin" mới có quyền truy cập bảng điều khiển này.` }}
-          </p>
-        </div>
-
-        <div class="space-y-3 pt-2">
-          <button 
-            @click="switchAdminAccount"
-            class="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-400 text-white font-display font-black text-xs uppercase tracking-wider shadow-lg shadow-pink-500/30 hover:scale-[1.02] active:scale-95 transition-all"
-          >
-            {{ isEn ? 'SWITCH TO ADMIN ACCOUNT' : 'ĐỔI SANG TÀI KHOẢN ADMIN' }}
-          </button>
-          <router-link to="/" class="inline-block text-xs font-mono text-slate-500 hover:text-slate-300 underline">
-            ← {{ isEn ? 'Return to Home Portal' : 'Quay về trang chủ TXA Studio' }}
-          </router-link>
-        </div>
-      </div>
-
-      <!-- STATE C: LOGGED IN AND ROLE === 'admin' -->
-      <div v-else class="space-y-6">
+      <!-- ADMIN TERMINAL CONTENT (Role: admin confirmed) -->
+      <div v-if="isAdmin" class="space-y-6">
         
         <!-- Navigation Tabs -->
         <div class="flex items-center gap-2 border-b border-slate-800 pb-4 overflow-x-auto text-xs font-mono font-bold">
@@ -3008,9 +2945,15 @@ async function copy(text) {
 
 function syncUser() {
   currentUser.value = getCurrentWebUser();
-  if (isAdmin.value) {
-    loadDashboardData();
+  if (!currentUser.value) {
+    router.replace({ path: '/login', query: { redirect: '/admin' } });
+    return;
   }
+  if (currentUser.value.role !== 'admin') {
+    router.replace('/');
+    return;
+  }
+  loadDashboardData();
 }
 
 onMounted(() => {
