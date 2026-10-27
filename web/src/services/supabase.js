@@ -373,7 +373,30 @@ export function setCurrentWebUser(user) {
   }
 }
 
+const SESSION_TOKEN_KEY = 'txa_session_token';
+
+export function getSessionToken() {
+  try {
+    return localStorage.getItem(SESSION_TOKEN_KEY) || '';
+  } catch {
+    return '';
+  }
+}
+
+function setSessionToken(token) {
+  try {
+    if (token) localStorage.setItem(SESSION_TOKEN_KEY, token);
+    else localStorage.removeItem(SESSION_TOKEN_KEY);
+  } catch {}
+}
+
 export function clearCurrentWebUser() {
+  // Thu hồi token phía server (best-effort), rồi xoá phía client
+  const token = getSessionToken();
+  setSessionToken('');
+  if (token) {
+    callRpc('txa_web_logout', { p_token: token }).catch(() => {});
+  }
   localStorage.removeItem('txa_web_session');
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new Event('txa-auth-change'));
@@ -426,6 +449,7 @@ export async function webLogin(email, password) {
     p_password: password
   });
   if (res?.success && res?.user) {
+    setSessionToken(res.session_token || '');
     setCurrentWebUser(res.user);
   }
   return res;
@@ -749,27 +773,59 @@ export async function adminListFeedbacks(limit = 50, offset = 0) {
 // T-DROP CLIPBOARD & AI OCR DESKTOP - ADMIN MANAGEMENT MODULE
 // =========================================================================
 
+// Các hàm admin T-Drop nhận session token (qua tham số p_pin) của tài khoản role = 'admin'.
+// Token sai/hết hạn -> server trả { ok:false, message: '...PIN...' } hoặc lỗi 42501.
+export class AdminSessionExpiredError extends Error {
+  constructor() {
+    super('Phiên đăng nhập admin đã hết hạn hoặc không có quyền. Vui lòng đăng nhập lại.');
+    this.name = 'AdminSessionExpiredError';
+  }
+}
+
+async function callTDropAdminRpc(fnName, params = {}) {
+  const token = getSessionToken();
+  if (!token) {
+    clearCurrentWebUser();
+    throw new AdminSessionExpiredError();
+  }
+  let res;
+  try {
+    res = await callRpc(fnName, { p_pin: token, ...params });
+  } catch (err) {
+    if (err?.status === 403 || err?.status === 401 || /42501|permission denied/i.test(err?.rawMessage || err?.message || '')) {
+      clearCurrentWebUser();
+      throw new AdminSessionExpiredError();
+    }
+    throw err;
+  }
+  if (res && res.ok === false && /PIN/.test(res.message || '')) {
+    clearCurrentWebUser();
+    throw new AdminSessionExpiredError();
+  }
+  return res;
+}
+
 export async function adminListTDropOrders(status = 'all') {
-  return await callRpc('admin_list_orders', {
+  return await callTDropAdminRpc('admin_list_orders', {
     p_status: status === 'all' ? '' : status
   });
 }
 
 export async function adminApproveTDropOrder(orderCode) {
-  return await callRpc('admin_approve_order', {
+  return await callTDropAdminRpc('admin_approve_order', {
     p_order_code: String(orderCode).trim()
   });
 }
 
 export async function adminListTDropLicenses(search = '', role = 'all') {
-  return await callRpc('admin_list_licenses', {
+  return await callTDropAdminRpc('admin_list_licenses', {
     p_search: String(search || '').trim(),
     p_role: role === 'all' ? '' : role
   });
 }
 
 export async function adminCreateTDropLicense(hardwareId, role = 'VIP', deviceName = '') {
-  return await callRpc('admin_create_tdrop_license', {
+  return await callTDropAdminRpc('admin_create_tdrop_license', {
     p_hardware_id: String(hardwareId).trim(),
     p_role: role || 'VIP',
     p_device_name: deviceName ? String(deviceName).trim() : 'Desktop App'
@@ -777,7 +833,7 @@ export async function adminCreateTDropLicense(hardwareId, role = 'VIP', deviceNa
 }
 
 export async function adminRevokeTDropLicense(targetKey) {
-  return await callRpc('admin_revoke_license', {
+  return await callTDropAdminRpc('admin_revoke_license', {
     p_target_key: String(targetKey).trim()
   });
 }

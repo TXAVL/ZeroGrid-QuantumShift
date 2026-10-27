@@ -637,6 +637,15 @@
                   <button @click="copy(order.transfer_content)" class="text-slate-400 hover:text-slate-200 text-[10px] shrink-0">Copy ND</button>
                 </div>
 
+                <!-- Payment info -->
+                <div v-if="order.renew_key || order.paid_amount || order.payment_ref" class="flex items-center gap-2 flex-wrap text-[11px] font-mono">
+                  <span v-if="order.renew_key" class="px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/40">↻ Gia hạn: {{ order.renew_key }}</span>
+                  <span v-if="order.paid_amount" class="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/30">Đã thu: {{ Number(order.paid_amount).toLocaleString('vi-VN') }} đ</span>
+                  <span v-if="order.payment_ref" class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+                    {{ String(order.payment_ref).startsWith('sepay:') ? '🤖 Tự duyệt (SePay)' : order.payment_ref === 'manual' ? '👤 Admin duyệt' : order.payment_ref }}
+                  </span>
+                </div>
+
                 <!-- License Key Generated Card (If Approved) -->
                 <div v-if="order.license_key" class="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-mono">
                   <div class="flex items-center gap-2 flex-wrap">
@@ -649,9 +658,12 @@
                     <button @click="copy(order.license_key)" class="px-3 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 font-bold text-[11px] transition-all">
                       Sao Chép Key
                     </button>
+                    <span v-if="order.emailed_at" class="px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 font-bold text-[11px]" :title="new Date(order.emailed_at).toLocaleString('vi-VN')">
+                      ✓ Đã gửi tự động
+                    </span>
                     <button @click="openMailtoClient(order)" class="px-3 py-1 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 font-bold text-[11px] transition-all flex items-center gap-1">
                       <span>📧</span>
-                      <span>Gửi Lại Email</span>
+                      <span>{{ order.emailed_at ? 'Gửi Lại Email' : 'Gửi Email (mailto)' }}</span>
                     </button>
                   </div>
                 </div>
@@ -2669,6 +2681,7 @@ async function loadTDropData() {
       tdropLicenses.value = licensesRes.licenses || [];
     }
   } catch (err) {
+    if (err?.name === 'AdminSessionExpiredError') return; // syncUser sẽ chuyển về trang đăng nhập
     console.error('Failed to load T-Drop data:', err);
   } finally {
     isTDropLoading.value = false;
@@ -2702,6 +2715,7 @@ async function handleApproveTDropOrder(order) {
       alert('Không thể duyệt đơn: ' + (res?.message || 'Lỗi không xác định'));
     }
   } catch (err) {
+    if (err?.name === 'AdminSessionExpiredError') return;
     alert('Lỗi duyệt đơn: ' + err.message);
   } finally {
     isTDropLoading.value = false;
@@ -2788,6 +2802,7 @@ async function handleRevokeTDropLicense(license) {
       alert('Không thể thu hồi: ' + (res?.message || 'Lỗi'));
     }
   } catch (err) {
+    if (err?.name === 'AdminSessionExpiredError') return;
     alert('Lỗi thu hồi key: ' + err.message);
   } finally {
     isTDropLoading.value = false;
@@ -2823,6 +2838,7 @@ async function handleCreateManualLicense() {
       alert('Không thể tạo key: ' + (res?.message || 'Lỗi'));
     }
   } catch (err) {
+    if (err?.name === 'AdminSessionExpiredError') return;
     alert('Lỗi tạo key: ' + err.message);
   } finally {
     isTDropLoading.value = false;
